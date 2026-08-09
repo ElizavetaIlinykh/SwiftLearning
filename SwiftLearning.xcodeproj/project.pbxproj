@@ -14,7 +14,6 @@
 		D786B0133028904500CBE45A /* Exceptions for "SwiftLearning" folder in "SwiftLearning" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Models/Lesson.swift,
 				Screens/MainTabView.swift,
 			);
 			target = D786AFEC30288D1000CBE45A /* SwiftLearning */;
