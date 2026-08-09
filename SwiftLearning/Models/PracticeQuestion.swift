@@ -1,6 +1,6 @@
 import Foundation
 
-struct PracticeQuestion: Identifiable, Hashable {
+struct PracticeQuestion: Identifiable, Hashable, Codable {
     let id: String
     let question: String
     let code: String?

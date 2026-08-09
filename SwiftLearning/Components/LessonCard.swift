@@ -6,15 +6,26 @@ enum LessonState {
     case locked
 }
 
-struct LessonCard: View {
-    let lesson: Lesson
+struct LessonCardViewModel: Identifiable, Hashable {
+    let id: String
+    let title: String
+    let description: String
+    let order: Int
     let state: LessonState
+
+    var actionTitle: String {
+        order == 1 ? "Start" : "Continue"
+    }
+}
+
+struct LessonCard: View {
+    let viewModel: LessonCardViewModel
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             HStack(spacing: 16) {
-                Text(String(format: "%02d", lesson.id))
+                Text(String(format: "%02d", viewModel.order))
                     .font(.headline)
                     .fontWeight(.bold)
                     .foregroundStyle(numberColor)
@@ -23,11 +34,11 @@ struct LessonCard: View {
                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
 
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(lesson.title)
+                    Text(viewModel.title)
                         .font(.headline)
                         .foregroundStyle(titleColor)
 
-                    Text(lesson.duration)
+                    Text(viewModel.description)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
@@ -41,24 +52,24 @@ struct LessonCard: View {
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .stroke(borderColor, lineWidth: state == .current ? 1.5 : 1)
+                    .stroke(borderColor, lineWidth: viewModel.state == .current ? 1.5 : 1)
             )
-            .opacity(state == .locked ? 0.62 : 1)
+            .opacity(viewModel.state == .locked ? 0.62 : 1)
         }
         .buttonStyle(.plain)
-        .disabled(state == .locked)
+        .disabled(viewModel.state == .locked)
     }
 
     @ViewBuilder
     private var stateView: some View {
-        switch state {
+        switch viewModel.state {
         case .completed:
             Image(systemName: "checkmark.circle.fill")
                 .font(.title3)
                 .foregroundStyle(.green)
         case .current:
             HStack(spacing: 6) {
-                Text(lesson.id == 1 ? "Start" : "Continue")
+                Text(viewModel.actionTitle)
                     .font(.caption)
                     .fontWeight(.semibold)
                 Image(systemName: "chevron.right")
@@ -74,7 +85,7 @@ struct LessonCard: View {
     }
 
     private var cardBackground: Color {
-        switch state {
+        switch viewModel.state {
         case .completed:
             return Color.green.opacity(0.08)
         case .current:
@@ -85,7 +96,7 @@ struct LessonCard: View {
     }
 
     private var borderColor: Color {
-        switch state {
+        switch viewModel.state {
         case .completed:
             return Color.green.opacity(0.22)
         case .current:
@@ -96,23 +107,47 @@ struct LessonCard: View {
     }
 
     private var numberColor: Color {
-        state == .locked ? .secondary : .accentColor
+        viewModel.state == .locked ? .secondary : .accentColor
     }
 
     private var titleColor: Color {
-        state == .locked ? .secondary : .primary
+        viewModel.state == .locked ? .secondary : .primary
     }
 
     private var numberBackground: Color {
-        state == .locked ? Color.secondary.opacity(0.10) : Color.accentColor.opacity(0.13)
+        viewModel.state == .locked ? Color.secondary.opacity(0.10) : Color.accentColor.opacity(0.13)
     }
 }
 
 #Preview {
     VStack(spacing: 12) {
-        LessonCard(lesson: LessonData.lessons[0], state: .current) {}
-        LessonCard(lesson: LessonData.lessons[1], state: .locked) {}
-        LessonCard(lesson: LessonData.lessons[2], state: .completed) {}
+        LessonCard(
+            viewModel: LessonCardViewModel(
+                id: "1",
+                title: "Variables",
+                description: "Basics",
+                order: 1,
+                state: .current
+            )
+        ) {}
+        LessonCard(
+            viewModel: LessonCardViewModel(
+                id: "2",
+                title: "Conditions",
+                description: "Control flow",
+                order: 2,
+                state: .locked
+            )
+        ) {}
+        LessonCard(
+            viewModel: LessonCardViewModel(
+                id: "3",
+                title: "Functions",
+                description: "Reusable code",
+                order: 3,
+                state: .completed
+            )
+        ) {}
     }
     .padding()
 }

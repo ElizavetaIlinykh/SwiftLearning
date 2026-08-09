@@ -14,25 +14,8 @@
 		D786B0133028904500CBE45A /* Exceptions for "SwiftLearning" folder in "SwiftLearning" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Components/AchievementCard.swift,
-				Components/AnswerOptionView.swift,
-				Components/CodeBlockView.swift,
-				Components/LessonCard.swift,
-				Components/PracticeCategoryCard.swift,
-				Components/PrimaryButton.swift,
-				Components/ProgressCard.swift,
-				Components/StatCard.swift,
-				Data/LessonData.swift,
 				Models/Lesson.swift,
-				Screens/Learn/CodeChallengeView.swift,
-				Screens/Learn/LearnView.swift,
-				Screens/Learn/LessonCompletedView.swift,
-				Screens/Learn/LessonView.swift,
-				Screens/Learn/QuizView.swift,
 				Screens/MainTabView.swift,
-				Screens/Practice/PracticeView.swift,
-				Screens/Profile/ProfileView.swift,
-				Stores/LearningProgressStore.swift,
 			);
 			target = D786AFEC30288D1000CBE45A /* SwiftLearning */;
 		};

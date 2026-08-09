@@ -1,6 +1,6 @@
 import Foundation
 
-struct PracticeCategory: Identifiable, Hashable {
+struct PracticeCategory: Identifiable, Hashable, Codable {
     let id: String
     let title: String
     let description: String

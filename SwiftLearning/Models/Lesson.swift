@@ -1,6 +1,6 @@
 import Foundation
 
-struct Lesson: Identifiable, Hashable {
+struct Lesson: Identifiable, Hashable, Codable {
     let id: Int
     let title: String
     let duration: String
@@ -12,14 +12,14 @@ struct Lesson: Identifiable, Hashable {
     let challenge: CodeChallenge
 }
 
-struct QuizQuestion: Hashable {
+struct QuizQuestion: Hashable, Codable {
     let question: String
     let answers: [String]
     let correctAnswerIndex: Int
     let explanation: String
 }
 
-struct CodeChallenge: Hashable {
+struct CodeChallenge: Hashable, Codable {
     let title: String
     let description: String
     let codeTemplate: String

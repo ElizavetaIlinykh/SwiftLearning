@@ -4,7 +4,19 @@ struct ProgressCard: View {
     let courseTitle: String
     let completedLessonsCount: Int
     let totalLessonsCount: Int
-    let action: () -> Void
+    let action: (() -> Void)?
+
+    init(
+        courseTitle: String,
+        completedLessonsCount: Int,
+        totalLessonsCount: Int,
+        action: (() -> Void)? = nil
+    ) {
+        self.courseTitle = courseTitle
+        self.completedLessonsCount = completedLessonsCount
+        self.totalLessonsCount = totalLessonsCount
+        self.action = action
+    }
 
     private var progress: Double {
         guard totalLessonsCount > 0 else { return 0 }
@@ -48,7 +60,7 @@ struct ProgressCard: View {
                 .frame(height: 54)
                 .background(Color.green.opacity(0.12))
                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-            } else {
+            } else if let action {
                 PrimaryButton(title: buttonTitle, action: action)
             }
         }
