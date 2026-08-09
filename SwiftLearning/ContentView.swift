@@ -2,15 +2,27 @@ import SwiftUI
 import Combine
 
 struct ContentView: View {
+    private let dependencies: AppDependencies
+
+    init(dependencies: AppDependencies = AppDependencies()) {
+        self.dependencies = dependencies
+    }
+
     var body: some View {
-        MainTabView()
+        MainTabView(dependencies: dependencies)
     }
 }
 
 struct MainTabView: View {
+    private let dependencies: AppDependencies
+
+    init(dependencies: AppDependencies) {
+        self.dependencies = dependencies
+    }
+
     var body: some View {
         TabView {
-            LearnView()
+            LearnModuleAssembler.assemble(dependencies: dependencies)
                 .tabItem {
                     Label("Learn", systemImage: "book.fill")
                 }
@@ -29,6 +41,6 @@ struct MainTabView: View {
 }
 
 #Preview {
-    ContentView()
+    ContentView(dependencies: AppDependencies())
         .environmentObject(LearningProgressStore())
 }

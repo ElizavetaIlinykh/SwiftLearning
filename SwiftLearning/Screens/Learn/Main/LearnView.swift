@@ -3,11 +3,6 @@ import SwiftUI
 struct LearnView: View {
     @StateObject private var viewModel: LearnViewModel
 
-    @MainActor
-    init() {
-        _viewModel = StateObject(wrappedValue: LearnViewModel())
-    }
-
     init(viewModel: LearnViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
@@ -140,5 +135,5 @@ struct LearnView: View {
 }
 
 #Preview {
-    LearnView()
+    LearnModuleAssembler.assemble(dependencies: AppDependencies())
 }

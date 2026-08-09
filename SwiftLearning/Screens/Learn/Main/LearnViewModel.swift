@@ -33,11 +33,6 @@ final class LearnViewModel: ObservableObject {
         lessons.filter { $0.status == .completed }.count
     }
 
-    init() {
-        self.lessonsManager = LessonsManager()
-        bindLessonsManagerUpdates()
-    }
-
     init(lessonsManager: LessonsManager) {
         self.lessonsManager = lessonsManager
         bindLessonsManagerUpdates()

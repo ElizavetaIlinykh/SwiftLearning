@@ -1,9 +1,15 @@
 import SwiftUI
 
 struct MainTabView: View {
+    private let dependencies: AppDependencies
+
+    init(dependencies: AppDependencies) {
+        self.dependencies = dependencies
+    }
+
     var body: some View {
         TabView {
-            LearnView()
+            LearnModuleAssembler.assemble(dependencies: dependencies)
                 .tabItem {
                     Label("Learn", systemImage: "book.fill")
                 }
@@ -22,6 +28,6 @@ struct MainTabView: View {
 }
 
 #Preview {
-    MainTabView()
+    MainTabView(dependencies: AppDependencies())
         .environmentObject(LearningProgressStore())
 }
