@@ -8,7 +8,8 @@ protocol NetworkManaging {
 
     func post<Body: Encodable, Response: Decodable>(
         _ path: String,
-        body: Body
+        body: Body,
+        queryItems: [URLQueryItem]
     ) async throws -> Response
 
     func put<Body: Encodable, Response: Decodable>(
@@ -22,6 +23,13 @@ protocol NetworkManaging {
 extension NetworkManaging {
     func get<Response: Decodable>(_ path: String) async throws -> Response {
         try await get(path, queryItems: [])
+    }
+
+    func post<Body: Encodable, Response: Decodable>(
+        _ path: String,
+        body: Body
+    ) async throws -> Response {
+        try await post(path, body: body, queryItems: [])
     }
 }
 
@@ -73,9 +81,10 @@ final class NetworkManager: NetworkManaging {
 
     func post<Body: Encodable, Response: Decodable>(
         _ path: String,
-        body: Body
+        body: Body,
+        queryItems: [URLQueryItem] = []
     ) async throws -> Response {
-        var request = try makeRequest(path: path, method: .post)
+        var request = try makeRequest(path: path, method: .post, queryItems: queryItems)
         request.httpBody = try encoder.encode(body)
         return try await send(request)
     }

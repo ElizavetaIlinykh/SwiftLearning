@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct LessonView: View {
+    @Environment(AppRouter.self) private var router
     @StateObject private var viewModel: LessonViewModel
 
     init(viewModel: LessonViewModel) {
@@ -70,6 +71,10 @@ struct LessonView: View {
                     .foregroundStyle(.secondary)
 
                 CodeBlockView(code: lesson.codeExample)
+            }
+
+            PrimaryButton(title: "Continue") {
+                router.push(.quiz(lessonID: lesson.id))
             }
         }
     }
@@ -144,5 +149,6 @@ struct LessonView: View {
             totalLessonsCount: 1,
             dependencies: AppDependenciesAssembler.assemble()
         )
+        .environment(AppRouter())
     }
 }

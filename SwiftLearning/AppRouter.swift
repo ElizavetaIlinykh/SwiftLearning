@@ -84,7 +84,8 @@ enum AppTab: Hashable {
 enum LessonsRoute: Hashable {
     case lesson(id: String, totalLessonsCount: Int)
     case quiz(lessonID: String)
-    case result(score: Int)
+    case codeTask(lessonID: String)
+    case result(lessonID: String)
 }
 
 enum PracticeRoute: Hashable {

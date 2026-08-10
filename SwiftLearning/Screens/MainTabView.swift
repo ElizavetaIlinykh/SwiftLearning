@@ -75,10 +75,15 @@ struct MainTabView: View {
                 totalLessonsCount: totalLessonsCount,
                 dependencies: dependencies
             )
-        case .quiz:
-            RoutePlaceholderView(title: "Quiz")
-        case .result(let score):
-            RoutePlaceholderView(title: "Result: \(score)")
+        case .quiz(let lessonID):
+            LessonQuizRouteView(lessonID: lessonID)
+        case .codeTask(let lessonID):
+            LessonCodeTaskAssembler.assemble(
+                lessonID: lessonID,
+                dependencies: dependencies
+            )
+        case .result(let lessonID):
+            LessonCompletionResultView(lessonID: lessonID)
         }
     }
 

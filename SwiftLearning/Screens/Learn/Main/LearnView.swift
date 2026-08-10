@@ -19,8 +19,10 @@ struct LearnView: View {
         }
         .background(Color(.systemGroupedBackground))
         .navigationBarTitleDisplayMode(.inline)
-        .task {
-            await viewModel.loadLessons()
+        .onAppear {
+            Task {
+                await viewModel.loadLessons()
+            }
         }
         .refreshable {
             await viewModel.loadLessons()

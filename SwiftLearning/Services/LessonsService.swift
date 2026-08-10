@@ -1,8 +1,11 @@
 import Foundation
 
+private struct EmptyRequestBody: Encodable {}
+
 protocol LessonsServicing {
     func fetchLessons() async throws -> [LessonSummary]
     func fetchLesson(id: String) async throws -> LessonDetails
+    func completeLesson(id: String) async throws -> LessonProgress
 }
 
 final class LessonsService: LessonsServicing {
@@ -23,5 +26,13 @@ final class LessonsService: LessonsServicing {
 
     func fetchLesson(id: String) async throws -> LessonDetails {
         try await networkManager.get("/lessons/\(id)")
+    }
+
+    func completeLesson(id: String) async throws -> LessonProgress {
+        try await networkManager.post(
+            "/lessons/\(id)/complete",
+            body: EmptyRequestBody(),
+            queryItems: [URLQueryItem(name: "user_id", value: userID)]
+        )
     }
 }
