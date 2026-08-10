@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct LearnView: View {
+    @Environment(AppRouter.self) private var router
     @StateObject private var viewModel: LearnViewModel
 
     init(viewModel: LearnViewModel) {
@@ -8,23 +9,21 @@ struct LearnView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 20) {
-                    header
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 20) {
+                header
 
-                    content
-                }
-                .padding(20)
+                content
             }
-            .background(Color(.systemGroupedBackground))
-            .navigationBarTitleDisplayMode(.inline)
-            .task {
-                await viewModel.loadLessons()
-            }
-            .refreshable {
-                await viewModel.loadLessons()
-            }
+            .padding(20)
+        }
+        .background(Color(.systemGroupedBackground))
+        .navigationBarTitleDisplayMode(.inline)
+        .task {
+            await viewModel.loadLessons()
+        }
+        .refreshable {
+            await viewModel.loadLessons()
         }
     }
 
@@ -72,7 +71,14 @@ struct LearnView: View {
                     .fontWeight(.bold)
 
                 ForEach(viewModel.lessonCards) { lessonCard in
-                    LessonCard(viewModel: lessonCard) {}
+                    LessonCard(viewModel: lessonCard) {
+                        router.push(
+                            .lesson(
+                                id: lessonCard.id,
+                                totalLessonsCount: viewModel.lessons.count
+                            )
+                        )
+                    }
                 }
             }
         }
@@ -136,4 +142,5 @@ struct LearnView: View {
 
 #Preview {
     LearnModuleAssembler.assemble(dependencies: AppDependenciesAssembler.assemble())
+        .environment(AppRouter())
 }

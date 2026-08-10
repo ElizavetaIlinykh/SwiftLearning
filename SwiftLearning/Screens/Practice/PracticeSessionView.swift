@@ -1,14 +1,14 @@
 import SwiftUI
 
 struct PracticeSessionView: View {
+    @Environment(AppRouter.self) private var router
+
     let category: PracticeCategory
-    let onDone: () -> Void
 
     @State private var currentQuestionIndex = 0
     @State private var selectedAnswerIndex: Int?
     @State private var isAnswered = false
     @State private var correctAnswersCount = 0
-    @State private var showResult = false
 
     private var question: PracticeQuestion {
         category.questions[currentQuestionIndex]
@@ -69,15 +69,6 @@ struct PracticeSessionView: View {
         .navigationTitle(category.title)
         .navigationBarTitleDisplayMode(.inline)
         .animation(.easeInOut(duration: 0.2), value: currentQuestionIndex)
-        .navigationDestination(isPresented: $showResult) {
-            PracticeResultView(
-                category: category,
-                correctAnswersCount: correctAnswersCount,
-                totalQuestions: category.questions.count,
-                onPracticeAgain: restart,
-                onDone: onDone
-            )
-        }
     }
 
     private var questionProgress: some View {
@@ -155,25 +146,24 @@ struct PracticeSessionView: View {
 
     private func advance() {
         if isLastQuestion {
-            showResult = true
+            router.push(
+                .result(
+                    categoryID: category.id,
+                    correctAnswersCount: correctAnswersCount,
+                    totalQuestions: category.questions.count
+                )
+            )
         } else {
             currentQuestionIndex += 1
             selectedAnswerIndex = nil
             isAnswered = false
         }
     }
-
-    private func restart() {
-        currentQuestionIndex = 0
-        selectedAnswerIndex = nil
-        isAnswered = false
-        correctAnswersCount = 0
-        showResult = false
-    }
 }
 
 #Preview {
     NavigationStack {
-        PracticeSessionView(category: PracticeData.categories[0]) {}
+        PracticeSessionView(category: PracticeData.categories[0])
+            .environment(AppRouter())
     }
 }

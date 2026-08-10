@@ -1,36 +1,29 @@
 import SwiftUI
 
 struct PracticeView: View {
-    @State private var navigationPath: [PracticeCategory] = []
+    @Environment(AppRouter.self) private var router
 
     private let categories = PracticeData.categories
 
     var body: some View {
-        NavigationStack(path: $navigationPath) {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    header
-                    infoCard
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                header
+                infoCard
 
-                    VStack(spacing: 14) {
-                        ForEach(categories) { category in
-                            PracticeCategoryCard(category: category) {
-                                navigationPath.append(category)
-                            }
+                VStack(spacing: 14) {
+                    ForEach(categories) { category in
+                        PracticeCategoryCard(category: category) {
+                            router.push(.exercise(id: category.id, attemptID: UUID()))
                         }
                     }
                 }
-                .padding(20)
             }
-            .background(Color(.systemGroupedBackground))
-            .navigationTitle("Practice")
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationDestination(for: PracticeCategory.self) { category in
-                PracticeSessionView(category: category) {
-                    navigationPath.removeAll()
-                }
-            }
+            .padding(20)
         }
+        .background(Color(.systemGroupedBackground))
+        .navigationTitle("Practice")
+        .navigationBarTitleDisplayMode(.inline)
     }
 
     private var header: some View {
@@ -76,5 +69,8 @@ struct PracticeView: View {
 }
 
 #Preview {
-    PracticeView()
+    NavigationStack {
+        PracticeView()
+            .environment(AppRouter())
+    }
 }

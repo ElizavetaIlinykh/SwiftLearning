@@ -47,28 +47,26 @@ struct ProfileView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 28) {
-                    profileHeader
-                    progressSection
-                    statisticsSection
-                    achievementsSection
-                    demoSection
-                }
-                .padding(20)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 28) {
+                profileHeader
+                progressSection
+                statisticsSection
+                achievementsSection
+                demoSection
             }
-            .background(Color(.systemGroupedBackground))
-            .navigationTitle("Profile")
-            .navigationBarTitleDisplayMode(.inline)
-            .alert("Reset progress?", isPresented: $isShowingResetAlert) {
-                Button("Cancel", role: .cancel) {}
-                Button("Reset", role: .destructive) {
-                    progressStore.resetProgress()
-                }
-            } message: {
-                Text("All lesson progress, XP and quiz statistics will be removed.")
+            .padding(20)
+        }
+        .background(Color(.systemGroupedBackground))
+        .navigationTitle("Profile")
+        .navigationBarTitleDisplayMode(.inline)
+        .alert("Reset progress?", isPresented: $isShowingResetAlert) {
+            Button("Cancel", role: .cancel) {}
+            Button("Reset", role: .destructive) {
+                progressStore.resetProgress()
             }
+        } message: {
+            Text("All lesson progress, XP and quiz statistics will be removed.")
         }
     }
 

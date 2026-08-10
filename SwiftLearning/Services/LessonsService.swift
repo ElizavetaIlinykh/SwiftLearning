@@ -2,6 +2,7 @@ import Foundation
 
 protocol LessonsServicing {
     func fetchLessons() async throws -> [LessonSummary]
+    func fetchLesson(id: String) async throws -> LessonDetails
 }
 
 final class LessonsService: LessonsServicing {
@@ -18,5 +19,9 @@ final class LessonsService: LessonsServicing {
 
     func fetchLessons() async throws -> [LessonSummary] {
         try await networkManager.get("/users/\(userID)/lessons")
+    }
+
+    func fetchLesson(id: String) async throws -> LessonDetails {
+        try await networkManager.get("/lessons/\(id)")
     }
 }

@@ -1,6 +1,10 @@
 import Foundation
 
 enum PracticeData {
+    static func category(id: String) -> PracticeCategory? {
+        categories.first { $0.id == id }
+    }
+
     static let categories: [PracticeCategory] = [
         PracticeCategory(
             id: "variables",
