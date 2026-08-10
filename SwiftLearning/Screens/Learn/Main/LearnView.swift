@@ -135,5 +135,5 @@ struct LearnView: View {
 }
 
 #Preview {
-    LearnModuleAssembler.assemble(dependencies: AppDependencies())
+    LearnModuleAssembler.assemble(dependencies: AppDependenciesAssembler.assemble())
 }

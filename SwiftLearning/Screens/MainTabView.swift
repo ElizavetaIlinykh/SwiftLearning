@@ -28,6 +28,6 @@ struct MainTabView: View {
 }
 
 #Preview {
-    MainTabView(dependencies: AppDependencies())
+    MainTabView(dependencies: AppDependenciesAssembler.assemble())
         .environmentObject(LearningProgressStore())
 }

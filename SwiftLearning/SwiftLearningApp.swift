@@ -3,7 +3,7 @@ import SwiftUI
 @main
 struct SwiftLearningApp: App {
     @StateObject private var progressStore = LearningProgressStore()
-    @State private var dependencies = AppDependencies()
+    @State private var dependencies = AppDependenciesAssembler.assemble()
 
     var body: some Scene {
         WindowGroup {

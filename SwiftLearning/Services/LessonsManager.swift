@@ -14,10 +14,6 @@ final class LessonsManager: ObservableObject {
 
     private let lessonsService: LessonsServicing
 
-    convenience init() {
-        self.init(lessonsService: LessonsService())
-    }
-
     init(lessonsService: LessonsServicing) {
         self.lessonsService = lessonsService
     }

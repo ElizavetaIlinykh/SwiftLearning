@@ -10,22 +10,9 @@
 		D786AFED30288D1000CBE45A /* SwiftLearning.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftLearning.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		D786B0133028904500CBE45A /* Exceptions for "SwiftLearning" folder in "SwiftLearning" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Screens/MainTabView.swift,
-			);
-			target = D786AFEC30288D1000CBE45A /* SwiftLearning */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		D786AFEF30288D1000CBE45A /* SwiftLearning */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				D786B0133028904500CBE45A /* Exceptions for "SwiftLearning" folder in "SwiftLearning" target */,
-			);
 			path = SwiftLearning;
 			sourceTree = "<group>";
 		};
