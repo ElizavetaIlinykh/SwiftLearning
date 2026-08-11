@@ -6,14 +6,20 @@ enum LessonCodeTaskAssembler {
         lessonID: String,
         dependencies: AppDependencies
     ) -> LessonCodeTaskView {
-        let viewModel = LessonCompletionViewModel(
+        let codeTaskManager = LessonCodeTaskManager(
             lessonID: lessonID,
             lessonsService: dependencies.services.lessonsService
         )
-
-        return LessonCodeTaskView(
+        let completionViewModel = LessonCompletionViewModel(
             lessonID: lessonID,
-            viewModel: viewModel
+            lessonsService: dependencies.services.lessonsService
         )
+        let viewModel = LessonCodeTaskViewModel(
+            lessonID: lessonID,
+            codeTaskManager: codeTaskManager,
+            completionViewModel: completionViewModel
+        )
+
+        return LessonCodeTaskView(viewModel: viewModel)
     }
 }

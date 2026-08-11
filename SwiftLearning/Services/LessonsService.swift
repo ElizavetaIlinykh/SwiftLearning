@@ -2,10 +2,22 @@ import Foundation
 
 private struct EmptyRequestBody: Encodable {}
 
+enum LessonCodeTaskError: LocalizedError {
+    case notFound
+
+    var errorDescription: String? {
+        switch self {
+        case .notFound:
+            return "No code task is available for this lesson."
+        }
+    }
+}
+
 protocol LessonsServicing {
     func fetchLessons() async throws -> [LessonSummary]
     func fetchLesson(id: String) async throws -> LessonDetails
     func fetchLessonQuestions(lessonID: String) async throws -> [LessonQuizQuestion]
+    func fetchLessonCodeTask(lessonID: String) async throws -> LessonCodeTask
     func completeLesson(id: String) async throws -> LessonProgress
 }
 
@@ -31,6 +43,14 @@ final class LessonsService: LessonsServicing {
 
     func fetchLessonQuestions(lessonID: String) async throws -> [LessonQuizQuestion] {
         try await networkManager.get("/lessons/\(lessonID)/questions")
+    }
+
+    func fetchLessonCodeTask(lessonID: String) async throws -> LessonCodeTask {
+        do {
+            return try await networkManager.get("/lessons/\(lessonID)/code-task")
+        } catch NetworkManager.NetworkError.serverError(let statusCode, _) where statusCode == 404 {
+            throw LessonCodeTaskError.notFound
+        }
     }
 
     func completeLesson(id: String) async throws -> LessonProgress {
