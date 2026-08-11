@@ -5,6 +5,7 @@ private struct EmptyRequestBody: Encodable {}
 protocol LessonsServicing {
     func fetchLessons() async throws -> [LessonSummary]
     func fetchLesson(id: String) async throws -> LessonDetails
+    func fetchLessonQuestions(lessonID: String) async throws -> [LessonQuizQuestion]
     func completeLesson(id: String) async throws -> LessonProgress
 }
 
@@ -26,6 +27,10 @@ final class LessonsService: LessonsServicing {
 
     func fetchLesson(id: String) async throws -> LessonDetails {
         try await networkManager.get("/lessons/\(id)")
+    }
+
+    func fetchLessonQuestions(lessonID: String) async throws -> [LessonQuizQuestion] {
+        try await networkManager.get("/lessons/\(lessonID)/questions")
     }
 
     func completeLesson(id: String) async throws -> LessonProgress {

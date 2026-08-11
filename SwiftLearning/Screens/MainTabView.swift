@@ -76,7 +76,10 @@ struct MainTabView: View {
                 dependencies: dependencies
             )
         case .quiz(let lessonID):
-            LessonQuizRouteView(lessonID: lessonID)
+            LessonQuizModuleAssembler.assemble(
+                lessonID: lessonID,
+                dependencies: dependencies
+            )
         case .codeTask(let lessonID):
             LessonCodeTaskAssembler.assemble(
                 lessonID: lessonID,
