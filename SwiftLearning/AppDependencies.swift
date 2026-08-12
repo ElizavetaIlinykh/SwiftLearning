@@ -13,12 +13,18 @@ final class AppDependencies {
 
 final class AppServices {
     let lessonsService: LessonsServicing
+    let userService: UserServicing
 
     init(networkManager: NetworkManaging) {
         self.lessonsService = LessonsService(networkManager: networkManager)
+        self.userService = UserService(networkManager: networkManager)
     }
 
-    init(lessonsService: LessonsServicing) {
+    init(
+        lessonsService: LessonsServicing,
+        userService: UserServicing
+    ) {
         self.lessonsService = lessonsService
+        self.userService = userService
     }
 }

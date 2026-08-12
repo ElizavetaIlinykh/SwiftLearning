@@ -59,7 +59,7 @@ struct MainTabView: View {
         @Bindable var router = router
 
         return NavigationStack(path: $router.profilePath) {
-            ProfileView()
+            ProfileModuleAssembler.assemble(dependencies: dependencies)
                 .navigationDestination(for: ProfileRoute.self) { route in
                     profileDestination(for: route)
                 }

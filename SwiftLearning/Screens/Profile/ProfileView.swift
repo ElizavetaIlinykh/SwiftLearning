@@ -1,87 +1,65 @@
 import SwiftUI
 
 struct ProfileView: View {
-    @EnvironmentObject private var progressStore: LearningProgressStore
-    @State private var isShowingResetAlert = false
+    @StateObject private var viewModel: ProfileViewModel
 
-    private let totalLessonsCount = LessonData.lessons.count
     private let statisticColumns = [
         GridItem(.flexible(), spacing: 12),
         GridItem(.flexible(), spacing: 12),
         GridItem(.flexible(), spacing: 12)
     ]
 
-    private var achievements: [Achievement] {
-        let completedCount = progressStore.completedLessonsCount
-
-        return [
-            Achievement(
-                id: "first-step",
-                title: "First Step",
-                description: "Complete your first lesson",
-                systemImage: "figure.walk",
-                isUnlocked: completedCount >= 1
-            ),
-            Achievement(
-                id: "swift-beginner",
-                title: "Swift Beginner",
-                description: "Complete 3 lessons",
-                systemImage: "chevron.left.forwardslash.chevron.right",
-                isUnlocked: completedCount >= 3
-            ),
-            Achievement(
-                id: "halfway-there",
-                title: "Halfway There",
-                description: "Complete 4 lessons",
-                systemImage: "flag.fill",
-                isUnlocked: completedCount >= 4
-            ),
-            Achievement(
-                id: "swift-explorer",
-                title: "Swift Explorer",
-                description: "Complete all lessons",
-                systemImage: "trophy.fill",
-                isUnlocked: completedCount == totalLessonsCount
-            )
-        ]
+    init(viewModel: ProfileViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
     }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 28) {
-                profileHeader
-                progressSection
-                statisticsSection
-                achievementsSection
-                demoSection
+                content
             }
             .padding(20)
         }
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Profile")
         .navigationBarTitleDisplayMode(.inline)
-        .alert("Reset progress?", isPresented: $isShowingResetAlert) {
-            Button("Cancel", role: .cancel) {}
-            Button("Reset", role: .destructive) {
-                progressStore.resetProgress()
+        .onAppear {
+            Task {
+                await viewModel.loadProfile()
             }
-        } message: {
-            Text("All lesson progress, XP and quiz statistics will be removed.")
+        }
+        .refreshable {
+            await viewModel.loadProfile()
         }
     }
 
-    private var profileHeader: some View {
+    @ViewBuilder
+    private var content: some View {
+        switch viewModel.state {
+        case .idle, .loading:
+            loadingView
+        case .failed(let message):
+            errorView(message: message)
+        case .loaded(let user, let statistics):
+            profileHeader(user: user)
+            progressSection(statistics: statistics)
+            statisticsSection(statistics: statistics)
+            achievementsSection(statistics: statistics)
+        }
+    }
+
+    private func profileHeader(user: UserProfile) -> some View {
         VStack(spacing: 12) {
             Image(systemName: "person.crop.circle.fill")
                 .font(.system(size: 92, weight: .regular))
                 .foregroundStyle(Color.accentColor)
 
             VStack(spacing: 5) {
-                Text("Swift Learner")
+                Text(user.name)
                     .font(.title2)
                     .fontWeight(.bold)
 
-                Text("Learning Swift one step at a time")
+                Text(user.email)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -91,7 +69,7 @@ struct ProfileView: View {
         .padding(.top, 8)
     }
 
-    private var progressSection: some View {
+    private func progressSection(statistics: UserStatistics) -> some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Your Progress")
                 .font(.title2)
@@ -99,21 +77,21 @@ struct ProfileView: View {
 
             VStack(alignment: .leading, spacing: 14) {
                 HStack(alignment: .firstTextBaseline) {
-                    Text("\(progressStore.completedLessonsCount) of \(totalLessonsCount) lessons completed")
+                    Text("\(statistics.completedLessonsCount) of \(statistics.totalLessonsCount) lessons completed")
                         .font(.headline)
 
                     Spacer()
 
-                    Text("\(progressStore.courseProgressPercentage)%")
+                    Text("\(statistics.progressPercent)%")
                         .font(.headline)
                         .fontWeight(.bold)
                         .foregroundStyle(Color.accentColor)
                 }
 
-                ProgressView(value: progressStore.courseProgress)
+                ProgressView(value: progressValue(for: statistics))
                     .tint(.accentColor)
 
-                if progressStore.completedLessonsCount == totalLessonsCount {
+                if isCourseCompleted(statistics) {
                     courseCompletedCard
                 }
             }
@@ -149,57 +127,114 @@ struct ProfileView: View {
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
-    private var statisticsSection: some View {
+    private func statisticsSection(statistics: UserStatistics) -> some View {
         VStack(alignment: .leading, spacing: 14) {
             Text("Statistics")
                 .font(.title2)
                 .fontWeight(.bold)
 
             LazyVGrid(columns: statisticColumns, spacing: 12) {
-                StatCard(title: "XP", value: "\(progressStore.xp)", systemImage: "bolt.fill")
-                StatCard(title: "Lessons", value: "\(progressStore.completedLessonsCount) / \(totalLessonsCount)", systemImage: "book.fill")
-                StatCard(title: "Accuracy", value: "\(progressStore.accuracy)%", systemImage: "target")
+                StatCard(title: "Level", value: "\(statistics.currentLevel)", systemImage: "bolt.fill")
+                StatCard(title: "Lessons", value: "\(statistics.completedLessonsCount) / \(statistics.totalLessonsCount)", systemImage: "book.fill")
+                StatCard(title: "Progress", value: "\(statistics.progressPercent)%", systemImage: "target")
             }
         }
     }
 
-    private var achievementsSection: some View {
+    private func achievementsSection(statistics: UserStatistics) -> some View {
         VStack(alignment: .leading, spacing: 14) {
             Text("Achievements")
                 .font(.title2)
                 .fontWeight(.bold)
 
             VStack(spacing: 12) {
-                ForEach(achievements) { achievement in
+                ForEach(achievements(for: statistics)) { achievement in
                     AchievementCard(achievement: achievement)
                 }
             }
         }
     }
 
-    private var demoSection: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text("Demo")
-                .font(.title2)
-                .fontWeight(.bold)
-
-            Button(role: .destructive) {
-                isShowingResetAlert = true
-            } label: {
-                HStack {
-                    Image(systemName: "arrow.counterclockwise")
-                    Text("Reset Progress")
-                }
+    private var loadingView: some View {
+        VStack(spacing: 14) {
+            ProgressView()
+            Text("Loading profile")
                 .font(.headline)
-                .frame(maxWidth: .infinity)
-                .frame(height: 52)
-            }
-            .buttonStyle(.bordered)
+                .foregroundStyle(.secondary)
         }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 48)
+    }
+
+    private func errorView(message: String) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Could not load profile")
+                .font(.headline)
+
+            Text(message)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            PrimaryButton(title: "Try Again") {
+                Task {
+                    await viewModel.loadProfile()
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(20)
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+        )
+    }
+
+    private func achievements(for statistics: UserStatistics) -> [Achievement] {
+        let completedCount = statistics.completedLessonsCount
+
+        return [
+            Achievement(
+                id: "first-step",
+                title: "First Step",
+                description: "Complete your first lesson",
+                systemImage: "figure.walk",
+                isUnlocked: completedCount >= 1
+            ),
+            Achievement(
+                id: "swift-beginner",
+                title: "Swift Beginner",
+                description: "Complete 3 lessons",
+                systemImage: "chevron.left.forwardslash.chevron.right",
+                isUnlocked: completedCount >= 3
+            ),
+            Achievement(
+                id: "halfway-there",
+                title: "Halfway There",
+                description: "Complete 4 lessons",
+                systemImage: "flag.fill",
+                isUnlocked: completedCount >= 4
+            ),
+            Achievement(
+                id: "swift-explorer",
+                title: "Swift Explorer",
+                description: "Complete all lessons",
+                systemImage: "trophy.fill",
+                isUnlocked: isCourseCompleted(statistics)
+            )
+        ]
+    }
+
+    private func progressValue(for statistics: UserStatistics) -> Double {
+        Double(statistics.progressPercent) / 100
+    }
+
+    private func isCourseCompleted(_ statistics: UserStatistics) -> Bool {
+        statistics.totalLessonsCount > 0 && statistics.completedLessonsCount == statistics.totalLessonsCount
     }
 }
 
 #Preview {
-    ProfileView()
-        .environmentObject(LearningProgressStore())
+    ProfileModuleAssembler.assemble(dependencies: AppDependenciesAssembler.assemble())
 }
