@@ -2,98 +2,120 @@ import SwiftUI
 
 struct PracticeSessionView: View {
     @Environment(AppRouter.self) private var router
+    @StateObject private var viewModel: PracticeSessionViewModel
 
-    let category: PracticeCategory
-
-    @State private var currentQuestionIndex = 0
+    @State private var currentTaskIndex = 0
     @State private var selectedAnswerIndex: Int?
     @State private var isAnswered = false
     @State private var correctAnswersCount = 0
 
-    private var question: PracticeQuestion {
-        category.questions[currentQuestionIndex]
-    }
-
-    private var isLastQuestion: Bool {
-        currentQuestionIndex == category.questions.count - 1
-    }
-
-    private var progress: Double {
-        Double(currentQuestionIndex + 1) / Double(category.questions.count)
-    }
-
-    private var isCorrect: Bool {
-        selectedAnswerIndex == question.correctAnswerIndex
+    init(viewModel: PracticeSessionViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
     }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
-                questionProgress
-
-                VStack(alignment: .leading, spacing: 14) {
-                    Text(question.question)
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .multilineTextAlignment(.leading)
-
-                    if let code = question.code {
-                        CodeBlockView(code: code)
-                    }
-                }
-
-                VStack(spacing: 12) {
-                    ForEach(question.answers.indices, id: \.self) { index in
-                        AnswerOptionView(
-                            title: question.answers[index],
-                            state: optionState(for: index)
-                        ) {
-                            selectAnswer(index)
-                        }
-                        .disabled(isAnswered)
-                    }
-                }
-
-                if isAnswered {
-                    feedbackView
-
-                    PrimaryButton(
-                        title: isLastQuestion ? "See Results" : "Next Question",
-                        action: advance
-                    )
-                }
+                content
             }
             .padding(20)
         }
         .background(Color(.systemGroupedBackground))
-        .navigationTitle(category.title)
+        .navigationTitle(viewModel.topicTitle)
         .navigationBarTitleDisplayMode(.inline)
-        .animation(.easeInOut(duration: 0.2), value: currentQuestionIndex)
+        .animation(.easeInOut(duration: 0.2), value: currentTaskIndex)
+        .task {
+            await viewModel.loadTasks()
+        }
+        .refreshable {
+            await viewModel.loadTasks()
+        }
     }
 
-    private var questionProgress: some View {
+    @ViewBuilder
+    private var content: some View {
+        switch viewModel.state {
+        case .idle, .loading:
+            loadingView
+        case .failed(let message):
+            errorView(message: message)
+        case .loaded:
+            if viewModel.tasks.isEmpty {
+                emptyView
+            } else {
+                taskContent(viewModel.tasks)
+            }
+        }
+    }
+
+    private func taskContent(_ tasks: [PracticeTask]) -> some View {
+        let task = tasks[currentTaskIndex]
+        let answers = task.answers.sorted { $0.order < $1.order }
+
+        return VStack(alignment: .leading, spacing: 22) {
+            taskProgress(totalTasks: tasks.count)
+
+            VStack(alignment: .leading, spacing: 14) {
+                Text(task.question)
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .multilineTextAlignment(.leading)
+
+                if let code = task.code {
+                    CodeBlockView(code: code)
+                }
+            }
+
+            VStack(spacing: 12) {
+                ForEach(answers.indices, id: \.self) { index in
+                    AnswerOptionView(
+                        title: answers[index].text,
+                        state: optionState(for: index, in: answers)
+                    ) {
+                        selectAnswer(index, in: answers)
+                    }
+                    .disabled(isAnswered)
+                }
+            }
+
+            if isAnswered {
+                feedbackView(answers)
+
+                PrimaryButton(
+                    title: isLastTask(totalTasks: tasks.count) ? "See Results" : "Next Question",
+                    action: {
+                        advance(totalTasks: tasks.count)
+                    }
+                )
+            }
+        }
+    }
+
+    private func taskProgress(totalTasks: Int) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("Question \(currentQuestionIndex + 1) of \(category.questions.count)")
+                Text("Question \(currentTaskIndex + 1) of \(totalTasks)")
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .foregroundStyle(.secondary)
 
                 Spacer()
 
-                Text(category.title)
+                Text(viewModel.topicTitle)
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .foregroundStyle(Color.accentColor)
             }
 
-            ProgressView(value: progress)
+            ProgressView(value: Double(currentTaskIndex + 1) / Double(totalTasks))
                 .tint(.accentColor)
         }
     }
 
-    private var feedbackView: some View {
-        VStack(alignment: .leading, spacing: 10) {
+    private func feedbackView(_ answers: [PracticeAnswer]) -> some View {
+        let isCorrect = selectedAnswerIndex.map { answers[$0].isCorrect } ?? false
+
+        return VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 8) {
                 Image(systemName: isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
                     .foregroundStyle(isCorrect ? .green : .red)
@@ -102,12 +124,6 @@ struct PracticeSessionView: View {
                     .font(.headline)
                     .foregroundStyle(isCorrect ? .green : .red)
             }
-
-            Text(question.explanation)
-                .font(.body)
-                .foregroundStyle(.secondary)
-                .lineSpacing(5)
-                .multilineTextAlignment(.leading)
         }
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -115,10 +131,76 @@ struct PracticeSessionView: View {
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 
-    private func optionState(for index: Int) -> AnswerOptionState {
+    private var loadingView: some View {
+        VStack(spacing: 14) {
+            ProgressView()
+            Text("Loading tasks")
+                .font(.headline)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 48)
+    }
+
+    private func errorView(message: String) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Could not load tasks")
+                .font(.headline)
+
+            Text(message)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            PrimaryButton(title: "Try Again") {
+                Task {
+                    await viewModel.loadTasks()
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(20)
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+        )
+    }
+
+    private var emptyView: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("No tasks yet")
+                .font(.headline)
+
+            Text("Tasks will appear here when the server returns them.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            Button("Done") {
+                router.popPracticeToRoot()
+            }
+            .font(.headline)
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity)
+            .frame(height: 48)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(20)
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+        )
+    }
+
+    private func optionState(
+        for index: Int,
+        in answers: [PracticeAnswer]
+    ) -> AnswerOptionState {
         guard let selectedAnswerIndex else { return .neutral }
 
-        if index == selectedAnswerIndex && index == question.correctAnswerIndex {
+        if index == selectedAnswerIndex && answers[index].isCorrect {
             return .selectedCorrect
         }
 
@@ -126,44 +208,56 @@ struct PracticeSessionView: View {
             return .selectedIncorrect
         }
 
-        if index == question.correctAnswerIndex {
+        if answers[index].isCorrect {
             return .correct
         }
 
         return .neutral
     }
 
-    private func selectAnswer(_ index: Int) {
+    private func selectAnswer(
+        _ index: Int,
+        in answers: [PracticeAnswer]
+    ) {
         guard !isAnswered else { return }
 
         selectedAnswerIndex = index
         isAnswered = true
 
-        if index == question.correctAnswerIndex {
+        if answers[index].isCorrect {
             correctAnswersCount += 1
         }
     }
 
-    private func advance() {
-        if isLastQuestion {
+    private func advance(totalTasks: Int) {
+        if isLastTask(totalTasks: totalTasks) {
             router.push(
                 .result(
-                    categoryID: category.id,
+                    topicID: viewModel.topicID,
+                    topicTitle: viewModel.topicTitle,
                     correctAnswersCount: correctAnswersCount,
-                    totalQuestions: category.questions.count
+                    totalQuestions: totalTasks
                 )
             )
         } else {
-            currentQuestionIndex += 1
+            currentTaskIndex += 1
             selectedAnswerIndex = nil
             isAnswered = false
         }
+    }
+
+    private func isLastTask(totalTasks: Int) -> Bool {
+        currentTaskIndex == totalTasks - 1
     }
 }
 
 #Preview {
     NavigationStack {
-        PracticeSessionView(category: PracticeData.categories[0])
-            .environment(AppRouter())
+        PracticeModuleAssembler.assembleSession(
+            topicID: "topic-uuid",
+            topicTitle: "Variables and Constants",
+            dependencies: AppDependenciesAssembler.assemble()
+        )
+        .environment(AppRouter())
     }
 }

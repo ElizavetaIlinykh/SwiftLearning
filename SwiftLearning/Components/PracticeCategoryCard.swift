@@ -24,7 +24,7 @@ struct PracticeCategoryCard: View {
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.leading)
 
-                    Text("\(category.questions.count) questions")
+                    Text("\(category.tasksCount) tasks")
                         .font(.caption)
                         .fontWeight(.semibold)
                         .foregroundStyle(Color.accentColor)
@@ -50,7 +50,15 @@ struct PracticeCategoryCard: View {
 }
 
 #Preview {
-    PracticeCategoryCard(category: PracticeData.categories[0]) {}
-        .padding()
-        .background(Color(.systemGroupedBackground))
+    PracticeCategoryCard(
+        category: PracticeCategory(
+            id: "topic-uuid",
+            title: "Variables and Constants",
+            description: "Practice variables and constants",
+            order: 1,
+            tasksCount: 3
+        )
+    ) {}
+    .padding()
+    .background(Color(.systemGroupedBackground))
 }

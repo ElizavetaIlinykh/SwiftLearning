@@ -1,9 +1,13 @@
 import Foundation
 
-struct PracticeCategory: Identifiable, Hashable, Codable {
+struct PracticeCategory: Identifiable, Hashable, Decodable {
     let id: String
     let title: String
     let description: String
-    let systemImage: String
-    let questions: [PracticeQuestion]
+    let order: Int
+    let tasksCount: Int
+
+    var systemImage: String {
+        "chevron.left.forwardslash.chevron.right"
+    }
 }

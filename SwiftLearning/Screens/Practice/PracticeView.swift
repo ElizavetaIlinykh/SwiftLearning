@@ -2,28 +2,58 @@ import SwiftUI
 
 struct PracticeView: View {
     @Environment(AppRouter.self) private var router
+    @StateObject private var viewModel: PracticeViewModel
 
-    private let categories = PracticeData.categories
+    init(viewModel: PracticeViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 header
                 infoCard
-
-                VStack(spacing: 14) {
-                    ForEach(categories) { category in
-                        PracticeCategoryCard(category: category) {
-                            router.push(.exercise(id: category.id, attemptID: UUID()))
-                        }
-                    }
-                }
+                content
             }
             .padding(20)
         }
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Practice")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            Task {
+                await viewModel.loadTopics()
+            }
+        }
+        .refreshable {
+            await viewModel.loadTopics()
+        }
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        switch viewModel.state {
+        case .idle, .loading:
+            loadingView
+        case .failed(let message):
+            errorView(message: message)
+        case .loaded:
+            if viewModel.topics.isEmpty {
+                emptyView
+            } else {
+                topicsList
+            }
+        }
+    }
+
+    private var topicsList: some View {
+        VStack(spacing: 14) {
+            ForEach(viewModel.topics) { topic in
+                PracticeCategoryCard(category: topic) {
+                    router.push(.exercise(id: topic.id, title: topic.title, attemptID: UUID()))
+                }
+            }
+        }
     }
 
     private var header: some View {
@@ -53,7 +83,7 @@ struct PracticeView: View {
             Text("Quick Practice")
                 .font(.headline)
 
-            Text("Answer 5 questions and check your Swift knowledge.")
+            Text("Answer questions and check your Swift knowledge.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
@@ -66,11 +96,66 @@ struct PracticeView: View {
                 .stroke(Color.primary.opacity(0.06), lineWidth: 1)
         )
     }
+
+    private var loadingView: some View {
+        VStack(spacing: 14) {
+            ProgressView()
+            Text("Loading practice topics")
+                .font(.headline)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 48)
+    }
+
+    private func errorView(message: String) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Could not load practice topics")
+                .font(.headline)
+
+            Text(message)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            PrimaryButton(title: "Try Again") {
+                Task {
+                    await viewModel.loadTopics()
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(20)
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+        )
+    }
+
+    private var emptyView: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("No practice topics yet")
+                .font(.headline)
+
+            Text("Topics will appear here when the server returns them.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(20)
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+        )
+    }
 }
 
 #Preview {
     NavigationStack {
-        PracticeView()
+        PracticeModuleAssembler.assemble(dependencies: AppDependenciesAssembler.assemble())
             .environment(AppRouter())
     }
 }

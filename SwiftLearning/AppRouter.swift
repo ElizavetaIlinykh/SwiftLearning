@@ -70,8 +70,8 @@ final class AppRouter {
         profilePath.removeAll()
     }
 
-    func restartPractice(categoryID: String) {
-        practicePath = [.exercise(id: categoryID, attemptID: UUID())]
+    func restartPractice(topicID: String, topicTitle: String) {
+        practicePath = [.exercise(id: topicID, title: topicTitle, attemptID: UUID())]
     }
 }
 
@@ -89,9 +89,9 @@ enum LessonsRoute: Hashable {
 }
 
 enum PracticeRoute: Hashable {
-    case topic(id: String)
-    case exercise(id: String, attemptID: UUID)
-    case result(categoryID: String, correctAnswersCount: Int, totalQuestions: Int)
+    case topic(id: String, title: String)
+    case exercise(id: String, title: String, attemptID: UUID)
+    case result(topicID: String, topicTitle: String, correctAnswersCount: Int, totalQuestions: Int)
 }
 
 enum ProfileRoute: Hashable {

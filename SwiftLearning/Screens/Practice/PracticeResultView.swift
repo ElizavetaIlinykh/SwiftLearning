@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct PracticeResultView: View {
-    let category: PracticeCategory
+    let topicTitle: String
     let correctAnswersCount: Int
     let totalQuestions: Int
     let onPracticeAgain: () -> Void
@@ -39,7 +39,7 @@ struct PracticeResultView: View {
                     .fontWeight(.bold)
                     .multilineTextAlignment(.center)
 
-                Text(category.title)
+                Text(topicTitle)
                     .font(.headline)
                     .foregroundStyle(.secondary)
             }
@@ -87,7 +87,7 @@ struct PracticeResultView: View {
 
 #Preview {
     PracticeResultView(
-        category: PracticeData.categories[0],
+        topicTitle: "Variables and Constants",
         correctAnswersCount: 4,
         totalQuestions: 5
     ) {} onDone: {}

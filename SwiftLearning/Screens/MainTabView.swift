@@ -48,7 +48,7 @@ struct MainTabView: View {
         @Bindable var router = router
 
         return NavigationStack(path: $router.practicePath) {
-            PracticeView()
+            PracticeModuleAssembler.assemble(dependencies: dependencies)
                 .navigationDestination(for: PracticeRoute.self) { route in
                     practiceDestination(for: route)
                 }
@@ -93,28 +93,24 @@ struct MainTabView: View {
     @ViewBuilder
     private func practiceDestination(for route: PracticeRoute) -> some View {
         switch route {
-        case .topic(let id), .exercise(let id, _):
-            if let category = PracticeData.category(id: id) {
-                PracticeSessionView(category: category)
-            } else {
-                RoutePlaceholderView(title: "Practice")
-            }
-        case .result(let categoryID, let correctAnswersCount, let totalQuestions):
-            if let category = PracticeData.category(id: categoryID) {
-                PracticeResultView(
-                    category: category,
-                    correctAnswersCount: correctAnswersCount,
-                    totalQuestions: totalQuestions,
-                    onPracticeAgain: {
-                        router.restartPractice(categoryID: categoryID)
-                    },
-                    onDone: {
-                        router.popPracticeToRoot()
-                    }
-                )
-            } else {
-                RoutePlaceholderView(title: "Practice Result")
-            }
+        case .topic(let id, let title), .exercise(let id, let title, _):
+            PracticeModuleAssembler.assembleSession(
+                topicID: id,
+                topicTitle: title,
+                dependencies: dependencies
+            )
+        case .result(let topicID, let topicTitle, let correctAnswersCount, let totalQuestions):
+            PracticeResultView(
+                topicTitle: topicTitle,
+                correctAnswersCount: correctAnswersCount,
+                totalQuestions: totalQuestions,
+                onPracticeAgain: {
+                    router.restartPractice(topicID: topicID, topicTitle: topicTitle)
+                },
+                onDone: {
+                    router.popPracticeToRoot()
+                }
+            )
         }
     }
 
