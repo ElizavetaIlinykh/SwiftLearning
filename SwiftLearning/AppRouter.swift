@@ -91,7 +91,7 @@ enum LessonsRoute: Hashable {
 enum PracticeRoute: Hashable {
     case topic(id: String, title: String)
     case exercise(id: String, title: String, attemptID: UUID)
-    case result(topicID: String, topicTitle: String, correctAnswersCount: Int, totalQuestions: Int)
+    case result(topicID: String, topicTitle: String, progress: PracticeProgress)
 }
 
 enum ProfileRoute: Hashable {

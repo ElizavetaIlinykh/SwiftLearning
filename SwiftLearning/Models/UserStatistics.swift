@@ -5,4 +5,5 @@ struct UserStatistics: Decodable, Hashable {
     let totalLessonsCount: Int
     let progressPercent: Int
     let currentLevel: Int
+    let completedPracticeTopicsCount: Int
 }

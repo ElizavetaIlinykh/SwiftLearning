@@ -2,23 +2,17 @@ import SwiftUI
 
 struct PracticeResultView: View {
     let topicTitle: String
-    let correctAnswersCount: Int
-    let totalQuestions: Int
+    let progress: PracticeProgress
     let onPracticeAgain: () -> Void
     let onDone: () -> Void
 
-    private var percentage: Int {
-        guard totalQuestions > 0 else { return 0 }
-        return Int((Double(correctAnswersCount) / Double(totalQuestions)) * 100)
-    }
-
     private var resultMessage: String {
-        switch correctAnswersCount {
-        case totalQuestions:
+        switch progress.scorePercent {
+        case 100:
             return "Perfect!"
-        case totalQuestions - 1:
+        case 80...99:
             return "Great work!"
-        case 3:
+        case 60...79:
             return "Good progress!"
         default:
             return "Keep practicing!"
@@ -29,9 +23,9 @@ struct PracticeResultView: View {
         VStack(spacing: 26) {
             Spacer()
 
-            Image(systemName: correctAnswersCount >= 3 ? "checkmark.circle.fill" : "arrow.clockwise.circle.fill")
+            Image(systemName: progress.scorePercent >= 60 ? "checkmark.circle.fill" : "arrow.clockwise.circle.fill")
                 .font(.system(size: 74, weight: .semibold))
-                .foregroundStyle(correctAnswersCount >= 3 ? .green : Color.accentColor)
+                .foregroundStyle(progress.scorePercent >= 60 ? .green : Color.accentColor)
 
             VStack(spacing: 10) {
                 Text("Practice Complete")
@@ -45,10 +39,10 @@ struct PracticeResultView: View {
             }
 
             VStack(spacing: 8) {
-                Text("\(correctAnswersCount) / \(totalQuestions)")
+                Text("\(progress.correctAnswersCount) / \(progress.totalAnswersCount)")
                     .font(.system(size: 54, weight: .bold, design: .rounded))
 
-                Text("\(percentage)% correct")
+                Text("\(progress.scorePercent)% correct")
                     .font(.headline)
                     .foregroundStyle(.secondary)
 
@@ -88,7 +82,12 @@ struct PracticeResultView: View {
 #Preview {
     PracticeResultView(
         topicTitle: "Variables and Constants",
-        correctAnswersCount: 4,
-        totalQuestions: 5
+        progress: PracticeProgress(
+            topicId: "topic-uuid",
+            correctAnswersCount: 4,
+            totalAnswersCount: 5,
+            scorePercent: 80,
+            completedAt: Date()
+        )
     ) {} onDone: {}
 }

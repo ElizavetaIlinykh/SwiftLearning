@@ -8,6 +8,7 @@ struct PracticeSessionView: View {
     @State private var selectedAnswerIndex: Int?
     @State private var isAnswered = false
     @State private var correctAnswersCount = 0
+    @State private var totalAnswersCount = 0
 
     init(viewModel: PracticeSessionViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -80,13 +81,15 @@ struct PracticeSessionView: View {
 
             if isAnswered {
                 feedbackView(answers)
+                completionErrorView
 
                 PrimaryButton(
-                    title: isLastTask(totalTasks: tasks.count) ? "See Results" : "Next Question",
+                    title: actionButtonTitle(totalTasks: tasks.count),
                     action: {
                         advance(totalTasks: tasks.count)
                     }
                 )
+                .disabled(isSavingResult)
             }
         }
     }
@@ -129,6 +132,16 @@ struct PracticeSessionView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+    }
+
+    @ViewBuilder
+    private var completionErrorView: some View {
+        if case .failed(let message) = viewModel.completionState {
+            Text(message)
+                .font(.subheadline)
+                .foregroundStyle(.red)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
     }
 
     private var loadingView: some View {
@@ -223,6 +236,7 @@ struct PracticeSessionView: View {
 
         selectedAnswerIndex = index
         isAnswered = true
+        totalAnswersCount += 1
 
         if answers[index].isCorrect {
             correctAnswersCount += 1
@@ -231,19 +245,44 @@ struct PracticeSessionView: View {
 
     private func advance(totalTasks: Int) {
         if isLastTask(totalTasks: totalTasks) {
-            router.push(
-                .result(
-                    topicID: viewModel.topicID,
-                    topicTitle: viewModel.topicTitle,
-                    correctAnswersCount: correctAnswersCount,
-                    totalQuestions: totalTasks
-                )
-            )
+            Task {
+                await saveResult()
+            }
         } else {
             currentTaskIndex += 1
             selectedAnswerIndex = nil
             isAnswered = false
         }
+    }
+
+    private func saveResult() async {
+        guard let progress = await viewModel.saveResult(
+            correctAnswersCount: correctAnswersCount,
+            totalAnswersCount: totalAnswersCount
+        ) else {
+            return
+        }
+
+        router.push(
+            .result(
+                topicID: viewModel.topicID,
+                topicTitle: viewModel.topicTitle,
+                progress: progress
+            )
+        )
+    }
+
+    private func actionButtonTitle(totalTasks: Int) -> String {
+        if isSavingResult {
+            return "Saving..."
+        }
+
+        return isLastTask(totalTasks: totalTasks) ? "See Results" : "Next Question"
+    }
+
+    private var isSavingResult: Bool {
+        if case .saving = viewModel.completionState { return true }
+        return false
     }
 
     private func isLastTask(totalTasks: Int) -> Bool {

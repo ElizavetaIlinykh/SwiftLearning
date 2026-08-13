@@ -99,11 +99,10 @@ struct MainTabView: View {
                 topicTitle: title,
                 dependencies: dependencies
             )
-        case .result(let topicID, let topicTitle, let correctAnswersCount, let totalQuestions):
+        case .result(let topicID, let topicTitle, let progress):
             PracticeResultView(
                 topicTitle: topicTitle,
-                correctAnswersCount: correctAnswersCount,
-                totalQuestions: totalQuestions,
+                progress: progress,
                 onPracticeAgain: {
                     router.restartPractice(topicID: topicID, topicTitle: topicTitle)
                 },

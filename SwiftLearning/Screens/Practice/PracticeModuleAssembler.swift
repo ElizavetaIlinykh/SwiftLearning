@@ -21,7 +21,8 @@ enum PracticeModuleAssembler {
         let viewModel = PracticeSessionViewModel(
             topicID: topicID,
             topicTitle: topicTitle,
-            tasksManager: tasksManager
+            tasksManager: tasksManager,
+            practiceService: dependencies.services.practiceService
         )
 
         return PracticeSessionView(viewModel: viewModel)
