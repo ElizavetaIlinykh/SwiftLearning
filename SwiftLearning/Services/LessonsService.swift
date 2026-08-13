@@ -23,18 +23,13 @@ protocol LessonsServicing {
 
 final class LessonsService: LessonsServicing {
     private let networkManager: NetworkManaging
-    private let userID: String
 
-    init(
-        networkManager: NetworkManaging = NetworkManager(),
-        userID: String = "993ba076-6998-4a3a-b3da-55fd517f704d"
-    ) {
+    init(networkManager: NetworkManaging = NetworkManager()) {
         self.networkManager = networkManager
-        self.userID = userID
     }
 
     func fetchLessons() async throws -> [LessonSummary] {
-        try await networkManager.get("/users/\(userID)/lessons")
+        try await networkManager.get("/me/lessons")
     }
 
     func fetchLesson(id: String) async throws -> LessonDetails {
@@ -56,8 +51,7 @@ final class LessonsService: LessonsServicing {
     func completeLesson(id: String) async throws -> LessonProgress {
         try await networkManager.post(
             "/lessons/\(id)/complete",
-            body: EmptyRequestBody(),
-            queryItems: [URLQueryItem(name: "user_id", value: userID)]
+            body: EmptyRequestBody()
         )
     }
 }

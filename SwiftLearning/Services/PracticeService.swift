@@ -18,14 +18,9 @@ protocol PracticeServicing {
 
 final class PracticeService: PracticeServicing {
     private let networkManager: NetworkManaging
-    private let userID: String
 
-    init(
-        networkManager: NetworkManaging,
-        userID: String = "993ba076-6998-4a3a-b3da-55fd517f704d"
-    ) {
+    init(networkManager: NetworkManaging) {
         self.networkManager = networkManager
-        self.userID = userID
     }
 
     func fetchTopics() async throws -> [PracticeCategory] {
@@ -46,12 +41,11 @@ final class PracticeService: PracticeServicing {
             body: PracticeCompletionRequest(
                 correctAnswersCount: correctAnswersCount,
                 totalAnswersCount: totalAnswersCount
-            ),
-            queryItems: [URLQueryItem(name: "user_id", value: userID)]
+            )
         )
     }
 
     func fetchPracticeProgress() async throws -> [PracticeProgress] {
-        try await networkManager.get("/users/\(userID)/practice-progress")
+        try await networkManager.get("/me/practice-progress")
     }
 }

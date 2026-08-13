@@ -7,21 +7,16 @@ protocol UserServicing {
 
 final class UserService: UserServicing {
     private let networkManager: NetworkManaging
-    private let userID: String
 
-    init(
-        networkManager: NetworkManaging,
-        userID: String = "993ba076-6998-4a3a-b3da-55fd517f704d"
-    ) {
+    init(networkManager: NetworkManaging) {
         self.networkManager = networkManager
-        self.userID = userID
     }
 
     func fetchUser() async throws -> UserProfile {
-        try await networkManager.get("/users/\(userID)")
+        try await networkManager.get("/me")
     }
 
     func fetchStatistics() async throws -> UserStatistics {
-        try await networkManager.get("/users/\(userID)/statistics")
+        try await networkManager.get("/me/statistics")
     }
 }

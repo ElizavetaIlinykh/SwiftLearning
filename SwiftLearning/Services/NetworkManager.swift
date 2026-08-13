@@ -38,13 +38,18 @@ final class NetworkManager: NetworkManaging {
     private let session: URLSession
     private let decoder: JSONDecoder
     private let encoder: JSONEncoder
+    private let tokenStorage: TokenStoring?
+
+    var unauthorizedHandler: (() -> Void)?
 
     init(
         baseURL: URL = URL(string: "http://127.0.0.1:8000")!,
-        session: URLSession = .shared
+        session: URLSession = .shared,
+        tokenStorage: TokenStoring? = nil
     ) {
         self.baseURL = baseURL
         self.session = session
+        self.tokenStorage = tokenStorage
 
         self.decoder = JSONDecoder()
         self.decoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -111,6 +116,9 @@ final class NetworkManager: NetworkManaging {
         }
 
         guard (200...299).contains(httpResponse.statusCode) else {
+            if httpResponse.statusCode == 401, !isAuthEndpoint(request) {
+                unauthorizedHandler?()
+            }
             throw NetworkError.serverError(statusCode: httpResponse.statusCode, data: data)
         }
 
@@ -149,7 +157,22 @@ final class NetworkManager: NetworkManaging {
         request.httpMethod = method.rawValue
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        if !isAuthEndpoint(path), let accessToken = try tokenStorage?.fetchAccessToken() {
+            request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        }
+
         return request
+    }
+
+    private func isAuthEndpoint(_ request: URLRequest) -> Bool {
+        guard let path = request.url?.path else { return false }
+        return isAuthEndpoint(path)
+    }
+
+    private func isAuthEndpoint(_ path: String) -> Bool {
+        let normalizedPath = path.hasPrefix("/") ? path : "/\(path)"
+        return normalizedPath == "/auth/register" || normalizedPath == "/auth/login"
     }
 }
 

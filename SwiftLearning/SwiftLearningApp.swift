@@ -8,9 +8,35 @@ struct SwiftLearningApp: App {
 
     var body: some Scene {
         WindowGroup {
-            MainTabView(dependencies: dependencies)
+            AppRootView(dependencies: dependencies)
                 .environment(router)
                 .environmentObject(progressStore)
+        }
+    }
+}
+
+private struct AppRootView: View {
+    let dependencies: AppDependencies
+    @ObservedObject private var session: SessionState
+
+    init(dependencies: AppDependencies) {
+        self.dependencies = dependencies
+        self.session = dependencies.session
+    }
+
+    var body: some View {
+        Group {
+            switch session.status {
+            case .unknown:
+                ProgressView("Checking session")
+            case .authenticated:
+                MainTabView(dependencies: dependencies)
+            case .unauthenticated:
+                AuthRootView(session: session)
+            }
+        }
+        .task {
+            await session.restoreSession()
         }
     }
 }

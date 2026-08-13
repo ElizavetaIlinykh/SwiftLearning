@@ -23,6 +23,11 @@ struct ProfileView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Profile")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            Button("Logout") {
+                viewModel.logout()
+            }
+        }
         .onAppear {
             Task {
                 await viewModel.loadProfile()
