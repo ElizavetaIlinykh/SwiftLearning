@@ -14,7 +14,7 @@ enum LessonCodeTaskError: LocalizedError {
 }
 
 protocol LessonsServicing {
-    func fetchLessons() async throws -> [LessonSummary]
+    func fetchLessons(offset: Int, limit: Int) async throws -> PaginatedResponse<LessonSummary>
     func fetchLesson(id: String) async throws -> LessonDetails
     func fetchLessonQuestions(lessonID: String) async throws -> [LessonQuizQuestion]
     func fetchLessonCodeTask(lessonID: String) async throws -> LessonCodeTask
@@ -28,8 +28,11 @@ final class LessonsService: LessonsServicing {
         self.networkManager = networkManager
     }
 
-    func fetchLessons() async throws -> [LessonSummary] {
-        try await networkManager.get("/me/lessons")
+    func fetchLessons(offset: Int, limit: Int) async throws -> PaginatedResponse<LessonSummary> {
+        try await networkManager.get(
+            "/me/lessons",
+            queryItems: paginationQueryItems(offset: offset, limit: limit)
+        )
     }
 
     func fetchLesson(id: String) async throws -> LessonDetails {

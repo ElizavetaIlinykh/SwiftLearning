@@ -29,7 +29,7 @@ struct PracticeSessionView: View {
             await viewModel.loadTasks()
         }
         .refreshable {
-            await viewModel.loadTasks()
+            await refreshTasks()
         }
     }
 
@@ -50,11 +50,17 @@ struct PracticeSessionView: View {
     }
 
     private func taskContent(_ tasks: [PracticeTask]) -> some View {
-        let task = tasks[currentTaskIndex]
+        let safeTaskIndex = min(currentTaskIndex, tasks.count - 1)
+        let task = tasks[safeTaskIndex]
         let answers = task.answers.sorted { $0.order < $1.order }
 
         return VStack(alignment: .leading, spacing: 22) {
             taskProgress(totalTasks: tasks.count)
+                .onAppear {
+                    Task {
+                        await viewModel.loadMoreTasksIfNeeded(currentTaskID: task.id)
+                    }
+                }
 
             VStack(alignment: .leading, spacing: 14) {
                 Text(task.question)
@@ -82,14 +88,17 @@ struct PracticeSessionView: View {
             if isAnswered {
                 feedbackView(answers)
                 completionErrorView
+                loadMoreTasksView
 
                 PrimaryButton(
                     title: actionButtonTitle(totalTasks: tasks.count),
                     action: {
-                        advance(totalTasks: tasks.count)
+                        Task {
+                            await advance(totalTasks: tasks.count)
+                        }
                     }
                 )
-                .disabled(isSavingResult)
+                .disabled(isSavingResult || viewModel.isLoadingMoreTasks)
             }
         }
     }
@@ -140,6 +149,20 @@ struct PracticeSessionView: View {
             Text(message)
                 .font(.subheadline)
                 .foregroundStyle(.red)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    @ViewBuilder
+    private var loadMoreTasksView: some View {
+        if viewModel.isLoadingMoreTasks {
+            ProgressView()
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 8)
+        } else if let message = viewModel.loadMoreTasksError {
+            Text(message)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
@@ -207,6 +230,15 @@ struct PracticeSessionView: View {
         )
     }
 
+    private func refreshTasks() async {
+        currentTaskIndex = 0
+        selectedAnswerIndex = nil
+        isAnswered = false
+        correctAnswersCount = 0
+        totalAnswersCount = 0
+        await viewModel.loadTasks()
+    }
+
     private func optionState(
         for index: Int,
         in answers: [PracticeAnswer]
@@ -243,16 +275,30 @@ struct PracticeSessionView: View {
         }
     }
 
-    private func advance(totalTasks: Int) {
-        if isLastTask(totalTasks: totalTasks) {
-            Task {
+    private func advance(totalTasks: Int) async {
+        if isLastTask(totalTasks: totalTasks), viewModel.hasMoreTasks {
+            let previousTaskCount = viewModel.tasks.count
+            await viewModel.loadMoreTasks()
+
+            if viewModel.tasks.count > previousTaskCount {
+                moveToNextTask()
+            } else if !viewModel.hasMoreTasks {
                 await saveResult()
             }
-        } else {
-            currentTaskIndex += 1
-            selectedAnswerIndex = nil
-            isAnswered = false
+            return
         }
+
+        if isLastTask(totalTasks: totalTasks) {
+            await saveResult()
+        } else {
+            moveToNextTask()
+        }
+    }
+
+    private func moveToNextTask() {
+        currentTaskIndex += 1
+        selectedAnswerIndex = nil
+        isAnswered = false
     }
 
     private func saveResult() async {
@@ -277,7 +323,11 @@ struct PracticeSessionView: View {
             return "Saving..."
         }
 
-        return isLastTask(totalTasks: totalTasks) ? "See Results" : "Next Question"
+        if viewModel.isLoadingMoreTasks {
+            return "Loading..."
+        }
+
+        return isLastTask(totalTasks: totalTasks) && !viewModel.hasMoreTasks ? "See Results" : "Next Question"
     }
 
     private var isSavingResult: Bool {

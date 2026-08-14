@@ -6,8 +6,8 @@ private struct PracticeCompletionRequest: Encodable {
 }
 
 protocol PracticeServicing {
-    func fetchTopics() async throws -> [PracticeCategory]
-    func fetchTasks(topicID: String) async throws -> [PracticeTask]
+    func fetchTopics(offset: Int, limit: Int) async throws -> PaginatedResponse<PracticeCategory>
+    func fetchTasks(topicID: String, offset: Int, limit: Int) async throws -> PaginatedResponse<PracticeTask>
     func completeTopic(
         topicID: String,
         correctAnswersCount: Int,
@@ -23,12 +23,18 @@ final class PracticeService: PracticeServicing {
         self.networkManager = networkManager
     }
 
-    func fetchTopics() async throws -> [PracticeCategory] {
-        try await networkManager.get("/practice/topics")
+    func fetchTopics(offset: Int, limit: Int) async throws -> PaginatedResponse<PracticeCategory> {
+        try await networkManager.get(
+            "/practice/topics",
+            queryItems: paginationQueryItems(offset: offset, limit: limit)
+        )
     }
 
-    func fetchTasks(topicID: String) async throws -> [PracticeTask] {
-        try await networkManager.get("/practice/topics/\(topicID)/tasks")
+    func fetchTasks(topicID: String, offset: Int, limit: Int) async throws -> PaginatedResponse<PracticeTask> {
+        try await networkManager.get(
+            "/practice/topics/\(topicID)/tasks",
+            queryItems: paginationQueryItems(offset: offset, limit: limit)
+        )
     }
 
     func completeTopic(

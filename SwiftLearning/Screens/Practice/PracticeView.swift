@@ -52,7 +52,38 @@ struct PracticeView: View {
                 PracticeCategoryCard(category: topic) {
                     router.push(.exercise(id: topic.id, title: topic.title, attemptID: UUID()))
                 }
+                .onAppear {
+                    Task {
+                        await viewModel.loadMoreTopicsIfNeeded(currentTopicID: topic.id)
+                    }
+                }
             }
+
+            loadMoreView
+        }
+    }
+
+    @ViewBuilder
+    private var loadMoreView: some View {
+        if viewModel.isLoadingMore {
+            ProgressView()
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+        } else if let message = viewModel.loadMoreError {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(message)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+
+                Button("Try Again") {
+                    Task {
+                        await viewModel.retryLoadMoreTopics()
+                    }
+                }
+                .font(.headline)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, 8)
         }
     }
 

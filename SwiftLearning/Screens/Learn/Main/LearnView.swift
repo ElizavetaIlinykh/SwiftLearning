@@ -81,8 +81,39 @@ struct LearnView: View {
                             )
                         )
                     }
+                    .onAppear {
+                        Task {
+                            await viewModel.loadMoreLessonsIfNeeded(currentLessonID: lessonCard.id)
+                        }
+                    }
                 }
+
+                loadMoreView
             }
+        }
+    }
+
+    @ViewBuilder
+    private var loadMoreView: some View {
+        if viewModel.isLoadingMore {
+            ProgressView()
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+        } else if let message = viewModel.loadMoreError {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(message)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+
+                Button("Try Again") {
+                    Task {
+                        await viewModel.retryLoadMoreLessons()
+                    }
+                }
+                .font(.headline)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, 8)
         }
     }
 

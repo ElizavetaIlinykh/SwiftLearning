@@ -15,6 +15,14 @@ final class PracticeViewModel: ObservableObject {
         return topics.sorted { $0.order < $1.order }
     }
 
+    var isLoadingMore: Bool {
+        topicsManager.isLoadingMore
+    }
+
+    var loadMoreError: String? {
+        topicsManager.loadMoreError
+    }
+
     init(topicsManager: PracticeTopicsManager) {
         self.topicsManager = topicsManager
         bindTopicsManagerUpdates()
@@ -22,6 +30,14 @@ final class PracticeViewModel: ObservableObject {
 
     func loadTopics() async {
         await topicsManager.loadTopics()
+    }
+
+    func loadMoreTopicsIfNeeded(currentTopicID: String) async {
+        await topicsManager.loadMoreTopicsIfNeeded(currentTopicID: currentTopicID)
+    }
+
+    func retryLoadMoreTopics() async {
+        await topicsManager.retryLoadMoreTopics()
     }
 
     private func bindTopicsManagerUpdates() {

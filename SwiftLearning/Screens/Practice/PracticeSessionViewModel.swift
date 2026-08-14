@@ -28,6 +28,18 @@ final class PracticeSessionViewModel: ObservableObject {
         return tasks.sorted { $0.order < $1.order }
     }
 
+    var hasMoreTasks: Bool {
+        tasksManager.hasMore
+    }
+
+    var isLoadingMoreTasks: Bool {
+        tasksManager.isLoadingMore
+    }
+
+    var loadMoreTasksError: String? {
+        tasksManager.loadMoreError
+    }
+
     init(
         topicID: String,
         topicTitle: String,
@@ -45,11 +57,20 @@ final class PracticeSessionViewModel: ObservableObject {
         await tasksManager.loadTasks()
     }
 
+    func loadMoreTasksIfNeeded(currentTaskID: String) async {
+        await tasksManager.loadMoreTasksIfNeeded(currentTaskID: currentTaskID)
+    }
+
+    func loadMoreTasks() async {
+        await tasksManager.loadMoreTasks()
+    }
+
     func saveResult(
         correctAnswersCount: Int,
         totalAnswersCount: Int
     ) async -> PracticeProgress? {
         guard completionState != .saving else { return nil }
+        guard !hasMoreTasks else { return nil }
 
         completionState = .saving
 

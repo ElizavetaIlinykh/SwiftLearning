@@ -33,6 +33,14 @@ final class LearnViewModel: ObservableObject {
         lessons.filter { $0.status == .completed }.count
     }
 
+    var isLoadingMore: Bool {
+        lessonsManager.isLoadingMore
+    }
+
+    var loadMoreError: String? {
+        lessonsManager.loadMoreError
+    }
+
     init(lessonsManager: LessonsManager) {
         self.lessonsManager = lessonsManager
         bindLessonsManagerUpdates()
@@ -48,6 +56,14 @@ final class LearnViewModel: ObservableObject {
 
     func loadLessons() async {
         await lessonsManager.loadLessons()
+    }
+
+    func loadMoreLessonsIfNeeded(currentLessonID: String) async {
+        await lessonsManager.loadMoreLessonsIfNeeded(currentLessonID: currentLessonID)
+    }
+
+    func retryLoadMoreLessons() async {
+        await lessonsManager.retryLoadMoreLessons()
     }
 
     private func lessonState(for status: LessonStatus) -> LessonState {
