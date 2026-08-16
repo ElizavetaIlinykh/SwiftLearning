@@ -21,11 +21,11 @@ struct LearnView: View {
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             Task {
-                await viewModel.loadLessons()
+                await viewModel.fetchLessons()
             }
         }
         .refreshable {
-            await viewModel.loadLessons()
+            await viewModel.refreshLessons()
         }
     }
 
@@ -50,7 +50,7 @@ struct LearnView: View {
             loadingView
         case .failed(let message):
             errorView(message: message)
-        case .loaded(let lessons, _):
+        case .loaded(let lessons):
             if lessons.isEmpty {
                 emptyView
             } else {
@@ -81,11 +81,6 @@ struct LearnView: View {
                             )
                         )
                     }
-                    .onAppear {
-                        Task {
-                            await viewModel.loadMoreLessonsIfNeeded(currentLessonID: lessonCard.id)
-                        }
-                    }
                 }
 
                 loadMoreView
@@ -95,14 +90,11 @@ struct LearnView: View {
 
     @ViewBuilder
     private var loadMoreView: some View {
-        switch viewModel.moreLoadingState {
-        case .idle:
-            EmptyView()
-        case .loading:
+        if viewModel.isLoadingMore {
             ProgressView()
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
-        case .failed(let message):
+        } else if let message = viewModel.loadMoreError {
             VStack(alignment: .leading, spacing: 8) {
                 Text(message)
                     .font(.subheadline)
@@ -110,13 +102,22 @@ struct LearnView: View {
 
                 Button("Try Again") {
                     Task {
-                        await viewModel.retryLoadMoreLessons()
+                        await viewModel.fetchLessons()
                     }
                 }
                 .font(.headline)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 8)
+        } else if viewModel.canRequestMoreLessons {
+            ProgressView()
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .onAppear {
+                    Task {
+                        await viewModel.fetchLessons()
+                    }
+                }
         }
     }
 
@@ -142,7 +143,7 @@ struct LearnView: View {
 
             PrimaryButton(title: "Try Again") {
                 Task {
-                    await viewModel.loadLessons()
+                    await viewModel.fetchLessons()
                 }
             }
         }
