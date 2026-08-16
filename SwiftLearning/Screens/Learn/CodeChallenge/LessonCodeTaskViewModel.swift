@@ -9,13 +9,8 @@ final class LessonCodeTaskViewModel: ObservableObject {
 
     let lessonID: String
 
-    var codeTaskState: LessonCodeTaskLoadingState {
-        codeTaskManager.state
-    }
-
-    var completionState: LessonCompletionViewModel.State {
-        completionViewModel.state
-    }
+    @Published private(set) var codeTaskState: LessonCodeTaskLoadingState
+    @Published private(set) var completionState: LessonCompletionViewModel.State
 
     init(
         lessonID: String,
@@ -25,6 +20,9 @@ final class LessonCodeTaskViewModel: ObservableObject {
         self.lessonID = lessonID
         self.codeTaskManager = codeTaskManager
         self.completionViewModel = completionViewModel
+        self.codeTaskState = codeTaskManager.state
+        self.completionState = completionViewModel.state
+
         bindManagers()
     }
 
@@ -41,15 +39,15 @@ final class LessonCodeTaskViewModel: ObservableObject {
     }
 
     private func bindManagers() {
-        codeTaskManager.objectWillChange
-            .sink { [weak self] _ in
-                self?.objectWillChange.send()
+        codeTaskManager.$state
+            .sink { [weak self] codeTaskState in
+                self?.codeTaskState = codeTaskState
             }
             .store(in: &cancellables)
 
-        completionViewModel.objectWillChange
-            .sink { [weak self] _ in
-                self?.objectWillChange.send()
+        completionViewModel.$state
+            .sink { [weak self] completionState in
+                self?.completionState = completionState
             }
             .store(in: &cancellables)
     }

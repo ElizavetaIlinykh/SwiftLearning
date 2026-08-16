@@ -8,9 +8,7 @@ final class LessonQuizViewModel: ObservableObject {
 
     let lessonID: String
 
-    var state: LessonQuizLoadingState {
-        quizManager.state
-    }
+    @Published private(set) var state: LessonQuizLoadingState
 
     init(
         lessonID: String,
@@ -18,17 +16,19 @@ final class LessonQuizViewModel: ObservableObject {
     ) {
         self.lessonID = lessonID
         self.quizManager = quizManager
-        bindQuizManagerUpdates()
+        self.state = quizManager.state
+
+        bindQuizManager()
     }
 
     func loadQuestions() async {
         await quizManager.loadQuestions()
     }
 
-    private func bindQuizManagerUpdates() {
-        quizManager.objectWillChange
-            .sink { [weak self] _ in
-                self?.objectWillChange.send()
+    private func bindQuizManager() {
+        quizManager.$state
+            .sink { [weak self] state in
+                self?.state = state
             }
             .store(in: &cancellables)
     }

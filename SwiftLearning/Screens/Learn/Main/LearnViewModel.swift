@@ -6,9 +6,9 @@ final class LearnViewModel: ObservableObject {
     private let lessonsManager: LessonsManager
     private var cancellables: Set<AnyCancellable> = []
 
-    var state: LessonsLoadingState {
-        lessonsManager.state
-    }
+    @Published private(set) var state: LessonsLoadingState
+    @Published private(set) var isLoadingMore: Bool
+    @Published private(set) var loadMoreError: String?
 
     var lessons: [LessonSummary] {
         guard case .loaded(let lessons) = state else { return [] }
@@ -33,25 +33,13 @@ final class LearnViewModel: ObservableObject {
         lessons.filter { $0.status == .completed }.count
     }
 
-    var isLoadingMore: Bool {
-        lessonsManager.isLoadingMore
-    }
-
-    var loadMoreError: String? {
-        lessonsManager.loadMoreError
-    }
-
     init(lessonsManager: LessonsManager) {
         self.lessonsManager = lessonsManager
-        bindLessonsManagerUpdates()
-    }
+        self.state = lessonsManager.state
+        self.isLoadingMore = lessonsManager.isLoadingMore
+        self.loadMoreError = lessonsManager.loadMoreError
 
-    private func bindLessonsManagerUpdates() {
-        lessonsManager.objectWillChange
-            .sink { [weak self] _ in
-                self?.objectWillChange.send()
-            }
-            .store(in: &cancellables)
+        bindLessonsManager()
     }
 
     func loadLessons() async {
@@ -64,6 +52,26 @@ final class LearnViewModel: ObservableObject {
 
     func retryLoadMoreLessons() async {
         await lessonsManager.retryLoadMoreLessons()
+    }
+
+    private func bindLessonsManager() {
+        lessonsManager.$state
+            .sink { [weak self] state in
+                self?.state = state
+            }
+            .store(in: &cancellables)
+
+        lessonsManager.$isLoadingMore
+            .sink { [weak self] isLoadingMore in
+                self?.isLoadingMore = isLoadingMore
+            }
+            .store(in: &cancellables)
+
+        lessonsManager.$loadMoreError
+            .sink { [weak self] loadMoreError in
+                self?.loadMoreError = loadMoreError
+            }
+            .store(in: &cancellables)
     }
 
     private func lessonState(for status: LessonStatus) -> LessonState {

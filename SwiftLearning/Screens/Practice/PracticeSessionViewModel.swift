@@ -10,6 +10,10 @@ enum PracticeCompletionState: Equatable {
 
 @MainActor
 final class PracticeSessionViewModel: ObservableObject {
+    @Published private(set) var state: PracticeTasksLoadingState
+    @Published private(set) var hasMoreTasks: Bool
+    @Published private(set) var isLoadingMoreTasks: Bool
+    @Published private(set) var loadMoreTasksError: String?
     @Published private(set) var completionState: PracticeCompletionState = .idle
 
     private let tasksManager: PracticeTasksManager
@@ -19,25 +23,9 @@ final class PracticeSessionViewModel: ObservableObject {
     let topicID: String
     let topicTitle: String
 
-    var state: PracticeTasksLoadingState {
-        tasksManager.state
-    }
-
     var tasks: [PracticeTask] {
         guard case .loaded(let tasks) = state else { return [] }
         return tasks.sorted { $0.order < $1.order }
-    }
-
-    var hasMoreTasks: Bool {
-        tasksManager.hasMore
-    }
-
-    var isLoadingMoreTasks: Bool {
-        tasksManager.isLoadingMore
-    }
-
-    var loadMoreTasksError: String? {
-        tasksManager.loadMoreError
     }
 
     init(
@@ -50,7 +38,12 @@ final class PracticeSessionViewModel: ObservableObject {
         self.topicTitle = topicTitle
         self.tasksManager = tasksManager
         self.practiceService = practiceService
-        bindTasksManagerUpdates()
+        self.state = tasksManager.state
+        self.hasMoreTasks = tasksManager.hasMore
+        self.isLoadingMoreTasks = tasksManager.isLoadingMore
+        self.loadMoreTasksError = tasksManager.loadMoreError
+
+        bindTasksManager()
     }
 
     func loadTasks() async {
@@ -88,10 +81,28 @@ final class PracticeSessionViewModel: ObservableObject {
         }
     }
 
-    private func bindTasksManagerUpdates() {
-        tasksManager.objectWillChange
-            .sink { [weak self] _ in
-                self?.objectWillChange.send()
+    private func bindTasksManager() {
+        tasksManager.$state
+            .sink { [weak self] state in
+                self?.state = state
+            }
+            .store(in: &cancellables)
+
+        tasksManager.$hasMore
+            .sink { [weak self] hasMoreTasks in
+                self?.hasMoreTasks = hasMoreTasks
+            }
+            .store(in: &cancellables)
+
+        tasksManager.$isLoadingMore
+            .sink { [weak self] isLoadingMoreTasks in
+                self?.isLoadingMoreTasks = isLoadingMoreTasks
+            }
+            .store(in: &cancellables)
+
+        tasksManager.$loadMoreError
+            .sink { [weak self] loadMoreTasksError in
+                self?.loadMoreTasksError = loadMoreTasksError
             }
             .store(in: &cancellables)
     }

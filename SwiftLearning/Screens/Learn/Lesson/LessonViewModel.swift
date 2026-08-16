@@ -8,28 +8,29 @@ final class LessonViewModel: ObservableObject {
 
     let totalLessonsCount: Int
 
-    var state: LessonDetailsLoadingState {
-        lessonDetailsManager.state
-    }
+    @Published private(set) var state: LessonDetailsLoadingState
 
     init(
-        lessonDetailsManager: LessonDetailsManager,
-        totalLessonsCount: Int
-    ) {
-        self.lessonDetailsManager = lessonDetailsManager
-        self.totalLessonsCount = totalLessonsCount
-        bindLessonDetailsManagerUpdates()
-    }
+          lessonDetailsManager: LessonDetailsManager,
+          totalLessonsCount: Int
+      ) {
+          self.lessonDetailsManager = lessonDetailsManager
+          self.totalLessonsCount = totalLessonsCount
+          self.state = lessonDetailsManager.state
+
+          bindLessonDetailsManager()
+      }
+
 
     func loadLesson() async {
         await lessonDetailsManager.loadLesson()
     }
 
-    private func bindLessonDetailsManagerUpdates() {
-        lessonDetailsManager.objectWillChange
-            .sink { [weak self] _ in
-                self?.objectWillChange.send()
-            }
-            .store(in: &cancellables)
-    }
+    private func bindLessonDetailsManager() {
+          lessonDetailsManager.$state
+              .sink { [weak self] state in
+                  self?.state = state
+              }
+              .store(in: &cancellables)
+      }
 }

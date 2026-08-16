@@ -7,9 +7,7 @@ final class ProfileViewModel: ObservableObject {
     private let session: SessionState
     private var cancellables: Set<AnyCancellable> = []
 
-    var state: ProfileLoadingState {
-        profileManager.state
-    }
+    @Published private(set) var state: ProfileLoadingState
 
     init(
         profileManager: ProfileManager,
@@ -17,7 +15,9 @@ final class ProfileViewModel: ObservableObject {
     ) {
         self.profileManager = profileManager
         self.session = session
-        bindProfileManagerUpdates()
+        self.state = profileManager.state
+
+        bindProfileManager()
     }
 
     func loadProfile() async {
@@ -28,10 +28,10 @@ final class ProfileViewModel: ObservableObject {
         session.logout()
     }
 
-    private func bindProfileManagerUpdates() {
-        profileManager.objectWillChange
-            .sink { [weak self] _ in
-                self?.objectWillChange.send()
+    private func bindProfileManager() {
+        profileManager.$state
+            .sink { [weak self] state in
+                self?.state = state
             }
             .store(in: &cancellables)
     }
