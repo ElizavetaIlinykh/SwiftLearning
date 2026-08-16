@@ -1,8 +1,6 @@
 import SwiftUI
 
 struct CodeChallengeView: View {
-    @EnvironmentObject private var progressStore: LearningProgressStore
-
     let lesson: Lesson
     let challenge: CodeChallenge
     let wasAlreadyCompleted: Bool
@@ -69,7 +67,6 @@ struct CodeChallengeView: View {
                     successView
 
                     Button {
-                        progressStore.completeLesson(lesson)
                         showCompletion = true
                     } label: {
                         Text("Finish Lesson")
@@ -155,6 +152,5 @@ struct CodeChallengeView: View {
             challenge: LessonData.lessons[0].challenge,
             wasAlreadyCompleted: false
         ) {}
-        .environmentObject(LearningProgressStore())
     }
 }

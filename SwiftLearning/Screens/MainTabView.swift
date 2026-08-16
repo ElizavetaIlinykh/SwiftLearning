@@ -127,5 +127,4 @@ struct MainTabView: View {
 #Preview {
     MainTabView(dependencies: AppDependenciesAssembler.assemble())
         .environment(AppRouter())
-        .environmentObject(LearningProgressStore())
 }

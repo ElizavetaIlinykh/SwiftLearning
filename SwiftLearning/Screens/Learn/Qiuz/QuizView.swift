@@ -1,8 +1,6 @@
 import SwiftUI
 
 struct QuizView: View {
-    @EnvironmentObject private var progressStore: LearningProgressStore
-
     let lesson: Lesson
     let question: QuizQuestion
     let wasAlreadyCompleted: Bool
@@ -118,7 +116,6 @@ struct QuizView: View {
         guard selectedAnswerIndex == nil else { return }
 
         selectedAnswerIndex = index
-        progressStore.recordQuizAnswer(isCorrect: index == question.correctAnswerIndex)
     }
 }
 
@@ -129,6 +126,5 @@ struct QuizView: View {
             question: LessonData.lessons[0].quiz,
             wasAlreadyCompleted: false
         ) {}
-        .environmentObject(LearningProgressStore())
     }
 }
