@@ -50,7 +50,7 @@ struct LearnView: View {
             loadingView
         case .failed(let message):
             errorView(message: message)
-        case .loaded(let lessons):
+        case .loaded(let lessons, _):
             if lessons.isEmpty {
                 emptyView
             } else {
@@ -95,11 +95,14 @@ struct LearnView: View {
 
     @ViewBuilder
     private var loadMoreView: some View {
-        if viewModel.isLoadingMore {
+        switch viewModel.moreLoadingState {
+        case .idle:
+            EmptyView()
+        case .loading:
             ProgressView()
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
-        } else if let message = viewModel.loadMoreError {
+        case .failed(let message):
             VStack(alignment: .leading, spacing: 8) {
                 Text(message)
                     .font(.subheadline)

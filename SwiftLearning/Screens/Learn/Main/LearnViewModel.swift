@@ -7,11 +7,9 @@ final class LearnViewModel: ObservableObject {
     private var cancellables: Set<AnyCancellable> = []
 
     @Published private(set) var state: LessonsLoadingState
-    @Published private(set) var isLoadingMore: Bool
-    @Published private(set) var loadMoreError: String?
 
     var lessons: [LessonSummary] {
-        guard case .loaded(let lessons) = state else { return [] }
+        guard case .loaded(let lessons, _) = state else { return [] }
         return lessons
     }
 
@@ -33,11 +31,14 @@ final class LearnViewModel: ObservableObject {
         lessons.filter { $0.status == .completed }.count
     }
 
+    var moreLoadingState: LessonsMoreLoadingState {
+        guard case .loaded(_, let moreLoadingState) = state else { return .idle }
+        return moreLoadingState
+    }
+
     init(lessonsManager: LessonsManager) {
         self.lessonsManager = lessonsManager
         self.state = lessonsManager.state
-        self.isLoadingMore = lessonsManager.isLoadingMore
-        self.loadMoreError = lessonsManager.loadMoreError
 
         bindLessonsManager()
     }
@@ -58,18 +59,6 @@ final class LearnViewModel: ObservableObject {
         lessonsManager.$state
             .sink { [weak self] state in
                 self?.state = state
-            }
-            .store(in: &cancellables)
-
-        lessonsManager.$isLoadingMore
-            .sink { [weak self] isLoadingMore in
-                self?.isLoadingMore = isLoadingMore
-            }
-            .store(in: &cancellables)
-
-        lessonsManager.$loadMoreError
-            .sink { [weak self] loadMoreError in
-                self?.loadMoreError = loadMoreError
             }
             .store(in: &cancellables)
     }

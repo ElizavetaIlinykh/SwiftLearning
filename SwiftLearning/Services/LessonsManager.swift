@@ -1,24 +1,32 @@
 import Combine
 import Foundation
 
+enum LessonsMoreLoadingState: Equatable {
+    case idle
+    case loading
+    case failed(String)
+}
+
 enum LessonsLoadingState: Equatable {
     case idle
     case loading
-    case loaded([LessonSummary])
+    case loaded(
+        lessons: [LessonSummary],
+        moreLoadingState: LessonsMoreLoadingState
+    )
     case failed(String)
 }
 
 @MainActor
 final class LessonsManager: ObservableObject {
     @Published private(set) var state: LessonsLoadingState = .idle
-    @Published private(set) var hasMore = false
-    @Published private(set) var isLoadingMore = false
-    @Published private(set) var loadMoreError: String?
 
     private let lessonsService: LessonsServicing
     private let pageLimit = 20
     private var loadedLessons: [LessonSummary] = []
     private var currentOffset = 0
+    private var hasMore = false
+    private var moreLoadingState: LessonsMoreLoadingState = .idle
 
     init(lessonsService: LessonsServicing) {
         self.lessonsService = lessonsService
@@ -29,8 +37,7 @@ final class LessonsManager: ObservableObject {
 
         state = .loading
         hasMore = false
-        isLoadingMore = false
-        loadMoreError = nil
+        moreLoadingState = .idle
         currentOffset = 0
 
         do {
@@ -38,7 +45,7 @@ final class LessonsManager: ObservableObject {
             loadedLessons = response.items
             currentOffset = response.offset + response.items.count
             hasMore = response.hasMore && !response.items.isEmpty
-            state = .loaded(loadedLessons)
+            publishLoadedState()
         } catch {
             loadedLessons = []
             state = .failed(error.localizedDescription)
@@ -55,10 +62,10 @@ final class LessonsManager: ObservableObject {
     }
 
     private func loadMoreLessons() async {
-        guard hasMore, !isLoadingMore else { return }
+        guard hasMore, moreLoadingState != .loading else { return }
 
-        isLoadingMore = true
-        loadMoreError = nil
+        moreLoadingState = .loading
+        publishLoadedState()
 
         do {
             let response = try await lessonsService.fetchLessons(
@@ -74,16 +81,23 @@ final class LessonsManager: ObservableObject {
                 hasMore = response.hasMore
             }
 
-            state = .loaded(loadedLessons)
+            moreLoadingState = .idle
         } catch {
-            loadMoreError = error.localizedDescription
+            moreLoadingState = .failed(error.localizedDescription)
         }
 
-        isLoadingMore = false
+        publishLoadedState()
+    }
+
+    private func publishLoadedState() {
+        state = .loaded(
+            lessons: loadedLessons,
+            moreLoadingState: moreLoadingState
+        )
     }
 
     private func shouldLoadMore(currentLessonID: String) -> Bool {
-        guard hasMore, !isLoadingMore else { return false }
+        guard hasMore, moreLoadingState != .loading else { return false }
         let orderedLessons = loadedLessons.sorted { $0.order < $1.order }
         guard let index = orderedLessons.firstIndex(where: { $0.id == currentLessonID }) else { return false }
         return index >= max(orderedLessons.count - 5, 0)
