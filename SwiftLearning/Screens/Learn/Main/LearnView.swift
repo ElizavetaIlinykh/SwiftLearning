@@ -50,7 +50,7 @@ struct LearnView: View {
             loadingView
         case .failed(let message):
             errorView(message: message)
-        case .loaded(let lessons):
+        case .loaded(let lessons, _):
             if lessons.isEmpty {
                 emptyView
             } else {

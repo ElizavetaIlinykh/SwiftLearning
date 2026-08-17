@@ -1,32 +1,42 @@
 import Combine
 import Foundation
 
+enum LessonsMoreLoadingState: Equatable {
+    case idle(canFetchMore: Bool)
+    case loading
+    case failed(String)
+}
+
 enum LessonsLoadingState: Equatable {
     case idle
     case loading
-    case loaded([LessonSummary])
+    case loaded(
+        lessons: [LessonSummary],
+        moreLoadingState: LessonsMoreLoadingState
+    )
     case failed(String)
 }
 
 @MainActor
 final class LessonsManager: ObservableObject {
+    private enum Constants {
+        static let pageLimit = 20
+    }
+
     @Published private(set) var state: LessonsLoadingState = .idle
-    @Published private(set) var isLoadingMore = false
-    @Published private(set) var loadMoreError: String?
-    @Published private(set) var canFetchMoreLessons = false
 
     private let lessonsService: LessonsServicing
-    private let pageLimit = 20
     private var loadedLessons: [LessonSummary] = []
     private var currentOffset = 0
     private var hasMore = false
+    private var moreLoadingState: LessonsMoreLoadingState = .idle(canFetchMore: false)
 
     init(lessonsService: LessonsServicing) {
         self.lessonsService = lessonsService
     }
 
     func fetch() async {
-        guard state != .loading, !isLoadingMore else { return }
+        guard state != .loading, moreLoadingState != .loading else { return }
 
         if loadedLessons.isEmpty {
             await loadInitialPage()
@@ -36,7 +46,7 @@ final class LessonsManager: ObservableObject {
     }
 
     func refresh() async {
-        guard state != .loading, !isLoadingMore else { return }
+        guard state != .loading, moreLoadingState != .loading else { return }
 
         resetPagination()
         await loadInitialPage()
@@ -47,36 +57,36 @@ final class LessonsManager: ObservableObject {
         resetPagination()
 
         do {
-            let response = try await lessonsService.fetchLessons(offset: currentOffset, limit: pageLimit)
+            let response = try await lessonsService.fetchLessons(
+                offset: currentOffset,
+                limit: Constants.pageLimit
+            )
             loadedLessons = response.items
             loadedLessons.sort { $0.order < $1.order }
             currentOffset = response.offset + response.items.count
             hasMore = response.hasMore && !response.items.isEmpty
-            state = .loaded(loadedLessons)
+            moreLoadingState = .idle(canFetchMore: hasMore)
+            publishLoadedState()
         } catch {
             loadedLessons = []
             state = .failed(error.localizedDescription)
         }
-
-        updateCanFetchMoreLessons()
     }
 
     private func loadNextPage() async {
-        guard hasMore, !isLoadingMore else { return }
+        guard hasMore, moreLoadingState != .loading else { return }
 
-        isLoadingMore = true
-        loadMoreError = nil
-        updateCanFetchMoreLessons()
+        moreLoadingState = .loading
+        publishLoadedState()
 
         defer {
-            isLoadingMore = false
-            updateCanFetchMoreLessons()
+            publishLoadedState()
         }
 
         do {
             let response = try await lessonsService.fetchLessons(
                 offset: currentOffset,
-                limit: pageLimit
+                limit: Constants.pageLimit
             )
             currentOffset = response.offset + response.items.count
 
@@ -88,9 +98,9 @@ final class LessonsManager: ObservableObject {
                 hasMore = response.hasMore
             }
 
-            state = .loaded(loadedLessons)
+            moreLoadingState = .idle(canFetchMore: hasMore)
         } catch {
-            loadMoreError = error.localizedDescription
+            moreLoadingState = .failed(error.localizedDescription)
         }
     }
 
@@ -98,12 +108,14 @@ final class LessonsManager: ObservableObject {
         loadedLessons = []
         currentOffset = 0
         hasMore = false
-        loadMoreError = nil
-        canFetchMoreLessons = false
+        moreLoadingState = .idle(canFetchMore: false)
     }
 
-    private func updateCanFetchMoreLessons() {
-        canFetchMoreLessons = hasMore && !loadedLessons.isEmpty && state != .loading && !isLoadingMore
+    private func publishLoadedState() {
+        state = .loaded(
+            lessons: loadedLessons,
+            moreLoadingState: moreLoadingState
+        )
     }
 }
 

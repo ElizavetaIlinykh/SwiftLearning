@@ -7,12 +7,9 @@ final class LearnViewModel: ObservableObject {
     private var cancellables: Set<AnyCancellable> = []
 
     @Published private(set) var state: LessonsLoadingState
-    @Published private(set) var isLoadingMore: Bool
-    @Published private(set) var loadMoreError: String?
-    @Published private(set) var canRequestMoreLessons: Bool
 
     var lessons: [LessonSummary] {
-        guard case .loaded(let lessons) = state else { return [] }
+        guard case .loaded(let lessons, _) = state else { return [] }
         return lessons
     }
 
@@ -33,12 +30,30 @@ final class LearnViewModel: ObservableObject {
         lessons.filter { $0.status == .completed }.count
     }
 
+    var moreLoadingState: LessonsMoreLoadingState {
+        guard case .loaded(_, let moreLoadingState) = state else {
+            return .idle(canFetchMore: false)
+        }
+        return moreLoadingState
+    }
+
+    var isLoadingMore: Bool {
+        moreLoadingState == .loading
+    }
+
+    var loadMoreError: String? {
+        guard case .failed(let message) = moreLoadingState else { return nil }
+        return message
+    }
+
+    var canRequestMoreLessons: Bool {
+        guard case .idle(let canFetchMore) = moreLoadingState else { return false }
+        return canFetchMore
+    }
+
     init(lessonsManager: LessonsManager) {
         self.lessonsManager = lessonsManager
         self.state = lessonsManager.state
-        self.isLoadingMore = lessonsManager.isLoadingMore
-        self.loadMoreError = lessonsManager.loadMoreError
-        self.canRequestMoreLessons = lessonsManager.canFetchMoreLessons
 
         bindLessonsManager()
     }
@@ -55,24 +70,6 @@ final class LearnViewModel: ObservableObject {
         lessonsManager.$state
             .sink { [weak self] state in
                 self?.state = state
-            }
-            .store(in: &cancellables)
-
-        lessonsManager.$isLoadingMore
-            .sink { [weak self] isLoadingMore in
-                self?.isLoadingMore = isLoadingMore
-            }
-            .store(in: &cancellables)
-
-        lessonsManager.$loadMoreError
-            .sink { [weak self] loadMoreError in
-                self?.loadMoreError = loadMoreError
-            }
-            .store(in: &cancellables)
-
-        lessonsManager.$canFetchMoreLessons
-            .sink { [weak self] canFetchMoreLessons in
-                self?.canRequestMoreLessons = canFetchMoreLessons
             }
             .store(in: &cancellables)
     }
