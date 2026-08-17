@@ -39,7 +39,7 @@ final class LessonsManager: ObservableObject {
         guard state != .loading, moreLoadingState != .loading else { return }
 
         if loadedLessons.isEmpty {
-            await loadInitialPage()
+            await loadInitialPage(preservingCurrentContentOnFailure: false)
         } else {
             await loadNextPage()
         }
@@ -47,12 +47,15 @@ final class LessonsManager: ObservableObject {
 
     func refresh() async {
         guard state != .loading, moreLoadingState != .loading else { return }
-
-        resetPagination()
-        await loadInitialPage()
+        await loadInitialPage(preservingCurrentContentOnFailure: true)
     }
 
-    private func loadInitialPage() async {
+    private func loadInitialPage(preservingCurrentContentOnFailure: Bool) async {
+        let previousLessons = loadedLessons
+        let previousOffset = currentOffset
+        let previousHasMore = hasMore
+        let previousMoreLoadingState = moreLoadingState
+
         state = .loading
         resetPagination()
 
@@ -68,8 +71,16 @@ final class LessonsManager: ObservableObject {
             moreLoadingState = .idle(canFetchMore: hasMore)
             publishLoadedState()
         } catch {
-            loadedLessons = []
-            state = .failed(error.localizedDescription)
+            if preservingCurrentContentOnFailure, !previousLessons.isEmpty {
+                loadedLessons = previousLessons
+                currentOffset = previousOffset
+                hasMore = previousHasMore
+                moreLoadingState = previousMoreLoadingState
+                publishLoadedState()
+            } else {
+                loadedLessons = []
+                state = .failed(error.localizedDescription)
+            }
         }
     }
 
