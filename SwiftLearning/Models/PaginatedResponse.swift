@@ -1,6 +1,6 @@
 import Foundation
 
-struct PaginatedResponse<Item: Decodable>: Decodable {
+nonisolated struct PaginatedResponse<Item: Decodable & Equatable>: Decodable, Equatable {
     let items: [Item]
     let total: Int
     let limit: Int

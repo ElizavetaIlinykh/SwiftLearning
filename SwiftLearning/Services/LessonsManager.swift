@@ -25,101 +25,97 @@ final class LessonsManager: ObservableObject {
 
     @Published private(set) var state: LessonsLoadingState = .idle
 
-    private let lessonsService: LessonsServicing
+    private let pageLoader: PaginationLoader<LessonSummary>
+
     private var loadedLessons: [LessonSummary] = []
-    private var currentOffset = 0
     private var hasMore = false
-    private var moreLoadingState: LessonsMoreLoadingState = .idle(canFetchMore: false)
+    private var moreLoadingState: LessonsMoreLoadingState = .idle
+
+    var hasMoreToFetch: Bool {
+        hasMore
+    }
 
     init(lessonsService: LessonsServicing) {
-        self.lessonsService = lessonsService
+        self.pageLoader = PaginationLoader(
+            contract: .init(limit: Constants.pageLimit)
+        ) { offset, limit in
+            let response = try await lessonsService.fetchLessons(
+                offset: offset,
+                limit: limit
+            )
+            return response.items
+        }
     }
 
     func fetch() async {
-        guard state != .loading, moreLoadingState != .loading else { return }
-
         if loadedLessons.isEmpty {
-            await loadInitialPage(preservingCurrentContentOnFailure: false)
+            await fetchInitial()
         } else {
-            await loadNextPage()
+            await fetchNext()
         }
     }
 
     func refresh() async {
-        guard state != .loading, moreLoadingState != .loading else { return }
-        await loadInitialPage(preservingCurrentContentOnFailure: true)
+        await fetchInitial()
     }
 
-    private func loadInitialPage(preservingCurrentContentOnFailure: Bool) async {
-        let previousLessons = loadedLessons
-        let previousOffset = currentOffset
-        let previousHasMore = hasMore
-        let previousMoreLoadingState = moreLoadingState
+    private func fetchInitial() async {
+        guard !isLoading else {
+            return
+        }
 
         state = .loading
-        resetPagination()
 
         do {
-            let response = try await lessonsService.fetchLessons(
-                offset: currentOffset,
-                limit: Constants.pageLimit
-            )
-            loadedLessons = response.items
-            loadedLessons.sort { $0.order < $1.order }
-            currentOffset = response.offset + response.items.count
-            hasMore = response.hasMore && !response.items.isEmpty
-            moreLoadingState = .idle(canFetchMore: hasMore)
+            let response = try await pageLoader.fetch()
+
+            loadedLessons = response.result
+            hasMore = response.hasNext
+            moreLoadingState = .idle
+
             publishLoadedState()
         } catch {
-            if preservingCurrentContentOnFailure, !previousLessons.isEmpty {
-                loadedLessons = previousLessons
-                currentOffset = previousOffset
-                hasMore = previousHasMore
-                moreLoadingState = previousMoreLoadingState
-                publishLoadedState()
-            } else {
-                loadedLessons = []
-                state = .failed(error.localizedDescription)
-            }
+            state = .failed(error.localizedDescription)
         }
     }
 
-    private func loadNextPage() async {
-        guard hasMore, moreLoadingState != .loading else { return }
+    private func fetchNext() async {
+        guard hasMore else {
+            return
+        }
+
+        guard !isLoading else {
+            return
+        }
 
         moreLoadingState = .loading
         publishLoadedState()
 
-        defer {
-            publishLoadedState()
-        }
-
         do {
-            let response = try await lessonsService.fetchLessons(
-                offset: currentOffset,
-                limit: Constants.pageLimit
-            )
-            currentOffset = response.offset + response.items.count
+            let response = try await pageLoader.loadNext()
 
-            if response.items.isEmpty {
-                hasMore = false
-            } else {
-                loadedLessons.appendUnique(response.items)
-                loadedLessons.sort { $0.order < $1.order }
-                hasMore = response.hasMore
-            }
+            loadedLessons.append(contentsOf: response.result)
+            hasMore = response.hasNext
+            moreLoadingState = .idle
 
-            moreLoadingState = .idle(canFetchMore: hasMore)
+            publishLoadedState()
         } catch {
             moreLoadingState = .failed(error.localizedDescription)
+            publishLoadedState()
         }
     }
 
-    private func resetPagination() {
-        loadedLessons = []
-        currentOffset = 0
-        hasMore = false
-        moreLoadingState = .idle(canFetchMore: false)
+    private var isLoading: Bool {
+        switch state {
+        case .loading:
+            return true
+
+        case .loaded(_, let moreLoadingState):
+            return moreLoadingState == .loading
+
+        case .idle, .failed:
+            return false
+        }
     }
 
     private func publishLoadedState() {
@@ -127,14 +123,5 @@ final class LessonsManager: ObservableObject {
             lessons: loadedLessons,
             moreLoadingState: moreLoadingState
         )
-    }
-}
-
-private extension Array where Element: Identifiable {
-    mutating func appendUnique(_ newElements: [Element]) where Element.ID: Hashable {
-        var existingIDs = Set(map(\.id))
-        for element in newElements where existingIDs.insert(element.id).inserted {
-            append(element)
-        }
     }
 }

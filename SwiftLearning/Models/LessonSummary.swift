@@ -1,6 +1,6 @@
 import Foundation
 
-struct LessonSummary: Identifiable, Hashable, Codable {
+struct LessonSummary: INetworkEntity {
     let id: String
     let title: String
     let description: String
@@ -8,7 +8,7 @@ struct LessonSummary: Identifiable, Hashable, Codable {
     let status: LessonStatus
 }
 
-enum LessonStatus: String, Hashable, Codable {
+enum LessonStatus: String, INetworkEntity {
     case available
     case locked
     case completed
