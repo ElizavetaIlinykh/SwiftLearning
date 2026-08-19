@@ -28,15 +28,15 @@ enum AuthError: LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .invalidCredentials:
-            return "Incorrect email or password."
+            "Incorrect email or password."
         case .emailAlreadyUsed:
-            return "This email is already registered."
+            "This email is already registered."
         case .invalidInput:
-            return "Please check the entered data."
+            "Please check the entered data."
         case .unauthorized, .missingSession:
-            return "Please sign in to continue."
-        case .requestFailed(let message):
-            return message
+            "Please sign in to continue."
+        case let .requestFailed(message):
+            message
         }
     }
 }

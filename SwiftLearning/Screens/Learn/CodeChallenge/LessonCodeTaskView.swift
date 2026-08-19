@@ -34,59 +34,22 @@ struct LessonCodeTaskView: View {
         switch viewModel.codeTaskState {
         case .idle, .loading:
             loadingView
-        case .loaded(let codeTask):
+        case let .loaded(codeTask):
             codeTaskContent(codeTask)
         case .notAvailable:
             noCodeTaskView
-        case .failed(let message):
+        case let .failed(message):
             errorView(message: message)
         }
     }
 
     private func codeTaskContent(_ codeTask: LessonCodeTask) -> some View {
         VStack(alignment: .leading, spacing: 24) {
-            VStack(alignment: .leading, spacing: 10) {
-                Text("Code Task")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
+            codeTaskHeader(codeTask)
 
-                Text(codeTask.title)
-                    .font(.title3)
-                    .fontWeight(.semibold)
+            codeBlockSection(codeTask)
 
-                Text(codeTask.description)
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-            }
-
-            VStack(alignment: .leading, spacing: 10) {
-                Text(answerState == .correct ? "COMPLETED CODE" : "COMPLETE THE CODE")
-                    .font(.caption)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.secondary)
-
-                CodeBlockView(code: codeTask.code)
-            }
-
-            VStack(alignment: .leading, spacing: 10) {
-                Text("ANSWER")
-                    .font(.caption)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.secondary)
-
-                TextField("Enter missing code", text: $answer)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .font(.body.monospaced())
-                    .padding(14)
-                    .background(Color(.secondarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .stroke(answerBorderColor, lineWidth: 1.5)
-                    )
-                    .disabled(answerState == .correct)
-            }
+            answerSection
 
             feedbackView
 
@@ -102,6 +65,55 @@ struct LessonCodeTaskView: View {
                     checkAnswer(for: codeTask)
                 }
             }
+        }
+    }
+
+    private func codeTaskHeader(_ codeTask: LessonCodeTask) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Code Task")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+
+            Text(codeTask.title)
+                .font(.title3)
+                .fontWeight(.semibold)
+
+            Text(codeTask.description)
+                .font(.body)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private func codeBlockSection(_ codeTask: LessonCodeTask) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(answerState == .correct ? "COMPLETED CODE" : "COMPLETE THE CODE")
+                .font(.caption)
+                .fontWeight(.bold)
+                .foregroundStyle(.secondary)
+
+            CodeBlockView(code: codeTask.code)
+        }
+    }
+
+    private var answerSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("ANSWER")
+                .font(.caption)
+                .fontWeight(.bold)
+                .foregroundStyle(.secondary)
+
+            TextField("Enter missing code", text: $answer)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .font(.body.monospaced())
+                .padding(14)
+                .background(Color(.secondarySystemGroupedBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .stroke(answerBorderColor, lineWidth: 1.5)
+                )
+                .disabled(answerState == .correct)
         }
     }
 
@@ -186,7 +198,7 @@ struct LessonCodeTaskView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
 
-        if case .failed(let message) = viewModel.completionState {
+        if case let .failed(message) = viewModel.completionState {
             Text(message)
                 .font(.subheadline)
                 .foregroundStyle(.red)
@@ -222,11 +234,11 @@ struct LessonCodeTaskView: View {
     private var answerBorderColor: Color {
         switch answerState {
         case .idle:
-            return Color.primary.opacity(0.08)
+            Color.primary.opacity(0.08)
         case .correct:
-            return Color.green.opacity(0.55)
+            Color.green.opacity(0.55)
         case .incorrect:
-            return Color.red.opacity(0.55)
+            Color.red.opacity(0.55)
         }
     }
 
@@ -235,7 +247,9 @@ struct LessonCodeTaskView: View {
     }
 
     private var isCompleting: Bool {
-        if case .completing = viewModel.completionState { return true }
+        if case .completing = viewModel.completionState {
+            return true
+        }
         return false
     }
 

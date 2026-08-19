@@ -43,9 +43,9 @@ struct ProfileView: View {
         switch viewModel.state {
         case .idle, .loading:
             loadingView
-        case .failed(let message):
+        case let .failed(message):
             errorView(message: message)
-        case .loaded(let user, let statistics):
+        case let .loaded(user, statistics):
             profileHeader(user: user)
             progressSection(statistics: statistics)
             statisticsSection(statistics: statistics)
@@ -140,7 +140,11 @@ struct ProfileView: View {
 
             LazyVGrid(columns: statisticColumns, spacing: 12) {
                 StatCard(title: "Level", value: "\(statistics.currentLevel)", systemImage: "bolt.fill")
-                StatCard(title: "Lessons", value: "\(statistics.completedLessonsCount) / \(statistics.totalLessonsCount)", systemImage: "book.fill")
+                StatCard(
+                    title: "Lessons",
+                    value: "\(statistics.completedLessonsCount) / \(statistics.totalLessonsCount)",
+                    systemImage: "book.fill"
+                )
                 StatCard(title: "Progress", value: "\(statistics.progressPercent)%", systemImage: "target")
             }
         }

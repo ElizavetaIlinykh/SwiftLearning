@@ -9,13 +9,13 @@ struct PracticeResultView: View {
     private var resultMessage: String {
         switch progress.scorePercent {
         case 100:
-            return "Perfect!"
-        case 80...99:
-            return "Great work!"
-        case 60...79:
-            return "Good progress!"
+            "Perfect!"
+        case 80 ... 99:
+            "Great work!"
+        case 60 ... 79:
+            "Good progress!"
         default:
-            return "Keep practicing!"
+            "Keep practicing!"
         }
     }
 

@@ -19,7 +19,7 @@ private struct AppRootView: View {
 
     init(dependencies: AppDependencies) {
         self.dependencies = dependencies
-        self.session = dependencies.session
+        session = dependencies.session
     }
 
     var body: some View {

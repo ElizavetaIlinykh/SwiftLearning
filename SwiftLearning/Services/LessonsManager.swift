@@ -33,7 +33,7 @@ final class LessonsManager: ObservableObject {
     private var isRefreshing = false
 
     init(lessonsService: LessonsServicing) {
-        self.pageLoader = PaginationLoader(
+        pageLoader = PaginationLoader(
             contract: .init(
                 limit: Constants.pageLimit
             )
@@ -146,13 +146,13 @@ final class LessonsManager: ObservableObject {
     private var isLoading: Bool {
         switch state {
         case .loading:
-            return true
+            true
 
-        case .loaded(_, let moreLoadingState):
-            return moreLoadingState == .loading
+        case let .loaded(_, moreLoadingState):
+            moreLoadingState == .loading
 
         case .idle, .failed:
-            return false
+            false
         }
     }
 

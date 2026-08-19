@@ -16,7 +16,7 @@ final class LessonQuizViewModel: ObservableObject {
     ) {
         self.lessonID = lessonID
         self.quizManager = quizManager
-        self.state = quizManager.state
+        state = quizManager.state
 
         bindQuizManager()
     }

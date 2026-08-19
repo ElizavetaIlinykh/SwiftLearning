@@ -11,26 +11,25 @@ final class LessonViewModel: ObservableObject {
     @Published private(set) var state: LessonDetailsLoadingState
 
     init(
-          lessonDetailsManager: LessonDetailsManager,
-          totalLessonsCount: Int
-      ) {
-          self.lessonDetailsManager = lessonDetailsManager
-          self.totalLessonsCount = totalLessonsCount
-          self.state = lessonDetailsManager.state
+        lessonDetailsManager: LessonDetailsManager,
+        totalLessonsCount: Int
+    ) {
+        self.lessonDetailsManager = lessonDetailsManager
+        self.totalLessonsCount = totalLessonsCount
+        state = lessonDetailsManager.state
 
-          bindLessonDetailsManager()
-      }
-
+        bindLessonDetailsManager()
+    }
 
     func loadLesson() async {
         await lessonDetailsManager.loadLesson()
     }
 
     private func bindLessonDetailsManager() {
-          lessonDetailsManager.$state
-              .sink { [weak self] state in
-                  self?.state = state
-              }
-              .store(in: &cancellables)
-      }
+        lessonDetailsManager.$state
+            .sink { [weak self] state in
+                self?.state = state
+            }
+            .store(in: &cancellables)
+    }
 }

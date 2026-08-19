@@ -69,23 +69,23 @@ struct MainTabView: View {
     @ViewBuilder
     private func lessonsDestination(for route: LessonsRoute) -> some View {
         switch route {
-        case .lesson(let id, let totalLessonsCount):
+        case let .lesson(id, totalLessonsCount):
             LessonModuleAssembler.assemble(
                 lessonID: id,
                 totalLessonsCount: totalLessonsCount,
                 dependencies: dependencies
             )
-        case .quiz(let lessonID):
+        case let .quiz(lessonID):
             LessonQuizModuleAssembler.assemble(
                 lessonID: lessonID,
                 dependencies: dependencies
             )
-        case .codeTask(let lessonID):
+        case let .codeTask(lessonID):
             LessonCodeTaskAssembler.assemble(
                 lessonID: lessonID,
                 dependencies: dependencies
             )
-        case .result(let lessonID):
+        case let .result(lessonID):
             LessonCompletionResultView(lessonID: lessonID)
         }
     }
@@ -93,13 +93,13 @@ struct MainTabView: View {
     @ViewBuilder
     private func practiceDestination(for route: PracticeRoute) -> some View {
         switch route {
-        case .topic(let id, let title), .exercise(let id, let title, _):
+        case let .topic(id, title), let .exercise(id, title, _):
             PracticeModuleAssembler.assembleSession(
                 topicID: id,
                 topicTitle: title,
                 dependencies: dependencies
             )
-        case .result(let topicID, let topicTitle, let progress):
+        case let .result(topicID, topicTitle, progress):
             PracticeResultView(
                 topicTitle: topicTitle,
                 progress: progress,

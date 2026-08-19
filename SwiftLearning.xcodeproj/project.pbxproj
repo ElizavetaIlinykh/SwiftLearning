@@ -116,6 +116,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D786AFF830288D1200CBE45A /* Build configuration list for PBXNativeTarget "SwiftLearning" */;
 			buildPhases = (
+				D786B1603035C61B00CBE45A /* SwiftFormat */,
 				D786AFE930288D1000CBE45A /* Sources */,
 				D786AFEA30288D1000CBE45A /* Frameworks */,
 				D786AFEB30288D1000CBE45A /* Resources */,
@@ -123,6 +124,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				D786B15F3035BC3E00CBE45A /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				D786AFEF30288D1000CBE45A /* SwiftLearning */,
@@ -158,6 +160,9 @@
 			);
 			mainGroup = D786AFE430288D1000CBE45A;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				D786B1593035BC1300CBE45A /* XCRemoteSwiftPackageReference "SwiftLint" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D786AFEE30288D1000CBE45A /* Products */;
 			projectDirPath = "";
@@ -178,6 +183,27 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		D786B1603035C61B00CBE45A /* SwiftFormat */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = SwiftFormat;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "export PATH=\"/opt/homebrew/bin:/usr/local/bin:$PATH\"\n\nif command -v swiftformat >/dev/null 2>&1; then\n    swiftformat \"$SRCROOT\"\nelse\n    echo \"warning: SwiftFormat not installed. Install it with: brew install swiftformat\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		D786AFE930288D1000CBE45A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -187,6 +213,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D786B15F3035BC3E00CBE45A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D786B15E3035BC3E00CBE45A /* SwiftLintBuildToolPlugin */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		D786AFF630288D1200CBE45A /* Debug */ = {
@@ -226,7 +259,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -289,7 +322,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -392,6 +425,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		D786B1593035BC1300CBE45A /* XCRemoteSwiftPackageReference "SwiftLint" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/realm/SwiftLint";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.65.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D786B15E3035BC3E00CBE45A /* SwiftLintBuildToolPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D786B1593035BC1300CBE45A /* XCRemoteSwiftPackageReference "SwiftLint" */;
+			productName = "plugin:SwiftLintBuildToolPlugin";
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = D786AFE530288D1000CBE45A /* Project object */;
 }

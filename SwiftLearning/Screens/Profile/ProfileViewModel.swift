@@ -15,7 +15,7 @@ final class ProfileViewModel: ObservableObject {
     ) {
         self.profileManager = profileManager
         self.session = session
-        self.state = profileManager.state
+        state = profileManager.state
 
         bindProfileManager()
     }

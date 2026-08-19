@@ -38,7 +38,7 @@ struct PracticeSessionView: View {
         switch viewModel.state {
         case .idle, .loading:
             loadingView
-        case .failed(let message):
+        case let .failed(message):
             errorView(message: message)
         case .loaded:
             if viewModel.tasks.isEmpty {
@@ -145,7 +145,7 @@ struct PracticeSessionView: View {
 
     @ViewBuilder
     private var completionErrorView: some View {
-        if case .failed(let message) = viewModel.completionState {
+        if case let .failed(message) = viewModel.completionState {
             Text(message)
                 .font(.subheadline)
                 .foregroundStyle(.red)
@@ -245,7 +245,7 @@ struct PracticeSessionView: View {
     ) -> AnswerOptionState {
         guard let selectedAnswerIndex else { return .neutral }
 
-        if index == selectedAnswerIndex && answers[index].isCorrect {
+        if index == selectedAnswerIndex, answers[index].isCorrect {
             return .selectedCorrect
         }
 
@@ -331,7 +331,9 @@ struct PracticeSessionView: View {
     }
 
     private var isSavingResult: Bool {
-        if case .saving = viewModel.completionState { return true }
+        if case .saving = viewModel.completionState {
+            return true
+        }
         return false
     }
 

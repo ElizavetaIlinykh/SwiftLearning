@@ -11,15 +11,15 @@ final class PracticeViewModel: ObservableObject {
     @Published private(set) var loadMoreError: String?
 
     var topics: [PracticeCategory] {
-        guard case .loaded(let topics) = state else { return [] }
+        guard case let .loaded(topics) = state else { return [] }
         return topics.sorted { $0.order < $1.order }
     }
 
     init(topicsManager: PracticeTopicsManager) {
         self.topicsManager = topicsManager
-        self.state = topicsManager.state
-        self.isLoadingMore = topicsManager.isLoadingMore
-        self.loadMoreError = topicsManager.loadMoreError
+        state = topicsManager.state
+        isLoadingMore = topicsManager.isLoadingMore
+        loadMoreError = topicsManager.loadMoreError
 
         bindTopicsManager()
     }

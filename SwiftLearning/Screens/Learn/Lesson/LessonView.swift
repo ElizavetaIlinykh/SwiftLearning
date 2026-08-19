@@ -27,7 +27,7 @@ struct LessonView: View {
     }
 
     private var navigationTitle: String {
-        guard case .loaded(let lesson) = viewModel.state else { return "Lesson" }
+        guard case let .loaded(lesson) = viewModel.state else { return "Lesson" }
         return lesson.title
     }
 
@@ -36,9 +36,9 @@ struct LessonView: View {
         switch viewModel.state {
         case .idle, .loading:
             loadingView
-        case .failed(let message):
+        case let .failed(message):
             errorView(message: message)
-        case .loaded(let lesson):
+        case let .loaded(lesson):
             lessonContent(lesson)
         }
     }

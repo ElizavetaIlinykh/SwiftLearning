@@ -6,15 +6,15 @@ protocol NetworkManaging {
         queryItems: [URLQueryItem]
     ) async throws -> Response
 
-    func post<Body: Encodable, Response: Decodable>(
+    func post<Response: Decodable>(
         _ path: String,
-        body: Body,
+        body: some Encodable,
         queryItems: [URLQueryItem]
     ) async throws -> Response
 
-    func put<Body: Encodable, Response: Decodable>(
+    func put<Response: Decodable>(
         _ path: String,
-        body: Body
+        body: some Encodable
     ) async throws -> Response
 
     func delete<Response: Decodable>(_ path: String) async throws -> Response
@@ -25,9 +25,9 @@ extension NetworkManaging {
         try await get(path, queryItems: [])
     }
 
-    func post<Body: Encodable, Response: Decodable>(
+    func post<Response: Decodable>(
         _ path: String,
-        body: Body
+        body: some Encodable
     ) async throws -> Response {
         try await post(path, body: body, queryItems: [])
     }
@@ -51,9 +51,9 @@ final class NetworkManager: NetworkManaging {
         self.session = session
         self.tokenStorage = tokenStorage
 
-        self.decoder = JSONDecoder()
-        self.decoder.keyDecodingStrategy = .convertFromSnakeCase
-        self.decoder.dateDecodingStrategy = .custom { decoder in
+        decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        decoder.dateDecodingStrategy = .custom { decoder in
             let container = try decoder.singleValueContainer()
             let dateString = try container.decode(String.self)
 
@@ -61,7 +61,7 @@ final class NetworkManager: NetworkManaging {
                 return date
             }
 
-            if let date = ISO8601DateFormatter.backendDateFormatterWithFractionalSeconds.date(from: dateString) {
+            if let date = ISO8601DateFormatter.backendFractionalDateFormatter.date(from: dateString) {
                 return date
             }
 
@@ -71,9 +71,9 @@ final class NetworkManager: NetworkManaging {
             )
         }
 
-        self.encoder = JSONEncoder()
-        self.encoder.keyEncodingStrategy = .convertToSnakeCase
-        self.encoder.dateEncodingStrategy = .iso8601
+        encoder = JSONEncoder()
+        encoder.keyEncodingStrategy = .convertToSnakeCase
+        encoder.dateEncodingStrategy = .iso8601
     }
 
     func get<Response: Decodable>(
@@ -84,9 +84,9 @@ final class NetworkManager: NetworkManaging {
         return try await send(request)
     }
 
-    func post<Body: Encodable, Response: Decodable>(
+    func post<Response: Decodable>(
         _ path: String,
-        body: Body,
+        body: some Encodable,
         queryItems: [URLQueryItem] = []
     ) async throws -> Response {
         var request = try makeRequest(path: path, method: .post, queryItems: queryItems)
@@ -94,9 +94,9 @@ final class NetworkManager: NetworkManaging {
         return try await send(request)
     }
 
-    func put<Body: Encodable, Response: Decodable>(
+    func put<Response: Decodable>(
         _ path: String,
-        body: Body
+        body: some Encodable
     ) async throws -> Response {
         var request = try makeRequest(path: path, method: .put)
         request.httpBody = try encoder.encode(body)
@@ -115,15 +115,15 @@ final class NetworkManager: NetworkManaging {
             throw NetworkError.invalidResponse
         }
 
-        guard (200...299).contains(httpResponse.statusCode) else {
+        guard (200 ... 299).contains(httpResponse.statusCode) else {
             if httpResponse.statusCode == 401, !isAuthEndpoint(request) {
                 unauthorizedHandler?()
             }
             throw NetworkError.serverError(statusCode: httpResponse.statusCode, data: data)
         }
 
-        if Response.self == EmptyResponse.self, data.isEmpty {
-            return EmptyResponse() as! Response
+        if data.isEmpty, let emptyResponse = EmptyResponse() as? Response {
+            return emptyResponse
         }
 
         do {
@@ -190,13 +190,13 @@ extension NetworkManager {
         var errorDescription: String? {
             switch self {
             case .invalidURL:
-                return "Invalid URL."
+                "Invalid URL."
             case .invalidResponse:
-                return "Invalid server response."
-            case .serverError(let statusCode, _):
-                return "Server returned status code \(statusCode)."
-            case .decodingFailed(let error):
-                return "Failed to decode response: \(error.localizedDescription)"
+                "Invalid server response."
+            case let .serverError(statusCode, _):
+                "Server returned status code \(statusCode)."
+            case let .decodingFailed(error):
+                "Failed to decode response: \(error.localizedDescription)"
             }
         }
     }
@@ -216,7 +216,7 @@ private extension ISO8601DateFormatter {
         return formatter
     }()
 
-    static let backendDateFormatterWithFractionalSeconds: ISO8601DateFormatter = {
+    static let backendFractionalDateFormatter: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         return formatter

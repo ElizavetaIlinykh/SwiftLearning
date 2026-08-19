@@ -87,22 +87,22 @@ struct LessonCard: View {
     private var cardBackground: Color {
         switch viewModel.state {
         case .completed:
-            return Color.green.opacity(0.08)
+            Color.green.opacity(0.08)
         case .current:
-            return Color.accentColor.opacity(0.10)
+            Color.accentColor.opacity(0.10)
         case .locked:
-            return Color.secondary.opacity(0.08)
+            Color.secondary.opacity(0.08)
         }
     }
 
     private var borderColor: Color {
         switch viewModel.state {
         case .completed:
-            return Color.green.opacity(0.22)
+            Color.green.opacity(0.22)
         case .current:
-            return Color.accentColor.opacity(0.55)
+            Color.accentColor.opacity(0.55)
         case .locked:
-            return Color.secondary.opacity(0.12)
+            Color.secondary.opacity(0.12)
         }
     }
 

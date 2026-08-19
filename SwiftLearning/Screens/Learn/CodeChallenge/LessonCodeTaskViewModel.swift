@@ -20,8 +20,8 @@ final class LessonCodeTaskViewModel: ObservableObject {
         self.lessonID = lessonID
         self.codeTaskManager = codeTaskManager
         self.completionViewModel = completionViewModel
-        self.codeTaskState = codeTaskManager.state
-        self.completionState = completionViewModel.state
+        codeTaskState = codeTaskManager.state
+        completionState = completionViewModel.state
 
         bindManagers()
     }

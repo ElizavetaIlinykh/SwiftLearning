@@ -49,7 +49,7 @@ final class AuthService: AuthServicing {
     func fetchCurrentUser() async throws -> UserProfile {
         do {
             return try await networkManager.get("/me")
-        } catch NetworkManager.NetworkError.serverError(let statusCode, _) where statusCode == 401 {
+        } catch let NetworkManager.NetworkError.serverError(statusCode, _) where statusCode == 401 {
             throw AuthError.unauthorized
         } catch {
             throw error
@@ -69,7 +69,7 @@ final class AuthService: AuthServicing {
             return authError
         }
 
-        if case NetworkManager.NetworkError.serverError(let statusCode, _) = error {
+        if case let NetworkManager.NetworkError.serverError(statusCode, _) = error {
             switch statusCode {
             case 401:
                 return isRegister ? .requestFailed("Could not register this account.") : .invalidCredentials

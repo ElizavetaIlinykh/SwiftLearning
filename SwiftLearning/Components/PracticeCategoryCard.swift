@@ -59,6 +59,6 @@ struct PracticeCategoryCard: View {
             tasksCount: 3
         )
     ) {}
-    .padding()
-    .background(Color(.systemGroupedBackground))
+        .padding()
+        .background(Color(.systemGroupedBackground))
 }

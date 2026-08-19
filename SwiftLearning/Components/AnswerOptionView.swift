@@ -41,55 +41,55 @@ struct AnswerOptionView: View {
     private var backgroundColor: Color {
         switch state {
         case .neutral:
-            return Color(.secondarySystemGroupedBackground)
+            Color(.secondarySystemGroupedBackground)
         case .selectedCorrect, .correct:
-            return Color.green.opacity(0.13)
+            Color.green.opacity(0.13)
         case .selectedIncorrect:
-            return Color.red.opacity(0.13)
+            Color.red.opacity(0.13)
         }
     }
 
     private var borderColor: Color {
         switch state {
         case .neutral:
-            return Color.primary.opacity(0.08)
+            Color.primary.opacity(0.08)
         case .selectedCorrect, .correct:
-            return Color.green.opacity(0.55)
+            Color.green.opacity(0.55)
         case .selectedIncorrect:
-            return Color.red.opacity(0.55)
+            Color.red.opacity(0.55)
         }
     }
 
     private var textColor: Color {
         switch state {
         case .neutral:
-            return .primary
+            .primary
         case .selectedCorrect, .correct:
-            return .green
+            .green
         case .selectedIncorrect:
-            return .red
+            .red
         }
     }
 
     private var iconColor: Color {
         switch state {
         case .selectedCorrect, .correct:
-            return .green
+            .green
         case .selectedIncorrect:
-            return .red
+            .red
         case .neutral:
-            return .secondary
+            .secondary
         }
     }
 
     private var systemImageName: String? {
         switch state {
         case .selectedCorrect, .correct:
-            return "checkmark.circle.fill"
+            "checkmark.circle.fill"
         case .selectedIncorrect:
-            return "xmark.circle.fill"
+            "xmark.circle.fill"
         case .neutral:
-            return nil
+            nil
         }
     }
 }

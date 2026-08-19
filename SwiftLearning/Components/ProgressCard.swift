@@ -80,6 +80,6 @@ struct ProgressCard: View {
         completedLessonsCount: 0,
         totalLessonsCount: 8
     ) {}
-    .padding()
-    .background(Color(.systemGroupedBackground))
+        .padding()
+        .background(Color(.systemGroupedBackground))
 }

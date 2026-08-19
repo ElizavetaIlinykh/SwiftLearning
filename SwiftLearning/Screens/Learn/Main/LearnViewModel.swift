@@ -3,20 +3,19 @@ import Foundation
 
 @MainActor
 final class LearnViewModel: ObservableObject {
-    
     enum LoadMoreState {
         case idle
         case loading
         case error(String)
     }
-    
+
     private let lessonsManager: LessonsManager
     private var cancellables: Set<AnyCancellable> = []
 
     @Published private(set) var state: LessonsLoadingState
 
     var lessons: [LessonSummary] {
-        guard case .loaded(let lessons, _) = state else { return [] }
+        guard case let .loaded(lessons, _) = state else { return [] }
         return lessons
     }
 
@@ -38,11 +37,11 @@ final class LearnViewModel: ObservableObject {
     }
 
     var loadMoreState: LoadMoreState {
-        guard case .loaded(_, let moreLoadingState) = state else { return .idle }
+        guard case let .loaded(_, moreLoadingState) = state else { return .idle }
         switch moreLoadingState {
         case .loading:
             return .loading
-        case .failed(let message):
+        case let .failed(message):
             return .error(message)
         case .idle:
             return .idle
@@ -51,7 +50,7 @@ final class LearnViewModel: ObservableObject {
 
     init(lessonsManager: LessonsManager) {
         self.lessonsManager = lessonsManager
-        self.state = lessonsManager.state
+        state = lessonsManager.state
 
         bindLessonsManager()
     }
@@ -83,11 +82,11 @@ final class LearnViewModel: ObservableObject {
     private func lessonState(for status: LessonStatus) -> LessonState {
         switch status {
         case .completed:
-            return .completed
+            .completed
         case .available:
-            return .current
+            .current
         case .locked:
-            return .locked
+            .locked
         }
     }
 }

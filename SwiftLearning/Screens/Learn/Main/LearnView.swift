@@ -55,10 +55,10 @@ struct LearnView: View {
         case .idle, .loading:
             loadingView
 
-        case .failed(let message):
+        case let .failed(message):
             errorView(message: message)
 
-        case .loaded(let lessons, _):
+        case let .loaded(lessons, _):
             if lessons.isEmpty {
                 emptyView
             } else {
@@ -67,35 +67,34 @@ struct LearnView: View {
         }
     }
 
+    @ViewBuilder
     private var lessonsContent: some View {
-        Group {
-            ProgressCard(
-                courseTitle: "Swift Basics",
-                completedLessonsCount: viewModel.completedLessonsCount,
-                totalLessonsCount: viewModel.lessons.count
-            ) {}
+        ProgressCard(
+            courseTitle: "Swift Basics",
+            completedLessonsCount: viewModel.completedLessonsCount,
+            totalLessonsCount: viewModel.lessons.count
+        ) {}
 
-            VStack(alignment: .leading, spacing: 14) {
-                Text("Course")
-                    .font(.title2)
-                    .fontWeight(.bold)
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Course")
+                .font(.title2)
+                .fontWeight(.bold)
 
-                LazyVStack(alignment: .leading, spacing: 14) {
-                    ForEach(viewModel.lessonCards) { lessonCard in
-                        LessonCard(viewModel: lessonCard) {
-                            router.push(
-                                .lesson(
-                                    id: lessonCard.id,
-                                    totalLessonsCount: viewModel.lessons.count
-                                )
+            LazyVStack(alignment: .leading, spacing: 14) {
+                ForEach(viewModel.lessonCards) { lessonCard in
+                    LessonCard(viewModel: lessonCard) {
+                        router.push(
+                            .lesson(
+                                id: lessonCard.id,
+                                totalLessonsCount: viewModel.lessons.count
                             )
-                        }
+                        )
                     }
                 }
-                .scrollTargetLayout()
-
-                loadMoreView
             }
+            .scrollTargetLayout()
+
+            loadMoreView
         }
     }
 
@@ -124,7 +123,7 @@ struct LearnView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
 
-        case .error(let message):
+        case let .error(message):
             VStack(alignment: .leading, spacing: 8) {
                 Text(message)
                     .font(.subheadline)

@@ -38,9 +38,9 @@ struct LessonQuizRouteView: View {
         switch viewModel.state {
         case .idle, .loading:
             loadingView
-        case .failed(let message):
+        case let .failed(message):
             errorView(message: message)
-        case .loaded(let questions):
+        case let .loaded(questions):
             let sortedQuestions = questions.sorted { $0.order < $1.order }
 
             if sortedQuestions.isEmpty {
@@ -191,7 +191,7 @@ struct LessonQuizRouteView: View {
     ) -> AnswerOptionState {
         guard let selectedAnswerIndex else { return .neutral }
 
-        if index == selectedAnswerIndex && answers[index].isCorrect {
+        if index == selectedAnswerIndex, answers[index].isCorrect {
             return .selectedCorrect
         }
 

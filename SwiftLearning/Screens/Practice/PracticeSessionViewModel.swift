@@ -24,7 +24,7 @@ final class PracticeSessionViewModel: ObservableObject {
     let topicTitle: String
 
     var tasks: [PracticeTask] {
-        guard case .loaded(let tasks) = state else { return [] }
+        guard case let .loaded(tasks) = state else { return [] }
         return tasks.sorted { $0.order < $1.order }
     }
 
@@ -38,10 +38,10 @@ final class PracticeSessionViewModel: ObservableObject {
         self.topicTitle = topicTitle
         self.tasksManager = tasksManager
         self.practiceService = practiceService
-        self.state = tasksManager.state
-        self.hasMoreTasks = tasksManager.hasMore
-        self.isLoadingMoreTasks = tasksManager.isLoadingMore
-        self.loadMoreTasksError = tasksManager.loadMoreError
+        state = tasksManager.state
+        hasMoreTasks = tasksManager.hasMore
+        isLoadingMoreTasks = tasksManager.isLoadingMore
+        loadMoreTasksError = tasksManager.loadMoreError
 
         bindTasksManager()
     }

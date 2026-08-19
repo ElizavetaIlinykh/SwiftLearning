@@ -35,7 +35,7 @@ struct PracticeView: View {
         switch viewModel.state {
         case .idle, .loading:
             loadingView
-        case .failed(let message):
+        case let .failed(message):
             errorView(message: message)
         case .loaded:
             if viewModel.topics.isEmpty {

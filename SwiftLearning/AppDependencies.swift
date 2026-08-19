@@ -24,9 +24,9 @@ final class AppServices {
         networkManager: NetworkManaging,
         authService: AuthServicing
     ) {
-        self.lessonsService = LessonsService(networkManager: networkManager)
-        self.userService = UserService(networkManager: networkManager)
-        self.practiceService = PracticeService(networkManager: networkManager)
+        lessonsService = LessonsService(networkManager: networkManager)
+        userService = UserService(networkManager: networkManager)
+        practiceService = PracticeService(networkManager: networkManager)
         self.authService = authService
     }
 

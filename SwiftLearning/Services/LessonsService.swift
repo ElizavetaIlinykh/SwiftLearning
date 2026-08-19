@@ -8,7 +8,7 @@ enum LessonCodeTaskError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .notFound:
-            return "No code task is available for this lesson."
+            "No code task is available for this lesson."
         }
     }
 }
@@ -46,7 +46,7 @@ final class LessonsService: LessonsServicing {
     func fetchLessonCodeTask(lessonID: String) async throws -> LessonCodeTask {
         do {
             return try await networkManager.get("/lessons/\(lessonID)/code-task")
-        } catch NetworkManager.NetworkError.serverError(let statusCode, _) where statusCode == 404 {
+        } catch let NetworkManager.NetworkError.serverError(statusCode, _) where statusCode == 404 {
             throw LessonCodeTaskError.notFound
         }
     }
