@@ -94,7 +94,9 @@ struct LearnView: View {
             }
             .scrollTargetLayout()
 
-            loadMoreView
+            LoadMoreView(state: viewModel.loadMoreState) {
+                await viewModel.retryLoadMoreLessons()
+            }
         }
     }
 
@@ -109,35 +111,6 @@ struct LearnView: View {
 
         Task {
             await viewModel.loadMoreLessons()
-        }
-    }
-
-    @ViewBuilder
-    private var loadMoreView: some View {
-        switch viewModel.loadMoreState {
-        case .idle:
-            EmptyView()
-
-        case .loading:
-            ProgressView()
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-
-        case let .error(message):
-            VStack(alignment: .leading, spacing: 8) {
-                Text(message)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-
-                Button("Try Again") {
-                    Task {
-                        await viewModel.retryLoadMoreLessons()
-                    }
-                }
-                .font(.headline)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.vertical, 8)
         }
     }
 

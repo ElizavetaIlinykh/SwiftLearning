@@ -3,12 +3,6 @@ import Foundation
 
 @MainActor
 final class LearnViewModel: ObservableObject {
-    enum LoadMoreState {
-        case idle
-        case loading
-        case error(String)
-    }
-
     private let lessonsManager: LessonsManager
     private var cancellables: Set<AnyCancellable> = []
 
@@ -36,7 +30,7 @@ final class LearnViewModel: ObservableObject {
         lessons.filter { $0.status == .completed }.count
     }
 
-    var loadMoreState: LoadMoreState {
+    var loadMoreState: LoadMoreView.State {
         guard case let .loaded(_, moreLoadingState) = state else { return .idle }
         switch moreLoadingState {
         case .loading:
