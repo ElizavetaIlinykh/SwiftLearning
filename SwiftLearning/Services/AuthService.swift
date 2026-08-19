@@ -9,8 +9,12 @@ protocol AuthServicing {
 }
 
 final class AuthService: AuthServicing {
+    // MARK: - Private properties -
+
     private let networkManager: NetworkManaging
     private let tokenStorage: TokenStoring
+
+    // MARK: - Init -
 
     init(
         networkManager: NetworkManaging,
@@ -19,6 +23,8 @@ final class AuthService: AuthServicing {
         self.networkManager = networkManager
         self.tokenStorage = tokenStorage
     }
+
+    // MARK: - Public methods -
 
     func register(name: String, email: String, password: String) async throws -> UserProfile {
         do {
@@ -63,6 +69,8 @@ final class AuthService: AuthServicing {
     func logout() {
         try? tokenStorage.deleteAccessToken()
     }
+
+    // MARK: - Private methods -
 
     private func mapAuthError(_ error: Error, isRegister: Bool) -> AuthError {
         if let authError = error as? AuthError {

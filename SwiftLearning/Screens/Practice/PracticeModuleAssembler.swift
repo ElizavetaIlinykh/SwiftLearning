@@ -2,6 +2,8 @@ import SwiftUI
 
 @MainActor
 enum PracticeModuleAssembler {
+    // MARK: - Public methods -
+
     static func assemble(dependencies: AppDependencies) -> PracticeView {
         let topicsManager = PracticeTopicsManager(practiceService: dependencies.services.practiceService)
         let viewModel = PracticeViewModel(topicsManager: topicsManager)

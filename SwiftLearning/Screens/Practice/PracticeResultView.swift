@@ -1,10 +1,14 @@
 import SwiftUI
 
 struct PracticeResultView: View {
+    // MARK: - Public properties -
+
     let topicTitle: String
     let progress: PracticeProgress
     let onPracticeAgain: () -> Void
     let onDone: () -> Void
+
+    // MARK: - Private properties -
 
     private var resultMessage: String {
         switch progress.scorePercent {

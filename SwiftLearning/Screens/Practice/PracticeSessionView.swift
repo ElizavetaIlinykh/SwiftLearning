@@ -1,18 +1,23 @@
 import SwiftUI
 
 struct PracticeSessionView: View {
+    // MARK: - Private properties -
+
     @Environment(AppRouter.self) private var router
     @StateObject private var viewModel: PracticeSessionViewModel
+
+    // MARK: - Init -
 
     @State private var currentTaskIndex = 0
     @State private var selectedAnswerIndex: Int?
     @State private var isAnswered = false
     @State private var correctAnswersCount = 0
     @State private var totalAnswersCount = 0
-
     init(viewModel: PracticeSessionViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
+
+    // MARK: - Public properties -
 
     var body: some View {
         ScrollView {
@@ -48,6 +53,8 @@ struct PracticeSessionView: View {
             }
         }
     }
+
+    // MARK: - Private methods -
 
     private func taskContent(_ tasks: [PracticeTask]) -> some View {
         let safeTaskIndex = min(currentTaskIndex, tasks.count - 1)

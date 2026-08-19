@@ -10,10 +10,13 @@ enum LessonQuizLoadingState: Equatable {
 
 @MainActor
 final class LessonQuizManager: ObservableObject {
-    @Published private(set) var state: LessonQuizLoadingState = .idle
+    // MARK: - Private properties -
 
+    @Published private(set) var state: LessonQuizLoadingState = .idle
     private let lessonID: String
     private let lessonsService: LessonsServicing
+
+    // MARK: - Init -
 
     init(
         lessonID: String,
@@ -22,6 +25,8 @@ final class LessonQuizManager: ObservableObject {
         self.lessonID = lessonID
         self.lessonsService = lessonsService
     }
+
+    // MARK: - Public methods -
 
     func loadQuestions() async {
         guard state != .loading else { return }

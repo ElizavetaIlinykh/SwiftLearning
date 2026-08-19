@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct AchievementCard: View {
+    // MARK: - Public properties -
+
     let achievement: Achievement
 
     var body: some View {
@@ -38,6 +40,8 @@ struct AchievementCard: View {
         )
         .opacity(achievement.isUnlocked ? 1 : 0.68)
     }
+
+    // MARK: - Private properties -
 
     private var iconColor: Color {
         achievement.isUnlocked ? Color.accentColor : .secondary

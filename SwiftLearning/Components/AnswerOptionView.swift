@@ -8,6 +8,8 @@ enum AnswerOptionState {
 }
 
 struct AnswerOptionView: View {
+    // MARK: - Public properties -
+
     let title: String
     let state: AnswerOptionState
     let action: () -> Void
@@ -37,6 +39,8 @@ struct AnswerOptionView: View {
         }
         .buttonStyle(.plain)
     }
+
+    // MARK: - Private properties -
 
     private var backgroundColor: Color {
         switch state {

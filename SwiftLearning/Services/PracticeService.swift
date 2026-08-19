@@ -1,6 +1,8 @@
 import Foundation
 
 private struct PracticeCompletionRequest: Encodable {
+    // MARK: - Public properties -
+
     let correctAnswersCount: Int
     let totalAnswersCount: Int
 }
@@ -17,11 +19,17 @@ protocol PracticeServicing {
 }
 
 final class PracticeService: PracticeServicing {
+    // MARK: - Private properties -
+
     private let networkManager: NetworkManaging
+
+    // MARK: - Init -
 
     init(networkManager: NetworkManaging) {
         self.networkManager = networkManager
     }
+
+    // MARK: - Public methods -
 
     func fetchTopics(offset: Int, limit: Int) async throws -> PaginatedResponse<PracticeCategory> {
         try await networkManager.get(

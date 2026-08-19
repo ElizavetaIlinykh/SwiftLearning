@@ -34,13 +34,19 @@ extension NetworkManaging {
 }
 
 final class NetworkManager: NetworkManaging {
+    // MARK: - Private properties -
+
     private let baseURL: URL
     private let session: URLSession
     private let decoder: JSONDecoder
     private let encoder: JSONEncoder
     private let tokenStorage: TokenStoring?
 
+    // MARK: - Public properties -
+
     var unauthorizedHandler: (() -> Void)?
+
+    // MARK: - Init -
 
     init(
         baseURL: URL = URL(string: "http://127.0.0.1:8000")!,
@@ -76,6 +82,8 @@ final class NetworkManager: NetworkManaging {
         encoder.dateEncodingStrategy = .iso8601
     }
 
+    // MARK: - Public methods -
+
     func get<Response: Decodable>(
         _ path: String,
         queryItems: [URLQueryItem] = []
@@ -107,6 +115,8 @@ final class NetworkManager: NetworkManaging {
         let request = try makeRequest(path: path, method: .delete)
         return try await send(request)
     }
+
+    // MARK: - Private methods -
 
     private func send<Response: Decodable>(_ request: URLRequest) async throws -> Response {
         let (data, response) = try await session.data(for: request)

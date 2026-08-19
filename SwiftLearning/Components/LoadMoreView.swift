@@ -7,9 +7,13 @@ struct LoadMoreView: View {
         case error(String)
     }
 
+    // MARK: - Public properties -
+
     let state: State
     let retryTitle: String
     let retryAction: () async -> Void
+
+    // MARK: - Init -
 
     init(
         state: State,

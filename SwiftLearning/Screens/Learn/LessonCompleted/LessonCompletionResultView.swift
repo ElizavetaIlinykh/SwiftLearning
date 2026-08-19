@@ -1,8 +1,11 @@
 import SwiftUI
 
 struct LessonCompletionResultView: View {
-    @Environment(AppRouter.self) private var router
+    // MARK: - Private properties -
 
+    // MARK: - Public properties -
+
+    @Environment(AppRouter.self) private var router
     let lessonID: String
 
     @State private var isVisible = false

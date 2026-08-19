@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct PracticeCategoryCard: View {
+    // MARK: - Public properties -
+
     let category: PracticeCategory
     let action: () -> Void
 

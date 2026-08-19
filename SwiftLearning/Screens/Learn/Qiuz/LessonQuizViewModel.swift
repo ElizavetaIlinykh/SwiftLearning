@@ -3,13 +3,18 @@ import Foundation
 
 @MainActor
 final class LessonQuizViewModel: ObservableObject {
+    // MARK: - Private properties -
+
     private let quizManager: LessonQuizManager
     private var cancellables: Set<AnyCancellable> = []
 
+    // MARK: - Public properties -
+
     let lessonID: String
 
-    @Published private(set) var state: LessonQuizLoadingState
+    // MARK: - Init -
 
+    @Published private(set) var state: LessonQuizLoadingState
     init(
         lessonID: String,
         quizManager: LessonQuizManager
@@ -21,9 +26,13 @@ final class LessonQuizViewModel: ObservableObject {
         bindQuizManager()
     }
 
+    // MARK: - Public methods -
+
     func loadQuestions() async {
         await quizManager.loadQuestions()
     }
+
+    // MARK: - Private methods -
 
     private func bindQuizManager() {
         quizManager.$state

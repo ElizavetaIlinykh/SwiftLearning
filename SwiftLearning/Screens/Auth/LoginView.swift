@@ -1,9 +1,13 @@
 import SwiftUI
 
 struct LoginView: View {
+    // MARK: - Public properties -
+
     @ObservedObject var session: SessionState
 
     let onRegisterTapped: () -> Void
+
+    // MARK: - Private properties -
 
     @State private var email = ""
     @State private var password = ""
@@ -71,6 +75,8 @@ struct LoginView: View {
                 .frame(maxWidth: .infinity)
         }
     }
+
+    // MARK: - Private methods -
 
     private func login() async {
         guard !isLoading else { return }

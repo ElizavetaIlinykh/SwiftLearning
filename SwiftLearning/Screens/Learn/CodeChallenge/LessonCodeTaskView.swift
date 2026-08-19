@@ -1,15 +1,20 @@
 import SwiftUI
 
 struct LessonCodeTaskView: View {
+    // MARK: - Private properties -
+
     @Environment(AppRouter.self) private var router
     @StateObject private var viewModel: LessonCodeTaskViewModel
 
+    // MARK: - Init -
+
     @State private var answer = ""
     @State private var answerState: AnswerState = .idle
-
     init(viewModel: LessonCodeTaskViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
+
+    // MARK: - Public properties -
 
     var body: some View {
         ScrollView {
@@ -42,6 +47,8 @@ struct LessonCodeTaskView: View {
             errorView(message: message)
         }
     }
+
+    // MARK: - Private methods -
 
     private func codeTaskContent(_ codeTask: LessonCodeTask) -> some View {
         VStack(alignment: .leading, spacing: 24) {

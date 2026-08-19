@@ -10,15 +10,18 @@ enum PracticeCompletionState: Equatable {
 
 @MainActor
 final class PracticeSessionViewModel: ObservableObject {
+    // MARK: - Private properties -
+
     @Published private(set) var state: PracticeTasksLoadingState
     @Published private(set) var hasMoreTasks: Bool
     @Published private(set) var isLoadingMoreTasks: Bool
     @Published private(set) var loadMoreTasksError: String?
     @Published private(set) var completionState: PracticeCompletionState = .idle
-
     private let tasksManager: PracticeTasksManager
     private let practiceService: PracticeServicing
     private var cancellables: Set<AnyCancellable> = []
+
+    // MARK: - Public properties -
 
     let topicID: String
     let topicTitle: String
@@ -27,6 +30,8 @@ final class PracticeSessionViewModel: ObservableObject {
         guard case let .loaded(tasks) = state else { return [] }
         return tasks.sorted { $0.order < $1.order }
     }
+
+    // MARK: - Init -
 
     init(
         topicID: String,
@@ -45,6 +50,8 @@ final class PracticeSessionViewModel: ObservableObject {
 
         bindTasksManager()
     }
+
+    // MARK: - Public methods -
 
     func loadTasks() async {
         await tasksManager.loadTasks()
@@ -80,6 +87,8 @@ final class PracticeSessionViewModel: ObservableObject {
             return nil
         }
     }
+
+    // MARK: - Private methods -
 
     private func bindTasksManager() {
         tasksManager.$state

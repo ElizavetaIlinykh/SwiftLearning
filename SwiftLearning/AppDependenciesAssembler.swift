@@ -1,5 +1,7 @@
 @MainActor
 enum AppDependenciesAssembler {
+    // MARK: - Public methods -
+
     static func assemble() -> AppDependencies {
         let tokenStorage = KeychainTokenStorage()
         let networkManager = NetworkManager(tokenStorage: tokenStorage)

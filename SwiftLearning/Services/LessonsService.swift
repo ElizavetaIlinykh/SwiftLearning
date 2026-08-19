@@ -5,6 +5,8 @@ private struct EmptyRequestBody: Encodable {}
 enum LessonCodeTaskError: LocalizedError {
     case notFound
 
+    // MARK: - Public properties -
+
     var errorDescription: String? {
         switch self {
         case .notFound:
@@ -22,11 +24,17 @@ protocol LessonsServicing {
 }
 
 final class LessonsService: LessonsServicing {
+    // MARK: - Private properties -
+
     private let networkManager: NetworkManaging
+
+    // MARK: - Init -
 
     init(networkManager: NetworkManaging = NetworkManager()) {
         self.networkManager = networkManager
     }
+
+    // MARK: - Public methods -
 
     func fetchLessons(offset: Int, limit: Int) async throws -> PaginatedResponse<LessonSummary> {
         try await networkManager.get(

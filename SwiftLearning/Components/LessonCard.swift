@@ -7,6 +7,8 @@ enum LessonState {
 }
 
 struct LessonCardViewModel: Identifiable, Hashable {
+    // MARK: - Public properties -
+
     let id: String
     let title: String
     let description: String
@@ -19,6 +21,8 @@ struct LessonCardViewModel: Identifiable, Hashable {
 }
 
 struct LessonCard: View {
+    // MARK: - Public properties -
+
     let viewModel: LessonCardViewModel
     let action: () -> Void
 
@@ -59,6 +63,8 @@ struct LessonCard: View {
         .buttonStyle(.plain)
         .disabled(viewModel.state == .locked)
     }
+
+    // MARK: - Private properties -
 
     @ViewBuilder
     private var stateView: some View {

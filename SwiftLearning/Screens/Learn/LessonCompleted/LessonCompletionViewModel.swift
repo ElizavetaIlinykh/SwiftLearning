@@ -10,10 +10,13 @@ final class LessonCompletionViewModel: ObservableObject {
         case failed(String)
     }
 
-    @Published private(set) var state: State = .idle
+    // MARK: - Private properties -
 
+    @Published private(set) var state: State = .idle
     private let lessonID: String
     private let lessonsService: LessonsServicing
+
+    // MARK: - Init -
 
     init(
         lessonID: String,
@@ -22,6 +25,8 @@ final class LessonCompletionViewModel: ObservableObject {
         self.lessonID = lessonID
         self.lessonsService = lessonsService
     }
+
+    // MARK: - Public methods -
 
     func completeLesson() async -> Bool {
         guard state != .completing else { return false }

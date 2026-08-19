@@ -1,12 +1,15 @@
 import SwiftUI
 
 struct LessonQuizRouteView: View {
+    // MARK: - Private properties -
+
     @Environment(AppRouter.self) private var router
     @StateObject private var viewModel: LessonQuizViewModel
 
+    // MARK: - Init -
+
     @State private var currentQuestionIndex = 0
     @State private var selectedAnswerIndex: Int?
-
     init(viewModel: LessonQuizViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
@@ -14,6 +17,8 @@ struct LessonQuizRouteView: View {
     private var isAnswered: Bool {
         selectedAnswerIndex != nil
     }
+
+    // MARK: - Public properties -
 
     var body: some View {
         ScrollView {
@@ -50,6 +55,8 @@ struct LessonQuizRouteView: View {
             }
         }
     }
+
+    // MARK: - Private methods -
 
     private func questionView(_ questions: [LessonQuizQuestion]) -> some View {
         let question = questions[currentQuestionIndex]

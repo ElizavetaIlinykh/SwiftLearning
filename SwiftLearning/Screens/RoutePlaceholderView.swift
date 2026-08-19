@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct RoutePlaceholderView: View {
+    // MARK: - Public properties -
+
     let title: String
 
     var body: some View {

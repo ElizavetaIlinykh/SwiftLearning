@@ -10,16 +10,19 @@ enum PracticeTasksLoadingState: Equatable {
 
 @MainActor
 final class PracticeTasksManager: ObservableObject {
+    // MARK: - Private properties -
+
     @Published private(set) var state: PracticeTasksLoadingState = .idle
     @Published private(set) var hasMore = false
     @Published private(set) var isLoadingMore = false
     @Published private(set) var loadMoreError: String?
-
     private let topicID: String
     private let practiceService: PracticeServicing
     private let pageLimit = 20
     private var loadedTasks: [PracticeTask] = []
     private var currentOffset = 0
+
+    // MARK: - Init -
 
     init(
         topicID: String,
@@ -28,6 +31,8 @@ final class PracticeTasksManager: ObservableObject {
         self.topicID = topicID
         self.practiceService = practiceService
     }
+
+    // MARK: - Public methods -
 
     func loadTasks() async {
         guard state != .loading else { return }
@@ -87,6 +92,8 @@ final class PracticeTasksManager: ObservableObject {
 
         isLoadingMore = false
     }
+
+    // MARK: - Private methods -
 
     private func shouldLoadMore(currentTaskID: String) -> Bool {
         guard hasMore, !isLoadingMore else { return false }

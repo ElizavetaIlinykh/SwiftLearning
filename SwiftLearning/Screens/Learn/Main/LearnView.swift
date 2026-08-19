@@ -1,12 +1,17 @@
 import SwiftUI
 
 struct LearnView: View {
+    // MARK: - Private properties -
+
+    // MARK: - Init -
+
     @Environment(AppRouter.self) private var router
     @StateObject private var viewModel: LearnViewModel
-
     init(viewModel: LearnViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
+
+    // MARK: - Public properties -
 
     var body: some View {
         ScrollView {
@@ -99,6 +104,8 @@ struct LearnView: View {
             }
         }
     }
+
+    // MARK: - Private methods -
 
     private func loadMoreIfNeeded(visibleLessonIDs: [String]) {
         let preloadIDs = viewModel.lessonCards

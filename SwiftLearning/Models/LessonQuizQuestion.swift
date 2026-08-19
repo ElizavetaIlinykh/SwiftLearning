@@ -1,6 +1,8 @@
 import Foundation
 
 struct LessonQuizQuestion: Hashable, Decodable, Identifiable {
+    // MARK: - Public properties -
+
     let id: UUID
     let text: String
     let order: Int
@@ -8,6 +10,8 @@ struct LessonQuizQuestion: Hashable, Decodable, Identifiable {
 }
 
 struct LessonQuizAnswer: Hashable, Decodable, Identifiable {
+    // MARK: - Public properties -
+
     let id: UUID
     let text: String
     let order: Int

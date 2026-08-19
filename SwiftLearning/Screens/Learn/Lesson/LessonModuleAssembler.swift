@@ -2,6 +2,8 @@ import SwiftUI
 
 @MainActor
 enum LessonModuleAssembler {
+    // MARK: - Public methods -
+
     static func assemble(
         lessonID: String,
         totalLessonsCount: Int,

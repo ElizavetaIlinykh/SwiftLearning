@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct StatCard: View {
+    // MARK: - Public properties -
+
     let title: String
     let value: String
     let systemImage: String

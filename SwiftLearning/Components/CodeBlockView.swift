@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct CodeBlockView: View {
+    // MARK: - Public properties -
+
     let code: String
 
     var body: some View {

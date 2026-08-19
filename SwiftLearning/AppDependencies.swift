@@ -1,6 +1,10 @@
 final class AppDependencies {
+    // MARK: - Public properties -
+
     let services: AppServices
     let session: SessionState
+
+    // MARK: - Init -
 
     init(
         services: AppServices,
@@ -12,10 +16,14 @@ final class AppDependencies {
 }
 
 final class AppServices {
+    // MARK: - Public properties -
+
     let lessonsService: LessonsServicing
     let userService: UserServicing
     let practiceService: PracticeServicing
     let authService: AuthServicing
+
+    // MARK: - Init -
 
     init(
         networkManager: NetworkManaging,

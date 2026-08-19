@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct PrimaryButton: View {
+    // MARK: - Public properties -
+
     let title: String
     let action: () -> Void
 

@@ -2,6 +2,8 @@ import SwiftUI
 
 @MainActor
 enum LessonCodeTaskAssembler {
+    // MARK: - Public methods -
+
     static func assemble(
         lessonID: String,
         dependencies: AppDependencies

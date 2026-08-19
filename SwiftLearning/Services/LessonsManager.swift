@@ -19,6 +19,8 @@ enum LessonsLoadingState: Equatable {
 
 @MainActor
 final class LessonsManager: ObservableObject {
+    // MARK: - Private properties -
+
     private enum Constants {
         static let pageLimit = 20
     }
@@ -31,6 +33,8 @@ final class LessonsManager: ObservableObject {
     private var hasMore = false
     private var moreLoadingState: LessonsMoreLoadingState = .idle
     private var isRefreshing = false
+
+    // MARK: - Init -
 
     init(lessonsService: LessonsServicing) {
         pageLoader = PaginationLoader(
@@ -46,6 +50,8 @@ final class LessonsManager: ObservableObject {
             return response.items
         }
     }
+
+    // MARK: - Public methods -
 
     func fetch() async {
         guard loadedLessons.isEmpty else {
@@ -88,6 +94,8 @@ final class LessonsManager: ObservableObject {
             publishLoadedState()
         }
     }
+
+    // MARK: - Private methods -
 
     private func fetchInitial() async {
         guard !isLoading, !isRefreshing else {

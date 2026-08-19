@@ -3,11 +3,14 @@ import Foundation
 
 @MainActor
 final class LearnViewModel: ObservableObject {
+    // MARK: - Private properties -
+
     private let lessonsManager: LessonsManager
     private var cancellables: Set<AnyCancellable> = []
 
-    @Published private(set) var state: LessonsLoadingState
+    // MARK: - Public properties -
 
+    @Published private(set) var state: LessonsLoadingState
     var lessons: [LessonSummary] {
         guard case let .loaded(lessons, _) = state else { return [] }
         return lessons
@@ -42,12 +45,16 @@ final class LearnViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Init -
+
     init(lessonsManager: LessonsManager) {
         self.lessonsManager = lessonsManager
         state = lessonsManager.state
 
         bindLessonsManager()
     }
+
+    // MARK: - Public methods -
 
     func fetchLessons() async {
         await lessonsManager.fetch()
@@ -64,6 +71,8 @@ final class LearnViewModel: ObservableObject {
     func refreshLessons() async {
         await lessonsManager.refresh()
     }
+
+    // MARK: - Private methods -
 
     private func bindLessonsManager() {
         lessonsManager.$state

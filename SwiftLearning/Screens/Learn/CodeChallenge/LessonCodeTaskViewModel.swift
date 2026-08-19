@@ -3,15 +3,20 @@ import Foundation
 
 @MainActor
 final class LessonCodeTaskViewModel: ObservableObject {
+    // MARK: - Private properties -
+
     private let codeTaskManager: LessonCodeTaskManager
     private let completionViewModel: LessonCompletionViewModel
     private var cancellables: Set<AnyCancellable> = []
 
+    // MARK: - Public properties -
+
     let lessonID: String
+
+    // MARK: - Init -
 
     @Published private(set) var codeTaskState: LessonCodeTaskLoadingState
     @Published private(set) var completionState: LessonCompletionViewModel.State
-
     init(
         lessonID: String,
         codeTaskManager: LessonCodeTaskManager,
@@ -26,6 +31,8 @@ final class LessonCodeTaskViewModel: ObservableObject {
         bindManagers()
     }
 
+    // MARK: - Public methods -
+
     func loadCodeTask() async {
         await codeTaskManager.loadCodeTask()
     }
@@ -37,6 +44,8 @@ final class LessonCodeTaskViewModel: ObservableObject {
     func completeLesson() async -> Bool {
         await completionViewModel.completeLesson()
     }
+
+    // MARK: - Private methods -
 
     private func bindManagers() {
         codeTaskManager.$state

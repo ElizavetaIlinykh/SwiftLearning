@@ -10,13 +10,18 @@ enum ProfileLoadingState: Equatable {
 
 @MainActor
 final class ProfileManager: ObservableObject {
-    @Published private(set) var state: ProfileLoadingState = .idle
+    // MARK: - Private properties -
 
+    @Published private(set) var state: ProfileLoadingState = .idle
     private let userService: UserServicing
+
+    // MARK: - Init -
 
     init(userService: UserServicing) {
         self.userService = userService
     }
+
+    // MARK: - Public methods -
 
     func loadProfile() async {
         guard state != .loading else { return }

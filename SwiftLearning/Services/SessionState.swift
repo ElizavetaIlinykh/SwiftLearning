@@ -9,14 +9,19 @@ enum AuthStatus: Equatable {
 
 @MainActor
 final class SessionState: ObservableObject {
+    // MARK: - Private properties -
+
     @Published private(set) var status: AuthStatus = .unknown
     @Published private(set) var currentUser: UserProfile?
-
     private let authService: AuthServicing
+
+    // MARK: - Init -
 
     init(authService: AuthServicing) {
         self.authService = authService
     }
+
+    // MARK: - Public methods -
 
     func restoreSession() async {
         guard status == .unknown else { return }

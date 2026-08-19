@@ -8,8 +8,12 @@ protocol TokenStoring {
 }
 
 final class KeychainTokenStorage: TokenStoring {
+    // MARK: - Private properties -
+
     private let service: String
     private let account: String
+
+    // MARK: - Init -
 
     init(
         service: String = Bundle.main.bundleIdentifier ?? "SwiftLearning",
@@ -18,6 +22,8 @@ final class KeychainTokenStorage: TokenStoring {
         self.service = service
         self.account = account
     }
+
+    // MARK: - Public methods -
 
     func fetchAccessToken() throws -> String? {
         var query = baseQuery()
@@ -76,6 +82,8 @@ final class KeychainTokenStorage: TokenStoring {
         }
     }
 
+    // MARK: - Private methods -
+
     private func baseQuery() -> [String: Any] {
         [
             kSecClass as String: kSecClassGenericPassword,
@@ -88,6 +96,8 @@ final class KeychainTokenStorage: TokenStoring {
 enum TokenStorageError: LocalizedError {
     case invalidStoredToken
     case keychainStatus(OSStatus)
+
+    // MARK: - Public properties -
 
     var errorDescription: String? {
         switch self {

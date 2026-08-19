@@ -1,9 +1,13 @@
 import SwiftUI
 
 struct RegisterView: View {
+    // MARK: - Public properties -
+
     @ObservedObject var session: SessionState
 
     let onLoginTapped: () -> Void
+
+    // MARK: - Private properties -
 
     @State private var name = ""
     @State private var email = ""
@@ -78,6 +82,8 @@ struct RegisterView: View {
                 .frame(maxWidth: .infinity)
         }
     }
+
+    // MARK: - Private methods -
 
     private func register() async {
         guard !isLoading else { return }

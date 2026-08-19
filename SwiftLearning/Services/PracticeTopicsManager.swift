@@ -1,100 +1,195 @@
 import Combine
 import Foundation
 
+enum PracticeTopicsMoreLoadingState: Equatable {
+    case idle
+    case loading
+    case failed(String)
+}
+
 enum PracticeTopicsLoadingState: Equatable {
     case idle
     case loading
-    case loaded([PracticeCategory])
+    case loaded(
+        topics: [PracticeCategory],
+        moreLoadingState: PracticeTopicsMoreLoadingState
+    )
     case failed(String)
 }
 
 @MainActor
 final class PracticeTopicsManager: ObservableObject {
-    @Published private(set) var state: PracticeTopicsLoadingState = .idle
-    @Published private(set) var hasMore = false
-    @Published private(set) var isLoadingMore = false
-    @Published private(set) var loadMoreError: String?
+    // MARK: - Private properties -
 
-    private let practiceService: PracticeServicing
-    private let pageLimit = 20
-    private var loadedTopics: [PracticeCategory] = []
-    private var currentOffset = 0
-
-    init(practiceService: PracticeServicing) {
-        self.practiceService = practiceService
+    private enum Constants {
+        static let pageLimit = 20
     }
 
-    func loadTopics() async {
-        guard state != .loading else { return }
+    @Published private(set) var state: PracticeTopicsLoadingState = .idle
 
-        state = .loading
-        hasMore = false
-        isLoadingMore = false
-        loadMoreError = nil
-        currentOffset = 0
+    private let pageLoader: PaginationLoader<PracticeCategory>
 
-        do {
-            let response = try await practiceService.fetchTopics(offset: currentOffset, limit: pageLimit)
-            loadedTopics = response.items
-            currentOffset = response.offset + response.items.count
-            hasMore = response.hasMore && !response.items.isEmpty
-            state = .loaded(loadedTopics)
-        } catch {
-            loadedTopics = []
-            state = .failed(error.localizedDescription)
+    private var loadedTopics: [PracticeCategory] = []
+    private var hasMore = false
+    private var moreLoadingState: PracticeTopicsMoreLoadingState = .idle
+    private var isRefreshing = false
+
+    private var isLoading: Bool {
+        switch state {
+        case .loading:
+            true
+
+        case let .loaded(_, moreLoadingState):
+            moreLoadingState == .loading
+
+        case .idle, .failed:
+            false
         }
+    }
+
+    // MARK: - Init -
+
+    init(practiceService: PracticeServicing) {
+        pageLoader = PaginationLoader(
+            contract: .init(
+                limit: Constants.pageLimit
+            )
+        ) { offset, limit in
+            let response = try await practiceService.fetchTopics(
+                offset: offset,
+                limit: limit
+            )
+
+            return response.items
+        }
+    }
+
+    // MARK: - Public methods -
+
+    func fetch() async {
+        guard loadedTopics.isEmpty else {
+            return
+        }
+
+        await fetchInitial()
     }
 
     func loadMoreTopicsIfNeeded(currentTopicID: String) async {
-        guard shouldLoadMore(currentTopicID: currentTopicID) else { return }
-        await loadMoreTopics()
-    }
-
-    func retryLoadMoreTopics() async {
-        await loadMoreTopics()
-    }
-
-    private func loadMoreTopics() async {
-        guard hasMore, !isLoadingMore else { return }
-
-        isLoadingMore = true
-        loadMoreError = nil
-
-        do {
-            let response = try await practiceService.fetchTopics(
-                offset: currentOffset,
-                limit: pageLimit
-            )
-            currentOffset = response.offset + response.items.count
-
-            if response.items.isEmpty {
-                hasMore = false
-            } else {
-                loadedTopics.appendUnique(response.items)
-                hasMore = response.hasMore
-            }
-
-            state = .loaded(loadedTopics)
-        } catch {
-            loadMoreError = error.localizedDescription
+        guard shouldLoadMore(currentTopicID: currentTopicID) else {
+            return
         }
 
-        isLoadingMore = false
+        await fetchNext()
+    }
+
+    func loadMore() async {
+        await fetchNext()
+    }
+
+    func refresh() async {
+        guard !isRefreshing, !isLoading else {
+            return
+        }
+
+        guard !loadedTopics.isEmpty else {
+            await fetchInitial()
+            return
+        }
+
+        isRefreshing = true
+        defer {
+            isRefreshing = false
+        }
+
+        do {
+            let response = try await pageLoader.fetch()
+
+            loadedTopics = response.result
+            hasMore = response.hasNext
+            moreLoadingState = .idle
+
+            publishLoadedState()
+        } catch is CancellationError {
+            return
+        } catch {
+            publishLoadedState()
+        }
+    }
+
+    // MARK: - Private methods -
+
+    private func fetchInitial() async {
+        guard !isLoading, !isRefreshing else {
+            return
+        }
+
+        state = .loading
+
+        do {
+            let response = try await pageLoader.fetch()
+
+            loadedTopics = response.result
+            hasMore = response.hasNext
+            moreLoadingState = .idle
+
+            publishLoadedState()
+        } catch is CancellationError {
+            return
+        } catch {
+            loadedTopics = []
+            state = .failed(
+                error.localizedDescription
+            )
+        }
+    }
+
+    private func fetchNext() async {
+        guard hasMore, !isLoading, !isRefreshing else {
+            return
+        }
+
+        moreLoadingState = .loading
+        publishLoadedState()
+
+        do {
+            let response = try await pageLoader.loadNext()
+
+            loadedTopics.append(
+                contentsOf: response.result
+            )
+
+            hasMore = response.hasNext
+            moreLoadingState = .idle
+
+            publishLoadedState()
+        } catch is CancellationError {
+            return
+        } catch {
+            moreLoadingState = .failed(
+                error.localizedDescription
+            )
+
+            publishLoadedState()
+        }
     }
 
     private func shouldLoadMore(currentTopicID: String) -> Bool {
-        guard hasMore, !isLoadingMore else { return false }
+        guard hasMore, !isLoading else {
+            return false
+        }
+
         let orderedTopics = loadedTopics.sorted { $0.order < $1.order }
-        guard let index = orderedTopics.firstIndex(where: { $0.id == currentTopicID }) else { return false }
+        guard let index = orderedTopics.firstIndex(where: { $0.id == currentTopicID }) else {
+            return false
+        }
+
         return index >= max(orderedTopics.count - 5, 0)
     }
-}
 
-private extension Array where Element: Identifiable {
-    mutating func appendUnique(_ newElements: [Element]) where Element.ID: Hashable {
-        var existingIDs = Set(map(\.id))
-        for element in newElements where existingIDs.insert(element.id).inserted {
-            append(element)
-        }
+    private func publishLoadedState() {
+        state = .loaded(
+            topics: loadedTopics,
+            moreLoadingState: moreLoadingState
+        )
     }
 }

@@ -1,6 +1,10 @@
 import SwiftUI
 
 struct AuthRootView: View {
+    // MARK: - Public properties -
+
+    // MARK: - Private properties -
+
     @ObservedObject var session: SessionState
     @State private var route: AuthRoute = .login
 

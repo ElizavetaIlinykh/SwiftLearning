@@ -1,6 +1,8 @@
 import Foundation
 
 struct LessonSummary: INetworkEntity {
+    // MARK: - Public properties -
+
     let id: String
     let title: String
     let description: String

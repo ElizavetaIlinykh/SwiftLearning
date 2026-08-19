@@ -1,12 +1,17 @@
 import SwiftUI
 
 struct PracticeView: View {
+    // MARK: - Private properties -
+
+    // MARK: - Init -
+
     @Environment(AppRouter.self) private var router
     @StateObject private var viewModel: PracticeViewModel
-
     init(viewModel: PracticeViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
+
+    // MARK: - Public properties -
 
     var body: some View {
         ScrollView {
@@ -26,7 +31,7 @@ struct PracticeView: View {
             }
         }
         .refreshable {
-            await viewModel.loadTopics()
+            await viewModel.refreshTopics()
         }
     }
 
@@ -37,8 +42,8 @@ struct PracticeView: View {
             loadingView
         case let .failed(message):
             errorView(message: message)
-        case .loaded:
-            if viewModel.topics.isEmpty {
+        case let .loaded(topics, _):
+            if topics.isEmpty {
                 emptyView
             } else {
                 topicsList
@@ -59,31 +64,9 @@ struct PracticeView: View {
                 }
             }
 
-            loadMoreView
-        }
-    }
-
-    @ViewBuilder
-    private var loadMoreView: some View {
-        if viewModel.isLoadingMore {
-            ProgressView()
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-        } else if let message = viewModel.loadMoreError {
-            VStack(alignment: .leading, spacing: 8) {
-                Text(message)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-
-                Button("Try Again") {
-                    Task {
-                        await viewModel.retryLoadMoreTopics()
-                    }
-                }
-                .font(.headline)
+            LoadMoreView(state: viewModel.loadMoreState) {
+                await viewModel.retryLoadMoreTopics()
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.vertical, 8)
         }
     }
 
@@ -138,6 +121,8 @@ struct PracticeView: View {
         .frame(maxWidth: .infinity)
         .padding(.vertical, 48)
     }
+
+    // MARK: - Private methods -
 
     private func errorView(message: String) -> some View {
         VStack(alignment: .leading, spacing: 14) {

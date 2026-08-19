@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct ProfileView: View {
+    // MARK: - Private properties -
+
     @StateObject private var viewModel: ProfileViewModel
 
     private let statisticColumns = [
@@ -9,9 +11,13 @@ struct ProfileView: View {
         GridItem(.flexible(), spacing: 12)
     ]
 
+    // MARK: - Init -
+
     init(viewModel: ProfileViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
+
+    // MARK: - Public properties -
 
     var body: some View {
         ScrollView {
@@ -52,6 +58,8 @@ struct ProfileView: View {
             achievementsSection(statistics: statistics)
         }
     }
+
+    // MARK: - Private methods -
 
     private func profileHeader(user: UserProfile) -> some View {
         VStack(spacing: 12) {

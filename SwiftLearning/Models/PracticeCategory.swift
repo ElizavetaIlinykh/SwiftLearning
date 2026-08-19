@@ -1,6 +1,8 @@
 import Foundation
 
-struct PracticeCategory: Identifiable, Hashable, Decodable {
+struct PracticeCategory: Identifiable, Hashable, INetworkEntity {
+    // MARK: - Public properties -
+
     let id: String
     let title: String
     let description: String

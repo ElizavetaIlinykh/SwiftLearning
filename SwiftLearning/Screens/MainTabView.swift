@@ -1,13 +1,19 @@
 import SwiftUI
 
 struct MainTabView: View {
+    // MARK: - Private properties -
+
     @Environment(AppRouter.self) private var router
 
     private let dependencies: AppDependencies
 
+    // MARK: - Init -
+
     init(dependencies: AppDependencies) {
         self.dependencies = dependencies
     }
+
+    // MARK: - Public properties -
 
     var body: some View {
         @Bindable var router = router
@@ -65,6 +71,8 @@ struct MainTabView: View {
                 }
         }
     }
+
+    // MARK: - Private methods -
 
     @ViewBuilder
     private func lessonsDestination(for route: LessonsRoute) -> some View {

@@ -1,10 +1,14 @@
 import SwiftUI
 
 struct ProgressCard: View {
+    // MARK: - Public properties -
+
     let courseTitle: String
     let completedLessonsCount: Int
     let totalLessonsCount: Int
     let action: (() -> Void)?
+
+    // MARK: - Init -
 
     init(
         courseTitle: String,
@@ -17,6 +21,8 @@ struct ProgressCard: View {
         self.totalLessonsCount = totalLessonsCount
         self.action = action
     }
+
+    // MARK: - Private properties -
 
     private var progress: Double {
         guard totalLessonsCount > 0 else { return 0 }

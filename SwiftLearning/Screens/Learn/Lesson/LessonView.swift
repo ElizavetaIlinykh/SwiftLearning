@@ -1,12 +1,17 @@
 import SwiftUI
 
 struct LessonView: View {
+    // MARK: - Private properties -
+
+    // MARK: - Init -
+
     @Environment(AppRouter.self) private var router
     @StateObject private var viewModel: LessonViewModel
-
     init(viewModel: LessonViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
+
+    // MARK: - Public properties -
 
     var body: some View {
         ScrollView {
@@ -42,6 +47,8 @@ struct LessonView: View {
             lessonContent(lesson)
         }
     }
+
+    // MARK: - Private methods -
 
     private func lessonContent(_ lesson: LessonDetails) -> some View {
         VStack(alignment: .leading, spacing: 24) {

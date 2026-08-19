@@ -3,11 +3,15 @@ import Observation
 
 @Observable
 final class AppRouter {
+    // MARK: - Public properties -
+
     var selectedTab: AppTab = .lessons
 
     var lessonsPath: [LessonsRoute] = []
     var practicePath: [PracticeRoute] = []
     var profilePath: [ProfileRoute] = []
+
+    // MARK: - Public methods -
 
     func push(_ route: LessonsRoute) {
         lessonsPath.append(route)
