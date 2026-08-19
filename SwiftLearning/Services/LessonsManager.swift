@@ -30,37 +30,67 @@ final class LessonsManager: ObservableObject {
     private var loadedLessons: [LessonSummary] = []
     private var hasMore = false
     private var moreLoadingState: LessonsMoreLoadingState = .idle
-
-    var hasMoreToFetch: Bool {
-        hasMore
-    }
+    private var isRefreshing = false
 
     init(lessonsService: LessonsServicing) {
         self.pageLoader = PaginationLoader(
-            contract: .init(limit: Constants.pageLimit)
+            contract: .init(
+                limit: Constants.pageLimit
+            )
         ) { offset, limit in
             let response = try await lessonsService.fetchLessons(
                 offset: offset,
                 limit: limit
             )
+
             return response.items
         }
     }
 
     func fetch() async {
-        if loadedLessons.isEmpty {
-            await fetchInitial()
-        } else {
-            await fetchNext()
+        guard loadedLessons.isEmpty else {
+            return
         }
-    }
 
-    func refresh() async {
         await fetchInitial()
     }
 
+    func loadMore() async {
+        await fetchNext()
+    }
+
+    func refresh() async {
+        guard !isRefreshing, !isLoading else {
+            return
+        }
+
+        guard !loadedLessons.isEmpty else {
+            await fetchInitial()
+            return
+        }
+
+        isRefreshing = true
+        defer {
+            isRefreshing = false
+        }
+
+        do {
+            let response = try await pageLoader.fetch()
+
+            loadedLessons = response.result
+            hasMore = response.hasNext
+            moreLoadingState = .idle
+
+            publishLoadedState()
+        } catch is CancellationError {
+            return
+        } catch {
+            publishLoadedState()
+        }
+    }
+
     private func fetchInitial() async {
-        guard !isLoading else {
+        guard !isLoading, !isRefreshing else {
             return
         }
 
@@ -74,17 +104,17 @@ final class LessonsManager: ObservableObject {
             moreLoadingState = .idle
 
             publishLoadedState()
+        } catch is CancellationError {
+            return
         } catch {
-            state = .failed(error.localizedDescription)
+            state = .failed(
+                error.localizedDescription
+            )
         }
     }
 
     private func fetchNext() async {
-        guard hasMore else {
-            return
-        }
-
-        guard !isLoading else {
+        guard hasMore, !isLoading, !isRefreshing else {
             return
         }
 
@@ -94,13 +124,21 @@ final class LessonsManager: ObservableObject {
         do {
             let response = try await pageLoader.loadNext()
 
-            loadedLessons.append(contentsOf: response.result)
+            loadedLessons.append(
+                contentsOf: response.result
+            )
+
             hasMore = response.hasNext
             moreLoadingState = .idle
 
             publishLoadedState()
+        } catch is CancellationError {
+            return
         } catch {
-            moreLoadingState = .failed(error.localizedDescription)
+            moreLoadingState = .failed(
+                error.localizedDescription
+            )
+
             publishLoadedState()
         }
     }

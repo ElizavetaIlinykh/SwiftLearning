@@ -8,7 +8,6 @@ final class LearnViewModel: ObservableObject {
         case idle
         case loading
         case error(String)
-        case readyToFetch
     }
     
     private let lessonsManager: LessonsManager
@@ -46,7 +45,7 @@ final class LearnViewModel: ObservableObject {
         case .failed(let message):
             return .error(message)
         case .idle:
-            return lessonsManager.hasMoreToFetch ? .readyToFetch : .idle
+            return .idle
         }
     }
 
@@ -59,6 +58,14 @@ final class LearnViewModel: ObservableObject {
 
     func fetchLessons() async {
         await lessonsManager.fetch()
+    }
+
+    func loadMoreLessons() async {
+        await lessonsManager.loadMore()
+    }
+
+    func retryLoadMoreLessons() async {
+        await lessonsManager.loadMore()
     }
 
     func refreshLessons() async {

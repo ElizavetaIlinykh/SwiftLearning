@@ -27,6 +27,12 @@ struct LearnView: View {
         .refreshable {
             await viewModel.refreshLessons()
         }
+        .onScrollTargetVisibilityChange(
+            idType: String.self,
+            threshold: 0.3
+        ) { visibleIDs in
+            loadMoreIfNeeded(visibleLessonIDs: visibleIDs)
+        }
     }
 
     private var header: some View {
@@ -48,8 +54,10 @@ struct LearnView: View {
         switch viewModel.state {
         case .idle, .loading:
             loadingView
+
         case .failed(let message):
             errorView(message: message)
+
         case .loaded(let lessons, _):
             if lessons.isEmpty {
                 emptyView
@@ -72,19 +80,36 @@ struct LearnView: View {
                     .font(.title2)
                     .fontWeight(.bold)
 
-                ForEach(viewModel.lessonCards) { lessonCard in
-                    LessonCard(viewModel: lessonCard) {
-                        router.push(
-                            .lesson(
-                                id: lessonCard.id,
-                                totalLessonsCount: viewModel.lessons.count
+                LazyVStack(alignment: .leading, spacing: 14) {
+                    ForEach(viewModel.lessonCards) { lessonCard in
+                        LessonCard(viewModel: lessonCard) {
+                            router.push(
+                                .lesson(
+                                    id: lessonCard.id,
+                                    totalLessonsCount: viewModel.lessons.count
+                                )
                             )
-                        )
+                        }
                     }
                 }
+                .scrollTargetLayout()
 
                 loadMoreView
             }
+        }
+    }
+
+    private func loadMoreIfNeeded(visibleLessonIDs: [String]) {
+        let preloadIDs = viewModel.lessonCards
+            .suffix(5)
+            .map(\.id)
+
+        guard preloadIDs.contains(where: visibleLessonIDs.contains) else {
+            return
+        }
+
+        Task {
+            await viewModel.loadMoreLessons()
         }
     }
 
@@ -93,10 +118,12 @@ struct LearnView: View {
         switch viewModel.loadMoreState {
         case .idle:
             EmptyView()
+
         case .loading:
             ProgressView()
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
+
         case .error(let message):
             VStack(alignment: .leading, spacing: 8) {
                 Text(message)
@@ -105,28 +132,20 @@ struct LearnView: View {
 
                 Button("Try Again") {
                     Task {
-                        await viewModel.fetchLessons()
+                        await viewModel.retryLoadMoreLessons()
                     }
                 }
                 .font(.headline)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 8)
-        case .readyToFetch:
-            ProgressView()
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-                .onAppear {
-                    Task {
-                        await viewModel.fetchLessons()
-                    }
-                }
         }
     }
 
     private var loadingView: some View {
         VStack(spacing: 14) {
             ProgressView()
+
             Text("Loading lessons")
                 .font(.headline)
                 .foregroundStyle(.secondary)
@@ -153,10 +172,21 @@ struct LearnView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(20)
         .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .clipShape(
+            RoundedRectangle(
+                cornerRadius: 20,
+                style: .continuous
+            )
+        )
         .overlay(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+            RoundedRectangle(
+                cornerRadius: 20,
+                style: .continuous
+            )
+            .stroke(
+                Color.primary.opacity(0.06),
+                lineWidth: 1
+            )
         )
     }
 
@@ -172,15 +202,29 @@ struct LearnView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(20)
         .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .clipShape(
+            RoundedRectangle(
+                cornerRadius: 20,
+                style: .continuous
+            )
+        )
         .overlay(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+            RoundedRectangle(
+                cornerRadius: 20,
+                style: .continuous
+            )
+            .stroke(
+                Color.primary.opacity(0.06),
+                lineWidth: 1
+            )
         )
     }
 }
 
 #Preview {
-    LearnModuleAssembler.assemble(dependencies: AppDependenciesAssembler.assemble())
+    LearnModuleAssembler
+        .assemble(
+            dependencies: AppDependenciesAssembler.assemble()
+        )
         .environment(AppRouter())
 }
