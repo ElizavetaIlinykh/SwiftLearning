@@ -1,14 +1,11 @@
 final class AppDependencies {
-    let networkManager: NetworkManaging
     let services: AppServices
     let session: SessionState
 
     init(
-        networkManager: NetworkManaging = NetworkManager(),
         services: AppServices,
         session: SessionState
     ) {
-        self.networkManager = networkManager
         self.services = services
         self.session = session
     }

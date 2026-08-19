@@ -21,7 +21,6 @@ enum AppDependenciesAssembler {
         )
 
         return AppDependencies(
-            networkManager: networkManager,
             services: services,
             session: session
         )
