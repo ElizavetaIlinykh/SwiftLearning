@@ -3,6 +3,14 @@ import Foundation
 
 @MainActor
 final class LearnViewModel: ObservableObject {
+    
+    enum LoadMoreState {
+        case idle
+        case loading
+        case error(String)
+        case readyToFetch
+    }
+    
     private let lessonsManager: LessonsManager
     private var cancellables: Set<AnyCancellable> = []
 
@@ -30,25 +38,16 @@ final class LearnViewModel: ObservableObject {
         lessons.filter { $0.status == .completed }.count
     }
 
-    var moreLoadingState: LessonsMoreLoadingState {
-        guard case .loaded(_, let moreLoadingState) = state else {
-            return .idle(canFetchMore: false)
+    var loadMoreState: LoadMoreState {
+        guard case .loaded(_, let moreLoadingState) = state else { return .idle }
+        switch moreLoadingState {
+        case .loading:
+            return .loading
+        case .failed(let message):
+            return .error(message)
+        case .idle:
+            return lessonsManager.hasMoreToFetch ? .readyToFetch : .idle
         }
-        return moreLoadingState
-    }
-
-    var isLoadingMore: Bool {
-        moreLoadingState == .loading
-    }
-
-    var loadMoreError: String? {
-        guard case .failed(let message) = moreLoadingState else { return nil }
-        return message
-    }
-
-    var canRequestMoreLessons: Bool {
-        guard case .idle(let canFetchMore) = moreLoadingState else { return false }
-        return canFetchMore
     }
 
     init(lessonsManager: LessonsManager) {

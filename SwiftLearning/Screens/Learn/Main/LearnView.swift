@@ -90,11 +90,14 @@ struct LearnView: View {
 
     @ViewBuilder
     private var loadMoreView: some View {
-        if viewModel.isLoadingMore {
+        switch viewModel.loadMoreState {
+        case .idle:
+            EmptyView()
+        case .loading:
             ProgressView()
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
-        } else if let message = viewModel.loadMoreError {
+        case .error(let message):
             VStack(alignment: .leading, spacing: 8) {
                 Text(message)
                     .font(.subheadline)
@@ -109,7 +112,7 @@ struct LearnView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 8)
-        } else if viewModel.canRequestMoreLessons {
+        case .readyToFetch:
             ProgressView()
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)

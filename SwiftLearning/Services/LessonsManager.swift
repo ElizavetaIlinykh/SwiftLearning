@@ -2,7 +2,7 @@ import Combine
 import Foundation
 
 enum LessonsMoreLoadingState: Equatable {
-    case idle(canFetchMore: Bool)
+    case idle
     case loading
     case failed(String)
 }
