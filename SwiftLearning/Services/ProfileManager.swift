@@ -1,12 +1,14 @@
 import Combine
 import Foundation
 
-enum ProfileLoadingState: Equatable {
-    case idle
-    case loading
-    case loaded(user: UserProfile, statistics: UserStatistics)
-    case failed(String)
+struct ProfileContent: Equatable {
+    // MARK: - Public properties -
+
+    let user: UserProfile
+    let statistics: UserStatistics
 }
+
+typealias ProfileLoadingState = LoadingState<ProfileContent>
 
 @MainActor
 final class ProfileManager: ObservableObject {
@@ -33,8 +35,10 @@ final class ProfileManager: ObservableObject {
             async let statistics = userService.fetchStatistics()
 
             state = try await .loaded(
-                user: user,
-                statistics: statistics
+                ProfileContent(
+                    user: user,
+                    statistics: statistics
+                )
             )
         } catch {
             state = .failed(UserFacingErrorMessage.message(for: error))

@@ -1,12 +1,7 @@
 import Combine
 import Foundation
 
-enum PracticeTasksLoadingState: Equatable {
-    case idle
-    case loading
-    case loaded([PracticeTask])
-    case failed(String)
-}
+typealias PracticeTasksLoadingState = LoadingState<[PracticeTask]>
 
 @MainActor
 final class PracticeTasksManager: ObservableObject {

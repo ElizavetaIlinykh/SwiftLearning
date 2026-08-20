@@ -51,11 +51,11 @@ struct ProfileView: View {
             loadingView
         case let .failed(message):
             errorView(message: message)
-        case let .loaded(user, statistics):
-            profileHeader(user: user)
-            progressSection(statistics: statistics)
-            statisticsSection(statistics: statistics)
-            achievementsSection(statistics: statistics)
+        case let .loaded(content):
+            profileHeader(user: content.user)
+            progressSection(statistics: content.statistics)
+            statisticsSection(statistics: content.statistics)
+            achievementsSection(statistics: content.statistics)
         }
     }
 

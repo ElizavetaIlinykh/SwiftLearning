@@ -1,12 +1,7 @@
 import Combine
 import Foundation
 
-enum LessonQuizLoadingState: Equatable {
-    case idle
-    case loading
-    case loaded([LessonQuizQuestion])
-    case failed(String)
-}
+typealias LessonQuizLoadingState = LoadingState<[LessonQuizQuestion]>
 
 @MainActor
 final class LessonQuizManager: ObservableObject {
