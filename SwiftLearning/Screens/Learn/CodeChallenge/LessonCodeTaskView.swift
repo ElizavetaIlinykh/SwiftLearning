@@ -162,28 +162,14 @@ struct LessonCodeTaskView: View {
     }
 
     private func errorView(message: String) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text("Could not load code task")
-                .font(.headline)
-
-            Text(message)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-
-            PrimaryButton(title: "Try Again") {
-                Task {
-                    await viewModel.loadCodeTask()
-                }
+        ErrorStateView(
+            title: "Could not load code task",
+            message: message
+        ) {
+            Task {
+                await viewModel.loadCodeTask()
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(20)
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .stroke(Color.primary.opacity(0.06), lineWidth: 1)
-        )
     }
 
     @ViewBuilder

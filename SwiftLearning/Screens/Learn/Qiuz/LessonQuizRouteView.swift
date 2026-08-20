@@ -126,28 +126,14 @@ struct LessonQuizRouteView: View {
     }
 
     private func errorView(message: String) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text("Could not load questions")
-                .font(.headline)
-
-            Text(message)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-
-            PrimaryButton(title: "Try Again") {
-                Task {
-                    await viewModel.loadQuestions()
-                }
+        ErrorStateView(
+            title: "Could not load questions",
+            message: message
+        ) {
+            Task {
+                await viewModel.loadQuestions()
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(20)
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .stroke(Color.primary.opacity(0.06), lineWidth: 1)
-        )
     }
 
     private var emptyView: some View {
