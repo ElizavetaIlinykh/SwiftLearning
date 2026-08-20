@@ -13,7 +13,10 @@ struct LearnProgressCardBuilder {
 
     // MARK: - Public methods -
 
-    func build(lessons: [LessonSummary]) -> ProgressCardViewModel {
+    func build(
+        lessons: [LessonSummary],
+        action: (() -> Void)?
+    ) -> ProgressCardViewModel {
         let completedLessonsCount = lessons.filter { $0.status == .completed }.count
 
         return ProgressCardViewModel(
@@ -27,7 +30,8 @@ struct LearnProgressCardBuilder {
             state: state(
                 completedLessonsCount: completedLessonsCount,
                 totalLessonsCount: lessons.count
-            )
+            ),
+            action: action
         )
     }
 

@@ -8,6 +8,7 @@ final class LearnViewModel: ObservableObject {
     private let lessonsManager: LessonsManager
     private let lessonCardBuilder: LearnLessonCardBuilder
     private let progressCardBuilder: LearnProgressCardBuilder
+    private let router: AppRouter
     private var cancellables: Set<AnyCancellable> = []
 
     // MARK: - Public properties -
@@ -23,7 +24,10 @@ final class LearnViewModel: ObservableObject {
     }
 
     var progressCard: ProgressCardViewModel {
-        progressCardBuilder.build(lessons: lessons)
+        progressCardBuilder.build(
+            lessons: lessons,
+            action: continueLearningAction
+        )
     }
 
     var completedLessonsCount: Int {
@@ -53,11 +57,13 @@ final class LearnViewModel: ObservableObject {
     init(
         lessonsManager: LessonsManager,
         lessonCardBuilder: LearnLessonCardBuilder,
-        progressCardBuilder: LearnProgressCardBuilder
+        progressCardBuilder: LearnProgressCardBuilder,
+        router: AppRouter
     ) {
         self.lessonsManager = lessonsManager
         self.lessonCardBuilder = lessonCardBuilder
         self.progressCardBuilder = progressCardBuilder
+        self.router = router
         state = lessonsManager.state
 
         bindLessonsManager()
@@ -81,7 +87,38 @@ final class LearnViewModel: ObservableObject {
         await lessonsManager.refresh()
     }
 
+    func selectLesson(id: String) {
+        openLesson(id: id)
+    }
+
+    // MARK: - Private properties -
+
+    private var continueLearningAction: (() -> Void)? {
+        guard nextAvailableLesson != nil else {
+            return nil
+        }
+
+        return continueLearning
+    }
+
     // MARK: - Private methods -
+
+    private func continueLearning() {
+        guard let lesson = nextAvailableLesson else {
+            return
+        }
+
+        openLesson(id: lesson.id)
+    }
+
+    private func openLesson(id: String) {
+        router.push(
+            .lesson(
+                id: id,
+                totalLessonsCount: lessons.count
+            )
+        )
+    }
 
     private func bindLessonsManager() {
         lessonsManager.$state

@@ -6,7 +6,7 @@ enum ProgressCardState {
     case completed
 }
 
-struct ProgressCardViewModel: Equatable {
+struct ProgressCardViewModel {
     // MARK: - Public properties -
 
     let courseTitle: String
@@ -14,23 +14,13 @@ struct ProgressCardViewModel: Equatable {
     let totalLessonsCount: Int
     let progress: Double
     let state: ProgressCardState
+    let action: (() -> Void)?
 }
 
 struct ProgressCard: View {
     // MARK: - Public properties -
 
     let viewModel: ProgressCardViewModel
-    let action: (() -> Void)?
-
-    // MARK: - Init -
-
-    init(
-        viewModel: ProgressCardViewModel,
-        action: (() -> Void)? = nil
-    ) {
-        self.viewModel = viewModel
-        self.action = action
-    }
 
     // MARK: - Public properties -
 
@@ -81,12 +71,12 @@ struct ProgressCard: View {
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
 
         case .notStarted:
-            if let action {
+            if let action = viewModel.action {
                 PrimaryButton(title: "Start Learning", action: action)
             }
 
         case .inProgress:
-            if let action {
+            if let action = viewModel.action {
                 PrimaryButton(title: "Continue Learning", action: action)
             }
         }
@@ -100,9 +90,10 @@ struct ProgressCard: View {
             completedLessonsCount: 0,
             totalLessonsCount: 8,
             progress: 0,
-            state: .notStarted
+            state: .notStarted,
+            action: {}
         )
-    ) {}
-        .padding()
-        .background(Color(.systemGroupedBackground))
+    )
+    .padding()
+    .background(Color(.systemGroupedBackground))
 }

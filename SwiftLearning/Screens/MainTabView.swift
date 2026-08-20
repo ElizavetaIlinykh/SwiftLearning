@@ -43,10 +43,13 @@ struct MainTabView: View {
         @Bindable var router = router
 
         return NavigationStack(path: $router.lessonsPath) {
-            LearnModuleAssembler.assemble(dependencies: dependencies)
-                .navigationDestination(for: LessonsRoute.self) { route in
-                    lessonsDestination(for: route)
-                }
+            LearnModuleAssembler.assemble(
+                dependencies: dependencies,
+                router: router
+            )
+            .navigationDestination(for: LessonsRoute.self) { route in
+                lessonsDestination(for: route)
+            }
         }
     }
 

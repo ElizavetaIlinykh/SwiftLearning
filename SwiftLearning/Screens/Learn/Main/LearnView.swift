@@ -5,7 +5,6 @@ struct LearnView: View {
 
     // MARK: - Init -
 
-    @Environment(AppRouter.self) private var router
     @StateObject private var viewModel: LearnViewModel
     init(viewModel: LearnViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -74,10 +73,7 @@ struct LearnView: View {
 
     @ViewBuilder
     private var lessonsContent: some View {
-        ProgressCard(
-            viewModel: viewModel.progressCard,
-            action: continueLearningAction
-        )
+        ProgressCard(viewModel: viewModel.progressCard)
 
         VStack(alignment: .leading, spacing: 14) {
             Text("Course")
@@ -87,12 +83,7 @@ struct LearnView: View {
             LazyVStack(alignment: .leading, spacing: 14) {
                 ForEach(viewModel.lessonCards) { lessonCard in
                     LessonCard(viewModel: lessonCard) {
-                        router.push(
-                            .lesson(
-                                id: lessonCard.id,
-                                totalLessonsCount: viewModel.lessons.count
-                            )
-                        )
+                        viewModel.selectLesson(id: lessonCard.id)
                     }
                 }
             }
@@ -104,28 +95,7 @@ struct LearnView: View {
         }
     }
 
-    private var continueLearningAction: (() -> Void)? {
-        guard viewModel.nextAvailableLesson != nil else {
-            return nil
-        }
-
-        return continueLearning
-    }
-
     // MARK: - Private methods -
-
-    private func continueLearning() {
-        guard let lesson = viewModel.nextAvailableLesson else {
-            return
-        }
-
-        router.push(
-            .lesson(
-                id: lesson.id,
-                totalLessonsCount: viewModel.lessons.count
-            )
-        )
-    }
 
     private func loadMoreIfNeeded(visibleLessonIDs: [String]) {
         let preloadIDs = viewModel.lessonCards
@@ -221,9 +191,12 @@ struct LearnView: View {
 }
 
 #Preview {
+    let router = AppRouter()
+
     LearnModuleAssembler
         .assemble(
-            dependencies: AppDependenciesAssembler.assemble()
+            dependencies: AppDependenciesAssembler.assemble(),
+            router: router
         )
-        .environment(AppRouter())
+        .environment(router)
 }
