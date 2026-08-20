@@ -6,6 +6,8 @@ final class LearnViewModel: ObservableObject {
     // MARK: - Private properties -
 
     private let lessonsManager: LessonsManager
+    private let lessonCardBuilder: LearnLessonCardBuilder
+    private let progressCardBuilder: LearnProgressCardBuilder
     private var cancellables: Set<AnyCancellable> = []
 
     // MARK: - Public properties -
@@ -17,20 +19,21 @@ final class LearnViewModel: ObservableObject {
     }
 
     var lessonCards: [LessonCardViewModel] {
-        lessons
-            .map { lesson in
-                LessonCardViewModel(
-                    id: lesson.id,
-                    title: lesson.title,
-                    description: lesson.description,
-                    order: lesson.order,
-                    state: lessonState(for: lesson.status)
-                )
-            }
+        lessonCardBuilder.build(lessons: lessons)
+    }
+
+    var progressCard: ProgressCardViewModel {
+        progressCardBuilder.build(lessons: lessons)
     }
 
     var completedLessonsCount: Int {
         lessons.filter { $0.status == .completed }.count
+    }
+
+    var nextAvailableLesson: LessonSummary? {
+        lessons
+            .sorted { $0.order < $1.order }
+            .first { $0.status == .available }
     }
 
     var loadMoreState: LoadMoreView.State {
@@ -47,8 +50,14 @@ final class LearnViewModel: ObservableObject {
 
     // MARK: - Init -
 
-    init(lessonsManager: LessonsManager) {
+    init(
+        lessonsManager: LessonsManager,
+        lessonCardBuilder: LearnLessonCardBuilder,
+        progressCardBuilder: LearnProgressCardBuilder
+    ) {
         self.lessonsManager = lessonsManager
+        self.lessonCardBuilder = lessonCardBuilder
+        self.progressCardBuilder = progressCardBuilder
         state = lessonsManager.state
 
         bindLessonsManager()
@@ -80,16 +89,5 @@ final class LearnViewModel: ObservableObject {
                 self?.state = state
             }
             .store(in: &cancellables)
-    }
-
-    private func lessonState(for status: LessonStatus) -> LessonState {
-        switch status {
-        case .completed:
-            .completed
-        case .available:
-            .current
-        case .locked:
-            .locked
-        }
     }
 }

@@ -75,10 +75,9 @@ struct LearnView: View {
     @ViewBuilder
     private var lessonsContent: some View {
         ProgressCard(
-            courseTitle: "Swift Basics",
-            completedLessonsCount: viewModel.completedLessonsCount,
-            totalLessonsCount: viewModel.lessons.count
-        ) {}
+            viewModel: viewModel.progressCard,
+            action: continueLearningAction
+        )
 
         VStack(alignment: .leading, spacing: 14) {
             Text("Course")
@@ -105,7 +104,28 @@ struct LearnView: View {
         }
     }
 
+    private var continueLearningAction: (() -> Void)? {
+        guard viewModel.nextAvailableLesson != nil else {
+            return nil
+        }
+
+        return continueLearning
+    }
+
     // MARK: - Private methods -
+
+    private func continueLearning() {
+        guard let lesson = viewModel.nextAvailableLesson else {
+            return
+        }
+
+        router.push(
+            .lesson(
+                id: lesson.id,
+                totalLessonsCount: viewModel.lessons.count
+            )
+        )
+    }
 
     private func loadMoreIfNeeded(visibleLessonIDs: [String]) {
         let preloadIDs = viewModel.lessonCards

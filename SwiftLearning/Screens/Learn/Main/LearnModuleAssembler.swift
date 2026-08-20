@@ -6,7 +6,13 @@ enum LearnModuleAssembler {
 
     static func assemble(dependencies: AppDependencies) -> LearnView {
         let lessonsManager = LessonsManager(lessonsService: dependencies.services.lessonsService)
-        let viewModel = LearnViewModel(lessonsManager: lessonsManager)
+        let lessonCardBuilder = LearnLessonCardBuilder()
+        let progressCardBuilder = LearnProgressCardBuilder()
+        let viewModel = LearnViewModel(
+            lessonsManager: lessonsManager,
+            lessonCardBuilder: lessonCardBuilder,
+            progressCardBuilder: progressCardBuilder
+        )
 
         return LearnView(viewModel: viewModel)
     }

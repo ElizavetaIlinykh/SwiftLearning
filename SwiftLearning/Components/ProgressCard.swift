@@ -1,74 +1,55 @@
 import SwiftUI
 
-struct ProgressCard: View {
+enum ProgressCardState {
+    case notStarted
+    case inProgress
+    case completed
+}
+
+struct ProgressCardViewModel: Equatable {
     // MARK: - Public properties -
 
     let courseTitle: String
     let completedLessonsCount: Int
     let totalLessonsCount: Int
+    let progress: Double
+    let state: ProgressCardState
+}
+
+struct ProgressCard: View {
+    // MARK: - Public properties -
+
+    let viewModel: ProgressCardViewModel
     let action: (() -> Void)?
 
     // MARK: - Init -
 
     init(
-        courseTitle: String,
-        completedLessonsCount: Int,
-        totalLessonsCount: Int,
+        viewModel: ProgressCardViewModel,
         action: (() -> Void)? = nil
     ) {
-        self.courseTitle = courseTitle
-        self.completedLessonsCount = completedLessonsCount
-        self.totalLessonsCount = totalLessonsCount
+        self.viewModel = viewModel
         self.action = action
     }
 
-    // MARK: - Private properties -
-
-    private var progress: Double {
-        guard totalLessonsCount > 0 else { return 0 }
-        return Double(completedLessonsCount) / Double(totalLessonsCount)
-    }
-
-    private var isCourseCompleted: Bool {
-        totalLessonsCount > 0 && completedLessonsCount == totalLessonsCount
-    }
-
-    private var buttonTitle: String {
-        completedLessonsCount == 0 ? "Start Learning" : "Continue Learning"
-    }
+    // MARK: - Public properties -
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             VStack(alignment: .leading, spacing: 8) {
-                Text(courseTitle)
+                Text(viewModel.courseTitle)
                     .font(.title3)
                     .fontWeight(.bold)
 
-                Text("\(completedLessonsCount) of \(totalLessonsCount) lessons completed")
+                Text("\(viewModel.completedLessonsCount) of \(viewModel.totalLessonsCount) lessons completed")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
 
-            ProgressView(value: progress)
+            ProgressView(value: viewModel.progress)
                 .tint(.accentColor)
 
-            if isCourseCompleted {
-                HStack(spacing: 10) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(.green)
-
-                    Text("Course Completed")
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(.green)
-                }
-                .frame(maxWidth: .infinity)
-                .frame(height: 54)
-                .background(Color.green.opacity(0.12))
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-            } else if let action {
-                PrimaryButton(title: buttonTitle, action: action)
-            }
+            footer
         }
         .padding(20)
         .background(Color(.secondarySystemGroupedBackground))
@@ -78,13 +59,49 @@ struct ProgressCard: View {
                 .stroke(Color.primary.opacity(0.06), lineWidth: 1)
         )
     }
+
+    // MARK: - Private properties -
+
+    @ViewBuilder
+    private var footer: some View {
+        switch viewModel.state {
+        case .completed:
+            HStack(spacing: 10) {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundStyle(.green)
+
+                Text("Course Completed")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.green)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 54)
+            .background(Color.green.opacity(0.12))
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+
+        case .notStarted:
+            if let action {
+                PrimaryButton(title: "Start Learning", action: action)
+            }
+
+        case .inProgress:
+            if let action {
+                PrimaryButton(title: "Continue Learning", action: action)
+            }
+        }
+    }
 }
 
 #Preview {
     ProgressCard(
-        courseTitle: "Swift Basics",
-        completedLessonsCount: 0,
-        totalLessonsCount: 8
+        viewModel: ProgressCardViewModel(
+            courseTitle: "Swift Basics",
+            completedLessonsCount: 0,
+            totalLessonsCount: 8,
+            progress: 0,
+            state: .notStarted
+        )
     ) {}
         .padding()
         .background(Color(.systemGroupedBackground))
