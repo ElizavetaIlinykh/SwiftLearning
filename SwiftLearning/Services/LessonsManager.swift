@@ -116,7 +116,7 @@ final class LessonsManager: ObservableObject {
             return
         } catch {
             state = .failed(
-                error.localizedDescription
+                UserFacingErrorMessage.message(for: error)
             )
         }
     }
@@ -144,7 +144,7 @@ final class LessonsManager: ObservableObject {
             return
         } catch {
             moreLoadingState = .failed(
-                error.localizedDescription
+                UserFacingErrorMessage.message(for: error)
             )
 
             publishLoadedState()

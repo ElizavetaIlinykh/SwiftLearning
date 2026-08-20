@@ -40,7 +40,7 @@ final class LessonCodeTaskManager: ObservableObject {
         } catch LessonCodeTaskError.notFound {
             state = .notAvailable
         } catch {
-            state = .failed(error.localizedDescription)
+            state = .failed(UserFacingErrorMessage.message(for: error))
         }
     }
 }

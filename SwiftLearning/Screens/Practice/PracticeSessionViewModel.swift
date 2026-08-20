@@ -83,7 +83,7 @@ final class PracticeSessionViewModel: ObservableObject {
             completionState = .saved(progress)
             return progress
         } catch {
-            completionState = .failed(error.localizedDescription)
+            completionState = .failed(UserFacingErrorMessage.message(for: error))
             return nil
         }
     }

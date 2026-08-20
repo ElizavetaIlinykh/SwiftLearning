@@ -38,7 +38,7 @@ final class LessonCompletionViewModel: ObservableObject {
             state = .completed(progress)
             return true
         } catch {
-            state = .failed(error.localizedDescription)
+            state = .failed(UserFacingErrorMessage.message(for: error))
             return false
         }
     }

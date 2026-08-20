@@ -90,6 +90,6 @@ final class AuthService: AuthServicing {
             }
         }
 
-        return .requestFailed(error.localizedDescription)
+        return .requestFailed(UserFacingErrorMessage.message(for: error))
     }
 }

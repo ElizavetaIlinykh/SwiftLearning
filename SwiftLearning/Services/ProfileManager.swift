@@ -37,7 +37,7 @@ final class ProfileManager: ObservableObject {
                 statistics: statistics
             )
         } catch {
-            state = .failed(error.localizedDescription)
+            state = .failed(UserFacingErrorMessage.message(for: error))
         }
     }
 }

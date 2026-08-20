@@ -94,7 +94,7 @@ struct RegisterView: View {
         do {
             try await session.register(name: name, email: email, password: password)
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = UserFacingErrorMessage.message(for: error)
         }
 
         isLoading = false

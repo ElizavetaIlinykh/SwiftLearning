@@ -37,7 +37,7 @@ final class LessonDetailsManager: ObservableObject {
             let lesson = try await lessonsService.fetchLesson(id: lessonID)
             state = .loaded(lesson)
         } catch {
-            state = .failed(error.localizedDescription)
+            state = .failed(UserFacingErrorMessage.message(for: error))
         }
     }
 }

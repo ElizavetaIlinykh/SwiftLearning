@@ -55,7 +55,7 @@ final class PracticeTasksManager: ObservableObject {
             state = .loaded(loadedTasks)
         } catch {
             loadedTasks = []
-            state = .failed(error.localizedDescription)
+            state = .failed(UserFacingErrorMessage.message(for: error))
         }
     }
 
@@ -87,7 +87,7 @@ final class PracticeTasksManager: ObservableObject {
 
             state = .loaded(loadedTasks)
         } catch {
-            loadMoreError = error.localizedDescription
+            loadMoreError = UserFacingErrorMessage.message(for: error)
         }
 
         isLoadingMore = false

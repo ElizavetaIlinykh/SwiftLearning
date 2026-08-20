@@ -138,7 +138,7 @@ final class PracticeTopicsManager: ObservableObject {
         } catch {
             loadedTopics = []
             state = .failed(
-                error.localizedDescription
+                UserFacingErrorMessage.message(for: error)
             )
         }
     }
@@ -166,7 +166,7 @@ final class PracticeTopicsManager: ObservableObject {
             return
         } catch {
             moreLoadingState = .failed(
-                error.localizedDescription
+                UserFacingErrorMessage.message(for: error)
             )
 
             publishLoadedState()

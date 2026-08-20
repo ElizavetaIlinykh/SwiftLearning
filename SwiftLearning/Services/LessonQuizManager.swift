@@ -37,7 +37,7 @@ final class LessonQuizManager: ObservableObject {
             let questions = try await lessonsService.fetchLessonQuestions(lessonID: lessonID)
             state = .loaded(questions)
         } catch {
-            state = .failed(error.localizedDescription)
+            state = .failed(UserFacingErrorMessage.message(for: error))
         }
     }
 }
