@@ -173,14 +173,7 @@ struct ProfileView: View {
     }
 
     private var loadingView: some View {
-        VStack(spacing: 14) {
-            ProgressView()
-            Text("Loading profile")
-                .font(.headline)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 48)
+        LoadingStateView(title: "Loading profile")
     }
 
     private func errorView(message: String) -> some View {

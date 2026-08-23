@@ -7,8 +7,6 @@ struct LessonCodeTaskView: View {
 
     // MARK: - Init -
 
-    @State private var answer = ""
-    @State private var answerState: AnswerState = .idle
     init(viewModel: LessonCodeTaskViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
@@ -38,8 +36,10 @@ struct LessonCodeTaskView: View {
         switch viewModel.codeTaskState {
         case .idle, .loading:
             loadingView
-        case let .loaded(codeTask):
-            codeTaskContent(codeTask)
+        case .loaded:
+            if let contentViewModel = viewModel.codeTaskContentViewModel {
+                codeTaskContent(contentViewModel)
+            }
         case .notAvailable:
             noCodeTaskView
         case let .failed(message):
@@ -49,56 +49,56 @@ struct LessonCodeTaskView: View {
 
     // MARK: - Private methods -
 
-    private func codeTaskContent(_ codeTask: LessonCodeTask) -> some View {
+    private func codeTaskContent(_ contentViewModel: LessonCodeTaskContentViewModel) -> some View {
         VStack(alignment: .leading, spacing: 24) {
-            codeTaskHeader(codeTask)
+            codeTaskHeader(contentViewModel)
 
-            codeBlockSection(codeTask)
+            codeBlockSection(contentViewModel)
 
             answerSection
 
             feedbackView
 
-            if answerState == .correct {
-                PrimaryButton(title: completionButtonTitle) {
-                    Task {
-                        await completeLesson()
-                    }
-                }
-                .disabled(isCompleting)
-            } else {
-                PrimaryButton(title: "Check Answer") {
-                    checkAnswer(for: codeTask)
-                }
-            }
+            primaryButton
         }
     }
 
-    private func codeTaskHeader(_ codeTask: LessonCodeTask) -> some View {
+    private func codeTaskHeader(_ contentViewModel: LessonCodeTaskContentViewModel) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Code Task")
                 .font(.largeTitle)
                 .fontWeight(.bold)
 
-            Text(codeTask.title)
+            Text(contentViewModel.title)
                 .font(.title3)
                 .fontWeight(.semibold)
 
-            Text(codeTask.description)
+            Text(contentViewModel.description)
                 .font(.body)
                 .foregroundStyle(.secondary)
         }
     }
 
-    private func codeBlockSection(_ codeTask: LessonCodeTask) -> some View {
+    private func codeBlockSection(_ contentViewModel: LessonCodeTaskContentViewModel) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(answerState == .correct ? "COMPLETED CODE" : "COMPLETE THE CODE")
+            Text(contentViewModel.codeSectionTitle)
                 .font(.caption)
                 .fontWeight(.bold)
                 .foregroundStyle(.secondary)
 
-            CodeBlockView(code: codeTask.code)
+            CodeBlockView(code: contentViewModel.code)
         }
+    }
+
+    private var primaryButton: some View {
+        let buttonViewModel = viewModel.primaryButtonViewModel
+
+        return PrimaryButton(title: buttonViewModel.title) {
+            Task {
+                await viewModel.performPrimaryAction(buttonViewModel.action)
+            }
+        }
+        .disabled(buttonViewModel.isDisabled)
     }
 
     private var answerSection: some View {
@@ -108,7 +108,7 @@ struct LessonCodeTaskView: View {
                 .fontWeight(.bold)
                 .foregroundStyle(.secondary)
 
-            TextField("Enter missing code", text: $answer)
+            TextField("Enter missing code", text: $viewModel.answer)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .font(.body.monospaced())
@@ -119,7 +119,7 @@ struct LessonCodeTaskView: View {
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
                         .stroke(answerBorderColor, lineWidth: 1.5)
                 )
-                .disabled(answerState == .correct)
+                .disabled(viewModel.answerState == .correct)
         }
     }
 
@@ -132,12 +132,7 @@ struct LessonCodeTaskView: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
-            PrimaryButton(title: completionButtonTitle) {
-                Task {
-                    await completeLesson()
-                }
-            }
-            .disabled(isCompleting)
+            primaryButton
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(20)
@@ -150,14 +145,7 @@ struct LessonCodeTaskView: View {
     }
 
     private var loadingView: some View {
-        VStack(spacing: 14) {
-            ProgressView()
-            Text("Loading code task")
-                .font(.headline)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 48)
+        LoadingStateView(title: "Loading code task")
     }
 
     private func errorView(message: String) -> some View {
@@ -173,7 +161,7 @@ struct LessonCodeTaskView: View {
 
     @ViewBuilder
     private var feedbackView: some View {
-        switch answerState {
+        switch viewModel.answerState {
         case .idle:
             EmptyView()
         case .correct:
@@ -224,7 +212,7 @@ struct LessonCodeTaskView: View {
     }
 
     private var answerBorderColor: Color {
-        switch answerState {
+        switch viewModel.answerState {
         case .idle:
             Color.primary.opacity(0.08)
         case .correct:
@@ -233,35 +221,6 @@ struct LessonCodeTaskView: View {
             Color.red.opacity(0.55)
         }
     }
-
-    private var completionButtonTitle: String {
-        isCompleting ? "Completing..." : "Finish Lesson"
-    }
-
-    private var isCompleting: Bool {
-        if case .completing = viewModel.completionState {
-            return true
-        }
-        return false
-    }
-
-    private func checkAnswer(for codeTask: LessonCodeTask) {
-        answerState = viewModel.isCorrectAnswer(answer, for: codeTask) ? .correct : .incorrect
-    }
-
-    private func completeLesson() async {
-        let didComplete = await viewModel.completeLesson()
-
-        if didComplete {
-            viewModel.openResult()
-        }
-    }
-}
-
-private enum AnswerState {
-    case idle
-    case correct
-    case incorrect
 }
 
 #Preview {

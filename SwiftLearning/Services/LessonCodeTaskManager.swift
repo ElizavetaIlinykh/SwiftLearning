@@ -8,24 +8,26 @@ enum LessonCodeTaskLoadingState: Equatable {
     case failed(String)
 }
 
-/// Loads the code task for a lesson.
+/// Coordinates the code task flow for a lesson.
 ///
-/// Missing code tasks are surfaced as `LessonCodeTaskError.notFound`
+/// Missing code tasks are surfaced as `LessonCodeTaskError.notFound`. UI-specific
+/// loading and completion states are handled by `LessonCodeTaskViewModel`.
 @MainActor
 final class LessonCodeTaskManager {
     // MARK: - Private properties -
 
     private let lessonID: String
     private let lessonsService: LessonsServicing
-    private var isLoading = false
+    private var isLoadingCodeTask = false
+    private var isCompletingLesson = false
 
     // MARK: - Init -
 
     /// Creates a code task manager for the given lesson.
     ///
     /// - Parameters:
-    ///   - lessonID: Identifier of the lesson whose code task should be loaded.
-    ///   - lessonsService: Service used to fetch code tasks.
+    ///   - lessonID: Identifier of the lesson whose code task should be loaded and completed.
+    ///   - lessonsService: Service used to fetch code tasks and save lesson progress.
     init(
         lessonID: String,
         lessonsService: LessonsServicing
@@ -36,19 +38,35 @@ final class LessonCodeTaskManager {
 
     // MARK: - Public methods -
 
-    /// Loads the lesson code task unless another load request is already running.
+    /// Loads the lesson code task unless another code task load request is already running.
     ///
     /// - Returns: The loaded code task.
     func loadCodeTask() async throws -> LessonCodeTask {
-        guard !isLoading else {
+        guard !isLoadingCodeTask else {
             throw CancellationError()
         }
 
-        isLoading = true
+        isLoadingCodeTask = true
         defer {
-            isLoading = false
+            isLoadingCodeTask = false
         }
 
         return try await lessonsService.fetchLessonCodeTask(lessonID: lessonID)
+    }
+
+    /// Marks the lesson as completed unless completion is already in progress.
+    ///
+    /// - Returns: Saved lesson progress.
+    func completeLesson() async throws -> LessonProgress {
+        guard !isCompletingLesson else {
+            throw CancellationError()
+        }
+
+        isCompletingLesson = true
+        defer {
+            isCompletingLesson = false
+        }
+
+        return try await lessonsService.completeLesson(id: lessonID)
     }
 }

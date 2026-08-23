@@ -13,14 +13,14 @@ enum LessonCodeTaskAssembler {
             lessonID: lessonID,
             lessonsService: dependencies.services.lessonsService
         )
-        let completionViewModel = LessonCompletionViewModel(
-            lessonID: lessonID,
-            lessonsService: dependencies.services.lessonsService
+        let builders = LessonCodeTaskBuilders(
+            contentBuilder: LessonCodeTaskContentBuilder(),
+            primaryButtonBuilder: LessonCodeTaskPrimaryButtonBuilder()
         )
         let viewModel = LessonCodeTaskViewModel(
             lessonID: lessonID,
             codeTaskManager: codeTaskManager,
-            completionViewModel: completionViewModel,
+            builders: builders,
             router: router
         )
 

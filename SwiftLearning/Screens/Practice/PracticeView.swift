@@ -111,14 +111,7 @@ struct PracticeView: View {
     }
 
     private var loadingView: some View {
-        VStack(spacing: 14) {
-            ProgressView()
-            Text("Loading practice topics")
-                .font(.headline)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 48)
+        LoadingStateView(title: "Loading practice topics")
     }
 
     // MARK: - Private methods -

@@ -107,14 +107,7 @@ struct LessonView: View {
     }
 
     private var loadingView: some View {
-        VStack(spacing: 14) {
-            ProgressView()
-            Text("Loading lesson")
-                .font(.headline)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 48)
+        LoadingStateView(title: "Loading lesson")
     }
 
     private func errorView(message: String) -> some View {
