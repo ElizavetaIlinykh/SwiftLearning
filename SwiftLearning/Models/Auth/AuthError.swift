@@ -1,28 +1,5 @@
 import Foundation
 
-struct AuthRequest: Encodable {
-    // MARK: - Public properties -
-
-    let email: String
-    let password: String
-}
-
-struct RegisterRequest: Encodable {
-    // MARK: - Public properties -
-
-    let email: String
-    let name: String
-    let password: String
-}
-
-struct AuthResponse: Decodable {
-    // MARK: - Public properties -
-
-    let accessToken: String
-    let tokenType: String
-    let user: UserProfile
-}
-
 enum AuthError: LocalizedError, Equatable {
     case invalidCredentials
     case emailAlreadyUsed
