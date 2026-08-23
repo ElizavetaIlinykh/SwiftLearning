@@ -153,13 +153,10 @@ struct PracticeView: View {
 }
 
 #Preview {
-    let router = AppRouter()
-
     NavigationStack {
         PracticeModuleAssembler.assemble(
             dependencies: AppDependenciesAssembler.assemble(),
-            router: router
+            onOpenTopic: { _, _ in }
         )
-        .environment(router)
     }
 }

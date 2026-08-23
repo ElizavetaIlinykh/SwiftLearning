@@ -14,7 +14,8 @@ final class PracticeSessionViewModel: ObservableObject {
     private let tasksManager: PracticeTasksManager
     private let taskBuilder: PracticeTaskBuilder
     private let practiceService: PracticeServicing
-    private let router: AppRouter
+    private let onClosePractice: () -> Void
+    private let onOpenResult: (PracticeProgress) -> Void
     private var tasks: [PracticeTask] = []
 
     // MARK: - Public properties -
@@ -40,14 +41,16 @@ final class PracticeSessionViewModel: ObservableObject {
         tasksManager: PracticeTasksManager,
         taskBuilder: PracticeTaskBuilder,
         practiceService: PracticeServicing,
-        router: AppRouter
+        onClosePractice: @escaping () -> Void,
+        onOpenResult: @escaping (PracticeProgress) -> Void
     ) {
         self.topicID = topicID
         self.topicTitle = topicTitle
         self.tasksManager = tasksManager
         self.taskBuilder = taskBuilder
         self.practiceService = practiceService
-        self.router = router
+        self.onClosePractice = onClosePractice
+        self.onOpenResult = onOpenResult
     }
 
     // MARK: - Public methods -
@@ -105,17 +108,11 @@ final class PracticeSessionViewModel: ObservableObject {
     }
 
     func closePractice() {
-        router.popPracticeToRoot()
+        onClosePractice()
     }
 
     func openResult(progress: PracticeProgress) {
-        router.push(
-            .result(
-                topicID: topicID,
-                topicTitle: topicTitle,
-                progress: progress
-            )
-        )
+        onOpenResult(progress)
     }
 
     // MARK: - Private methods -

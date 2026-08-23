@@ -136,12 +136,8 @@ struct LearnView: View {
 }
 
 #Preview {
-    let router = AppRouter()
-
-    LearnModuleAssembler
-        .assemble(
-            dependencies: AppDependenciesAssembler.assemble(),
-            router: router
-        )
-        .environment(router)
+    LearnModuleAssembler.assemble(
+        dependencies: AppDependenciesAssembler.assemble(),
+        onOpenLesson: { _, _ in }
+    )
 }

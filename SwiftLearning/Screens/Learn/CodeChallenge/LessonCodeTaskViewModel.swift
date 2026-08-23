@@ -7,7 +7,7 @@ final class LessonCodeTaskViewModel: ObservableObject {
 
     private let codeTaskManager: LessonCodeTaskManager
     private let builders: LessonCodeTaskBuilders
-    private let router: AppRouter
+    private let onOpenResult: (String) -> Void
     private var codeTask: LessonCodeTask?
 
     // MARK: - Public properties -
@@ -28,12 +28,12 @@ final class LessonCodeTaskViewModel: ObservableObject {
         lessonID: String,
         codeTaskManager: LessonCodeTaskManager,
         builders: LessonCodeTaskBuilders,
-        router: AppRouter
+        onOpenResult: @escaping (String) -> Void
     ) {
         self.lessonID = lessonID
         self.codeTaskManager = codeTaskManager
         self.builders = builders
-        self.router = router
+        self.onOpenResult = onOpenResult
     }
 
     // MARK: - Public methods -
@@ -107,7 +107,7 @@ final class LessonCodeTaskViewModel: ObservableObject {
     }
 
     private func openResult() {
-        router.push(.result(lessonID: lessonID))
+        onOpenResult(lessonID)
     }
 
     private func resetAnswer() {

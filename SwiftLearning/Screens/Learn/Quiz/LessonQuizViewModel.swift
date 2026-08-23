@@ -7,7 +7,7 @@ final class LessonQuizViewModel: ObservableObject {
 
     private let quizManager: LessonQuizManager
     private let contentBuilder: LessonQuizContentBuilder
-    private let router: AppRouter
+    private let onOpenCodeTask: (String) -> Void
 
     // MARK: - Public properties -
 
@@ -20,12 +20,12 @@ final class LessonQuizViewModel: ObservableObject {
         lessonID: String,
         quizManager: LessonQuizManager,
         contentBuilder: LessonQuizContentBuilder,
-        router: AppRouter
+        onOpenCodeTask: @escaping (String) -> Void
     ) {
         self.lessonID = lessonID
         self.quizManager = quizManager
         self.contentBuilder = contentBuilder
-        self.router = router
+        self.onOpenCodeTask = onOpenCodeTask
     }
 
     // MARK: - Public methods -
@@ -44,7 +44,7 @@ final class LessonQuizViewModel: ObservableObject {
     }
 
     func openCodeTask() {
-        router.push(.codeTask(lessonID: lessonID))
+        onOpenCodeTask(lessonID)
     }
 
     // MARK: - Private methods -

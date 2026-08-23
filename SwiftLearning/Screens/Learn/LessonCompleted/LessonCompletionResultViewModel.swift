@@ -4,7 +4,7 @@ import Foundation
 final class LessonCompletionResultViewModel {
     // MARK: - Private properties -
 
-    private let router: AppRouter
+    private let onContinueLearning: () -> Void
 
     // MARK: - Public properties -
 
@@ -14,15 +14,15 @@ final class LessonCompletionResultViewModel {
 
     init(
         lessonID: String,
-        router: AppRouter
+        onContinueLearning: @escaping () -> Void
     ) {
         self.lessonID = lessonID
-        self.router = router
+        self.onContinueLearning = onContinueLearning
     }
 
     // MARK: - Public methods -
 
     func continueLearning() {
-        router.popLessonsToRoot()
+        onContinueLearning()
     }
 }

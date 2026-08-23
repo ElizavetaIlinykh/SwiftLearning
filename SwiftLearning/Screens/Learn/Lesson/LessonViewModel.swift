@@ -8,7 +8,7 @@ final class LessonViewModel: ObservableObject {
     private let lessonDetailsManager: LessonDetailsManager
     private let totalLessonsCount: Int
     private let builders: LessonBuilders
-    private let router: AppRouter
+    private let onContinueToQuiz: (String) -> Void
 
     // MARK: - Public properties -
 
@@ -25,12 +25,12 @@ final class LessonViewModel: ObservableObject {
         lessonDetailsManager: LessonDetailsManager,
         totalLessonsCount: Int,
         builders: LessonBuilders,
-        router: AppRouter
+        onContinueToQuiz: @escaping (String) -> Void
     ) {
         self.lessonDetailsManager = lessonDetailsManager
         self.totalLessonsCount = totalLessonsCount
         self.builders = builders
-        self.router = router
+        self.onContinueToQuiz = onContinueToQuiz
     }
 
     // MARK: - Public methods -
@@ -49,7 +49,7 @@ final class LessonViewModel: ObservableObject {
     }
 
     func continueToQuiz(lessonID: String) {
-        router.push(.quiz(lessonID: lessonID))
+        onContinueToQuiz(lessonID)
     }
 
     // MARK: - Private methods -

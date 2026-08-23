@@ -8,7 +8,7 @@ final class LearnViewModel: ObservableObject {
     private let lessonsManager: LessonsManager
     private let lessonCardBuilder: LearnLessonCardBuilder
     private let progressCardBuilder: LearnProgressCardBuilder
-    private let router: AppRouter
+    private let onOpenLesson: (String, Int) -> Void
     private var lessons: [LessonSummary] = []
 
     // MARK: - Public properties -
@@ -25,12 +25,12 @@ final class LearnViewModel: ObservableObject {
         lessonsManager: LessonsManager,
         lessonCardBuilder: LearnLessonCardBuilder,
         progressCardBuilder: LearnProgressCardBuilder,
-        router: AppRouter
+        onOpenLesson: @escaping (String, Int) -> Void
     ) {
         self.lessonsManager = lessonsManager
         self.lessonCardBuilder = lessonCardBuilder
         self.progressCardBuilder = progressCardBuilder
-        self.router = router
+        self.onOpenLesson = onOpenLesson
     }
 
     // MARK: - Public methods -
@@ -153,11 +153,6 @@ final class LearnViewModel: ObservableObject {
     }
 
     private func openLesson(id: String) {
-        router.push(
-            .lesson(
-                id: id,
-                totalLessonsCount: lessons.count
-            )
-        )
+        onOpenLesson(id, lessons.count)
     }
 }

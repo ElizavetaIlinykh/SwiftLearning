@@ -7,7 +7,7 @@ final class PracticeViewModel: ObservableObject {
 
     private let topicsManager: PracticeTopicsManager
     private let categoryCardBuilder: PracticeCategoryCardBuilder
-    private let router: AppRouter
+    private let onOpenTopic: (String, String) -> Void
     private var topics: [PracticeCategory] = []
 
     // MARK: - Public properties -
@@ -23,11 +23,11 @@ final class PracticeViewModel: ObservableObject {
     init(
         topicsManager: PracticeTopicsManager,
         categoryCardBuilder: PracticeCategoryCardBuilder,
-        router: AppRouter
+        onOpenTopic: @escaping (String, String) -> Void
     ) {
         self.topicsManager = topicsManager
         self.categoryCardBuilder = categoryCardBuilder
-        self.router = router
+        self.onOpenTopic = onOpenTopic
     }
 
     // MARK: - Public methods -
@@ -89,7 +89,7 @@ final class PracticeViewModel: ObservableObject {
             return
         }
 
-        router.push(.exercise(id: topic.id, title: topic.title, attemptID: UUID()))
+        onOpenTopic(topic.id, topic.title)
     }
 
     // MARK: - Private properties -

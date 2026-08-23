@@ -308,15 +308,13 @@ struct PracticeSessionView: View {
 }
 
 #Preview {
-    let router = AppRouter()
-
     NavigationStack {
         PracticeModuleAssembler.assembleSession(
             topicID: "topic-uuid",
             topicTitle: "Variables and Constants",
             dependencies: AppDependenciesAssembler.assemble(),
-            router: router
+            onClosePractice: {},
+            onOpenResult: { _ in }
         )
-        .environment(router)
     }
 }

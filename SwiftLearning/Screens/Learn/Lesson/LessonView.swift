@@ -125,15 +125,12 @@ struct LessonView: View {
 }
 
 #Preview {
-    let router = AppRouter()
-
     NavigationStack {
         LessonModuleAssembler.assemble(
             lessonID: "57451d1d-27d4-40a3-86a1-3c06b176be68",
             totalLessonsCount: 1,
             dependencies: AppDependenciesAssembler.assemble(),
-            router: router
+            onContinueToQuiz: { _ in }
         )
-        .environment(router)
     }
 }
