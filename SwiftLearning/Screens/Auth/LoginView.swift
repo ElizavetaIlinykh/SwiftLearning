@@ -5,7 +5,7 @@ struct LoginView: View {
 
     @ObservedObject var session: SessionState
 
-    let onRegisterTapped: () -> Void
+    let output: (AuthOutput) -> Void
 
     // MARK: - Private properties -
 
@@ -70,9 +70,11 @@ struct LoginView: View {
             }
             .disabled(isLoading)
 
-            Button("Create an account", action: onRegisterTapped)
-                .font(.headline)
-                .frame(maxWidth: .infinity)
+            Button("Create an account") {
+                output(.openRegistration)
+            }
+            .font(.headline)
+            .frame(maxWidth: .infinity)
         }
     }
 
@@ -97,6 +99,6 @@ struct LoginView: View {
 #Preview {
     LoginView(
         session: AppDependenciesAssembler.assemble().session,
-        onRegisterTapped: {}
+        output: { _ in }
     )
 }

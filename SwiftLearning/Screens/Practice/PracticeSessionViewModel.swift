@@ -7,6 +7,11 @@ enum PracticeCompletionState: Equatable {
     case failed(String)
 }
 
+enum PracticeSessionOutput {
+    case closePractice
+    case openResult(progress: PracticeProgress)
+}
+
 @MainActor
 final class PracticeSessionViewModel: ObservableObject {
     // MARK: - Private properties -
@@ -14,8 +19,7 @@ final class PracticeSessionViewModel: ObservableObject {
     private let tasksManager: PracticeTasksManager
     private let taskBuilder: PracticeTaskBuilder
     private let practiceService: PracticeServicing
-    private let onClosePractice: () -> Void
-    private let onOpenResult: (PracticeProgress) -> Void
+    private let output: (PracticeSessionOutput) -> Void
     private var tasks: [PracticeTask] = []
 
     // MARK: - Public properties -
@@ -41,16 +45,14 @@ final class PracticeSessionViewModel: ObservableObject {
         tasksManager: PracticeTasksManager,
         taskBuilder: PracticeTaskBuilder,
         practiceService: PracticeServicing,
-        onClosePractice: @escaping () -> Void,
-        onOpenResult: @escaping (PracticeProgress) -> Void
+        output: @escaping (PracticeSessionOutput) -> Void
     ) {
         self.topicID = topicID
         self.topicTitle = topicTitle
         self.tasksManager = tasksManager
         self.taskBuilder = taskBuilder
         self.practiceService = practiceService
-        self.onClosePractice = onClosePractice
-        self.onOpenResult = onOpenResult
+        self.output = output
     }
 
     // MARK: - Public methods -
@@ -108,11 +110,11 @@ final class PracticeSessionViewModel: ObservableObject {
     }
 
     func closePractice() {
-        onClosePractice()
+        output(.closePractice)
     }
 
     func openResult(progress: PracticeProgress) {
-        onOpenResult(progress)
+        output(.openResult(progress: progress))
     }
 
     // MARK: - Private methods -

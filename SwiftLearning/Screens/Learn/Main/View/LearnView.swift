@@ -138,6 +138,6 @@ struct LearnView: View {
 #Preview {
     LearnModuleAssembler.assemble(
         dependencies: AppDependenciesAssembler.assemble(),
-        onOpenLesson: { _, _ in }
+        output: { _ in }
     )
 }

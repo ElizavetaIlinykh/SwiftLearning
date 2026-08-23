@@ -7,7 +7,7 @@ enum LessonCodeTaskAssembler {
     static func assemble(
         lessonID: String,
         dependencies: AppDependencies,
-        onOpenResult: @escaping (String) -> Void
+        output: @escaping (LessonCodeTaskOutput) -> Void
     ) -> LessonCodeTaskView {
         let codeTaskManager = LessonCodeTaskManager(
             lessonID: lessonID,
@@ -21,7 +21,7 @@ enum LessonCodeTaskAssembler {
             lessonID: lessonID,
             codeTaskManager: codeTaskManager,
             builders: builders,
-            onOpenResult: onOpenResult
+            output: output
         )
 
         return LessonCodeTaskView(viewModel: viewModel)

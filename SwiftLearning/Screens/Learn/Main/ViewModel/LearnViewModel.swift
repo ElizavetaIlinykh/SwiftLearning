@@ -1,6 +1,13 @@
 import Combine
 import Foundation
 
+enum LearnOutput {
+    case openLesson(
+        id: String,
+        lessonsCount: Int
+    )
+}
+
 @MainActor
 final class LearnViewModel: ObservableObject {
     // MARK: - Private properties -
@@ -8,7 +15,7 @@ final class LearnViewModel: ObservableObject {
     private let lessonsManager: LessonsManager
     private let lessonCardBuilder: LearnLessonCardBuilder
     private let progressCardBuilder: LearnProgressCardBuilder
-    private let onOpenLesson: (String, Int) -> Void
+    private let output: (LearnOutput) -> Void
     private var lessons: [LessonSummary] = []
 
     // MARK: - Public properties -
@@ -25,12 +32,12 @@ final class LearnViewModel: ObservableObject {
         lessonsManager: LessonsManager,
         lessonCardBuilder: LearnLessonCardBuilder,
         progressCardBuilder: LearnProgressCardBuilder,
-        onOpenLesson: @escaping (String, Int) -> Void
+        output: @escaping (LearnOutput) -> Void
     ) {
         self.lessonsManager = lessonsManager
         self.lessonCardBuilder = lessonCardBuilder
         self.progressCardBuilder = progressCardBuilder
-        self.onOpenLesson = onOpenLesson
+        self.output = output
     }
 
     // MARK: - Public methods -
@@ -153,6 +160,11 @@ final class LearnViewModel: ObservableObject {
     }
 
     private func openLesson(id: String) {
-        onOpenLesson(id, lessons.count)
+        output(
+            .openLesson(
+                id: id,
+                lessonsCount: lessons.count
+            )
+        )
     }
 }

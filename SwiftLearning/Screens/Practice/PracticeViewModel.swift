@@ -1,13 +1,20 @@
 import Combine
 import Foundation
 
+enum PracticeOutput {
+    case openTopic(
+        id: String,
+        title: String
+    )
+}
+
 @MainActor
 final class PracticeViewModel: ObservableObject {
     // MARK: - Private properties -
 
     private let topicsManager: PracticeTopicsManager
     private let categoryCardBuilder: PracticeCategoryCardBuilder
-    private let onOpenTopic: (String, String) -> Void
+    private let output: (PracticeOutput) -> Void
     private var topics: [PracticeCategory] = []
 
     // MARK: - Public properties -
@@ -23,11 +30,11 @@ final class PracticeViewModel: ObservableObject {
     init(
         topicsManager: PracticeTopicsManager,
         categoryCardBuilder: PracticeCategoryCardBuilder,
-        onOpenTopic: @escaping (String, String) -> Void
+        output: @escaping (PracticeOutput) -> Void
     ) {
         self.topicsManager = topicsManager
         self.categoryCardBuilder = categoryCardBuilder
-        self.onOpenTopic = onOpenTopic
+        self.output = output
     }
 
     // MARK: - Public methods -
@@ -89,7 +96,12 @@ final class PracticeViewModel: ObservableObject {
             return
         }
 
-        onOpenTopic(topic.id, topic.title)
+        output(
+            .openTopic(
+                id: topic.id,
+                title: topic.title
+            )
+        )
     }
 
     // MARK: - Private properties -

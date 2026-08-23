@@ -1,13 +1,17 @@
 import Combine
 import Foundation
 
+enum LessonCodeTaskOutput {
+    case openResult(lessonID: String)
+}
+
 @MainActor
 final class LessonCodeTaskViewModel: ObservableObject {
     // MARK: - Private properties -
 
     private let codeTaskManager: LessonCodeTaskManager
     private let builders: LessonCodeTaskBuilders
-    private let onOpenResult: (String) -> Void
+    private let output: (LessonCodeTaskOutput) -> Void
     private var codeTask: LessonCodeTask?
 
     // MARK: - Public properties -
@@ -28,12 +32,12 @@ final class LessonCodeTaskViewModel: ObservableObject {
         lessonID: String,
         codeTaskManager: LessonCodeTaskManager,
         builders: LessonCodeTaskBuilders,
-        onOpenResult: @escaping (String) -> Void
+        output: @escaping (LessonCodeTaskOutput) -> Void
     ) {
         self.lessonID = lessonID
         self.codeTaskManager = codeTaskManager
         self.builders = builders
-        self.onOpenResult = onOpenResult
+        self.output = output
     }
 
     // MARK: - Public methods -
@@ -107,7 +111,7 @@ final class LessonCodeTaskViewModel: ObservableObject {
     }
 
     private func openResult() {
-        onOpenResult(lessonID)
+        output(.openResult(lessonID: lessonID))
     }
 
     private func resetAnswer() {

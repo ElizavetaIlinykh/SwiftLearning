@@ -17,14 +17,17 @@ struct PracticeCoordinatorView: View {
         NavigationStack(path: $router.path) {
             PracticeModuleAssembler.assemble(
                 dependencies: dependencies,
-                onOpenTopic: { topicID, topicTitle in
-                    router.navigate(
-                        to: .exercise(
-                            id: topicID,
-                            title: topicTitle,
-                            attemptID: UUID()
+                output: { output in
+                    switch output {
+                    case let .openTopic(id, title):
+                        router.navigate(
+                            to: .exercise(
+                                id: id,
+                                title: title,
+                                attemptID: UUID()
+                            )
                         )
-                    )
+                    }
                 }
             )
             .navigationDestination(for: PracticeRouter.Route.self) { route in
@@ -44,17 +47,19 @@ struct PracticeCoordinatorView: View {
                 topicID: id,
                 topicTitle: title,
                 dependencies: dependencies,
-                onClosePractice: {
-                    router.popToRoot()
-                },
-                onOpenResult: { progress in
-                    router.navigate(
-                        to: .result(
-                            topicID: id,
-                            topicTitle: title,
-                            progress: progress
+                output: { output in
+                    switch output {
+                    case .closePractice:
+                        router.popToRoot()
+                    case let .openResult(progress):
+                        router.navigate(
+                            to: .result(
+                                topicID: id,
+                                topicTitle: title,
+                                progress: progress
+                            )
                         )
-                    )
+                    }
                 }
             )
         case let .result(topicID, topicTitle, progress):

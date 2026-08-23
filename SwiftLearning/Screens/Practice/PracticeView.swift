@@ -156,7 +156,7 @@ struct PracticeView: View {
     NavigationStack {
         PracticeModuleAssembler.assemble(
             dependencies: AppDependenciesAssembler.assemble(),
-            onOpenTopic: { _, _ in }
+            output: { _ in }
         )
     }
 }

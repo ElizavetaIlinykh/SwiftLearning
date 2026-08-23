@@ -1,6 +1,10 @@
 import Combine
 import Foundation
 
+enum LessonOutput {
+    case openQuiz(lessonID: String)
+}
+
 @MainActor
 final class LessonViewModel: ObservableObject {
     // MARK: - Private properties -
@@ -8,7 +12,7 @@ final class LessonViewModel: ObservableObject {
     private let lessonDetailsManager: LessonDetailsManager
     private let totalLessonsCount: Int
     private let builders: LessonBuilders
-    private let onContinueToQuiz: (String) -> Void
+    private let output: (LessonOutput) -> Void
 
     // MARK: - Public properties -
 
@@ -25,12 +29,12 @@ final class LessonViewModel: ObservableObject {
         lessonDetailsManager: LessonDetailsManager,
         totalLessonsCount: Int,
         builders: LessonBuilders,
-        onContinueToQuiz: @escaping (String) -> Void
+        output: @escaping (LessonOutput) -> Void
     ) {
         self.lessonDetailsManager = lessonDetailsManager
         self.totalLessonsCount = totalLessonsCount
         self.builders = builders
-        self.onContinueToQuiz = onContinueToQuiz
+        self.output = output
     }
 
     // MARK: - Public methods -
@@ -49,7 +53,7 @@ final class LessonViewModel: ObservableObject {
     }
 
     func continueToQuiz(lessonID: String) {
-        onContinueToQuiz(lessonID)
+        output(.openQuiz(lessonID: lessonID))
     }
 
     // MARK: - Private methods -

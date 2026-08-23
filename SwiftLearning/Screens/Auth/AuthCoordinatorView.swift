@@ -26,8 +26,13 @@ struct AuthCoordinatorView: View {
     private var loginView: some View {
         LoginView(
             session: dependencies.session,
-            onRegisterTapped: {
-                router.navigate(to: .registration)
+            output: { output in
+                switch output {
+                case .openRegistration:
+                    router.navigate(to: .registration)
+                case .openLogin:
+                    router.popToRoot()
+                }
             }
         )
     }
@@ -40,8 +45,13 @@ struct AuthCoordinatorView: View {
         case .registration:
             RegisterView(
                 session: dependencies.session,
-                onLoginTapped: {
-                    router.popToRoot()
+                output: { output in
+                    switch output {
+                    case .openRegistration:
+                        router.navigate(to: .registration)
+                    case .openLogin:
+                        router.popToRoot()
+                    }
                 }
             )
         }

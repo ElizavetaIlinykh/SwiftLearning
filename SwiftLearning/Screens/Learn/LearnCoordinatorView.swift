@@ -17,8 +17,11 @@ struct LearnCoordinatorView: View {
         NavigationStack(path: $router.path) {
             LearnModuleAssembler.assemble(
                 dependencies: dependencies,
-                onOpenLesson: { id, totalLessonsCount in
-                    router.navigate(to: .lesson(id: id, totalLessonsCount: totalLessonsCount))
+                output: { output in
+                    switch output {
+                    case let .openLesson(id, lessonsCount):
+                        router.navigate(to: .lesson(id: id, totalLessonsCount: lessonsCount))
+                    }
                 }
             )
             .navigationDestination(for: LearnRouter.Route.self) { route in
@@ -38,32 +41,44 @@ struct LearnCoordinatorView: View {
                 lessonID: id,
                 totalLessonsCount: totalLessonsCount,
                 dependencies: dependencies,
-                onContinueToQuiz: { lessonID in
-                    router.navigate(to: .quiz(lessonID: lessonID))
+                output: { output in
+                    switch output {
+                    case let .openQuiz(lessonID):
+                        router.navigate(to: .quiz(lessonID: lessonID))
+                    }
                 }
             )
         case let .quiz(lessonID):
             LessonQuizModuleAssembler.assemble(
                 lessonID: lessonID,
                 dependencies: dependencies,
-                onOpenCodeTask: { lessonID in
-                    router.navigate(to: .codeTask(lessonID: lessonID))
+                output: { output in
+                    switch output {
+                    case let .openCodeTask(lessonID):
+                        router.navigate(to: .codeTask(lessonID: lessonID))
+                    }
                 }
             )
         case let .codeTask(lessonID):
             LessonCodeTaskAssembler.assemble(
                 lessonID: lessonID,
                 dependencies: dependencies,
-                onOpenResult: { lessonID in
-                    router.navigate(to: .result(lessonID: lessonID))
+                output: { output in
+                    switch output {
+                    case let .openResult(lessonID):
+                        router.navigate(to: .result(lessonID: lessonID))
+                    }
                 }
             )
         case let .result(lessonID):
             LessonCompletionResultView(
                 viewModel: LessonCompletionResultViewModel(
                     lessonID: lessonID,
-                    onContinueLearning: {
-                        router.popToRoot()
+                    output: { output in
+                        switch output {
+                        case .continueLearning:
+                            router.popToRoot()
+                        }
                     }
                 )
             )

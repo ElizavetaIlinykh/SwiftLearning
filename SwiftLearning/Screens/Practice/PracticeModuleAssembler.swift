@@ -6,13 +6,13 @@ enum PracticeModuleAssembler {
 
     static func assemble(
         dependencies: AppDependencies,
-        onOpenTopic: @escaping (String, String) -> Void
+        output: @escaping (PracticeOutput) -> Void
     ) -> PracticeView {
         let topicsManager = PracticeTopicsManager(practiceService: dependencies.services.practiceService)
         let viewModel = PracticeViewModel(
             topicsManager: topicsManager,
             categoryCardBuilder: PracticeCategoryCardBuilder(),
-            onOpenTopic: onOpenTopic
+            output: output
         )
 
         return PracticeView(viewModel: viewModel)
@@ -22,8 +22,7 @@ enum PracticeModuleAssembler {
         topicID: String,
         topicTitle: String,
         dependencies: AppDependencies,
-        onClosePractice: @escaping () -> Void,
-        onOpenResult: @escaping (PracticeProgress) -> Void
+        output: @escaping (PracticeSessionOutput) -> Void
     ) -> PracticeSessionView {
         let tasksManager = PracticeTasksManager(
             topicID: topicID,
@@ -35,8 +34,7 @@ enum PracticeModuleAssembler {
             tasksManager: tasksManager,
             taskBuilder: PracticeTaskBuilder(),
             practiceService: dependencies.services.practiceService,
-            onClosePractice: onClosePractice,
-            onOpenResult: onOpenResult
+            output: output
         )
 
         return PracticeSessionView(viewModel: viewModel)

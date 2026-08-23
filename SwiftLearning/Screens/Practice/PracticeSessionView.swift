@@ -313,8 +313,7 @@ struct PracticeSessionView: View {
             topicID: "topic-uuid",
             topicTitle: "Variables and Constants",
             dependencies: AppDependenciesAssembler.assemble(),
-            onClosePractice: {},
-            onOpenResult: { _ in }
+            output: { _ in }
         )
     }
 }

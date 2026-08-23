@@ -1,10 +1,14 @@
 import Foundation
 
+enum LessonCompletionResultOutput {
+    case continueLearning
+}
+
 @MainActor
 final class LessonCompletionResultViewModel {
     // MARK: - Private properties -
 
-    private let onContinueLearning: () -> Void
+    private let output: (LessonCompletionResultOutput) -> Void
 
     // MARK: - Public properties -
 
@@ -14,15 +18,15 @@ final class LessonCompletionResultViewModel {
 
     init(
         lessonID: String,
-        onContinueLearning: @escaping () -> Void
+        output: @escaping (LessonCompletionResultOutput) -> Void
     ) {
         self.lessonID = lessonID
-        self.onContinueLearning = onContinueLearning
+        self.output = output
     }
 
     // MARK: - Public methods -
 
     func continueLearning() {
-        onContinueLearning()
+        output(.continueLearning)
     }
 }

@@ -8,7 +8,7 @@ enum LessonModuleAssembler {
         lessonID: String,
         totalLessonsCount: Int,
         dependencies: AppDependencies,
-        onContinueToQuiz: @escaping (String) -> Void
+        output: @escaping (LessonOutput) -> Void
     ) -> LessonView {
         let lessonDetailsManager = LessonDetailsManager(
             lessonID: lessonID,
@@ -22,7 +22,7 @@ enum LessonModuleAssembler {
             lessonDetailsManager: lessonDetailsManager,
             totalLessonsCount: totalLessonsCount,
             builders: builders,
-            onContinueToQuiz: onContinueToQuiz
+            output: output
         )
 
         return LessonView(viewModel: viewModel)

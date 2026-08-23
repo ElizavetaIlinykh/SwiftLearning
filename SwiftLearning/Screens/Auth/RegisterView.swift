@@ -5,7 +5,7 @@ struct RegisterView: View {
 
     @ObservedObject var session: SessionState
 
-    let onLoginTapped: () -> Void
+    let output: (AuthOutput) -> Void
 
     // MARK: - Private properties -
 
@@ -77,9 +77,11 @@ struct RegisterView: View {
             }
             .disabled(isLoading)
 
-            Button("Back to login", action: onLoginTapped)
-                .font(.headline)
-                .frame(maxWidth: .infinity)
+            Button("Back to login") {
+                output(.openLogin)
+            }
+            .font(.headline)
+            .frame(maxWidth: .infinity)
         }
     }
 
@@ -104,6 +106,6 @@ struct RegisterView: View {
 #Preview {
     RegisterView(
         session: AppDependenciesAssembler.assemble().session,
-        onLoginTapped: {}
+        output: { _ in }
     )
 }

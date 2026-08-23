@@ -201,7 +201,7 @@ struct LessonQuizRouteView: View {
         LessonQuizModuleAssembler.assemble(
             lessonID: "57451d1d-27d4-40a3-86a1-3c06b176be68",
             dependencies: AppDependenciesAssembler.assemble(),
-            onOpenCodeTask: { _ in }
+            output: { _ in }
         )
     }
 }
