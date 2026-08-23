@@ -1,26 +1,6 @@
 import Combine
 import Foundation
 
-enum LessonCompletionState: Equatable {
-    case idle
-    case completing
-    case completed(LessonProgress)
-    case failed(String)
-}
-
-enum AnswerState {
-    case idle
-    case correct
-    case incorrect
-}
-
-struct LessonCodeTaskContentViewModel {
-    let title: String
-    let description: String
-    let codeSectionTitle: String
-    let code: String
-}
-
 @MainActor
 final class LessonCodeTaskViewModel: ObservableObject {
     // MARK: - Private properties -
