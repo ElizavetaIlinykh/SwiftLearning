@@ -34,11 +34,6 @@
 			children = (
 				D786AFEF30288D1000CBE45A /* SwiftLearning */,
 				D786AFEE30288D1000CBE45A /* Products */,
-				D786AFFB30288FA600CBE45A /* Models */,
-				D786AFFC30288FA600CBE45A /* Data */,
-				D786AFFD30288FA600CBE45A /* Stores */,
-				D786AFFE30288FA600CBE45A /* Screens */,
-				D786AFFF30288FA600CBE45A /* Components */,
 			);
 			sourceTree = "<group>";
 		};
@@ -48,65 +43,6 @@
 				D786AFED30288D1000CBE45A /* SwiftLearning.app */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		D786AFFB30288FA600CBE45A /* Models */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		D786AFFC30288FA600CBE45A /* Data */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Data;
-			sourceTree = "<group>";
-		};
-		D786AFFD30288FA600CBE45A /* Stores */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Stores;
-			sourceTree = "<group>";
-		};
-		D786AFFE30288FA600CBE45A /* Screens */ = {
-			isa = PBXGroup;
-			children = (
-				D786B00030288FAB00CBE45A /* Learn */,
-				D786B00130288FAB00CBE45A /* Practice */,
-				D786B00230288FAB00CBE45A /* Profile */,
-			);
-			path = Screens;
-			sourceTree = "<group>";
-		};
-		D786AFFF30288FA600CBE45A /* Components */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Components;
-			sourceTree = "<group>";
-		};
-		D786B00030288FAB00CBE45A /* Learn */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Learn;
-			sourceTree = "<group>";
-		};
-		D786B00130288FAB00CBE45A /* Practice */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Practice;
-			sourceTree = "<group>";
-		};
-		D786B00230288FAB00CBE45A /* Profile */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Profile;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
