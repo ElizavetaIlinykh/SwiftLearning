@@ -1,6 +1,22 @@
 import Combine
 import Foundation
 
+enum LessonsMoreLoadingState: Equatable {
+    case idle
+    case loading
+    case failed(String)
+}
+
+enum LessonsLoadingState: Equatable {
+    case idle
+    case loading
+    case loaded(
+        lessons: [LessonSummary],
+        moreLoadingState: LessonsMoreLoadingState
+    )
+    case failed(String)
+}
+
 @MainActor
 final class LearnViewModel: ObservableObject {
     // MARK: - Private properties -
@@ -9,11 +25,11 @@ final class LearnViewModel: ObservableObject {
     private let lessonCardBuilder: LearnLessonCardBuilder
     private let progressCardBuilder: LearnProgressCardBuilder
     private let router: AppRouter
-    private var cancellables: Set<AnyCancellable> = []
 
     // MARK: - Public properties -
 
-    @Published private(set) var state: LessonsLoadingState
+    @Published private(set) var state: LessonsLoadingState = .idle
+
     var lessons: [LessonSummary] {
         guard case let .loaded(lessons, _) = state else { return [] }
         return lessons
@@ -64,27 +80,59 @@ final class LearnViewModel: ObservableObject {
         self.lessonCardBuilder = lessonCardBuilder
         self.progressCardBuilder = progressCardBuilder
         self.router = router
-        state = lessonsManager.state
-
-        bindLessonsManager()
     }
 
     // MARK: - Public methods -
 
     func fetchLessons() async {
-        await lessonsManager.fetch()
+        if lessons.isEmpty {
+            state = .loading
+        }
+
+        do {
+            let lessons = try await lessonsManager.fetch()
+            setLoadedState(lessons: lessons)
+        } catch is CancellationError {
+            return
+        } catch {
+            state = .failed(
+                UserFacingErrorMessage.message(for: error)
+            )
+        }
     }
 
     func loadMoreLessons() async {
-        await lessonsManager.loadMore()
+        setLoadMoreState(.loading)
+
+        do {
+            let lessons = try await lessonsManager.loadMore()
+            setLoadedState(lessons: lessons)
+        } catch is CancellationError {
+            setLoadMoreState(.idle)
+        } catch {
+            setLoadMoreState(
+                .failed(
+                    UserFacingErrorMessage.message(for: error)
+                )
+            )
+        }
     }
 
     func retryLoadMoreLessons() async {
-        await lessonsManager.loadMore()
+        await loadMoreLessons()
     }
 
     func refreshLessons() async {
-        await lessonsManager.refresh()
+        do {
+            let lessons = try await lessonsManager.refresh()
+            setLoadedState(lessons: lessons)
+        } catch is CancellationError {
+            return
+        } catch {
+            state = .failed(
+                UserFacingErrorMessage.message(for: error)
+            )
+        }
     }
 
     func selectLesson(id: String) {
@@ -103,6 +151,27 @@ final class LearnViewModel: ObservableObject {
 
     // MARK: - Private methods -
 
+    private func setLoadedState(
+        lessons: [LessonSummary],
+        moreLoadingState: LessonsMoreLoadingState = .idle
+    ) {
+        state = .loaded(
+            lessons: lessons,
+            moreLoadingState: moreLoadingState
+        )
+    }
+
+    private func setLoadMoreState(_ moreLoadingState: LessonsMoreLoadingState) {
+        guard case let .loaded(lessons, _) = state else {
+            return
+        }
+
+        setLoadedState(
+            lessons: lessons,
+            moreLoadingState: moreLoadingState
+        )
+    }
+
     private func continueLearning() {
         guard let lesson = nextAvailableLesson else {
             return
@@ -118,13 +187,5 @@ final class LearnViewModel: ObservableObject {
                 totalLessonsCount: lessons.count
             )
         )
-    }
-
-    private func bindLessonsManager() {
-        lessonsManager.$state
-            .sink { [weak self] state in
-                self?.state = state
-            }
-            .store(in: &cancellables)
     }
 }
