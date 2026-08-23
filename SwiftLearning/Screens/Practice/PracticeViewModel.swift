@@ -6,11 +6,12 @@ final class PracticeViewModel: ObservableObject {
     // MARK: - Private properties -
 
     private let topicsManager: PracticeTopicsManager
-    private var cancellables: Set<AnyCancellable> = []
+    private let router: AppRouter
 
     // MARK: - Public properties -
 
-    @Published private(set) var state: PracticeTopicsLoadingState
+    @Published private(set) var state: PracticeTopicsLoadingState = .idle
+
     var topics: [PracticeCategory] {
         guard case let .loaded(topics, _) = state else { return [] }
         return topics.sorted { $0.order < $1.order }
@@ -30,38 +31,92 @@ final class PracticeViewModel: ObservableObject {
 
     // MARK: - Init -
 
-    init(topicsManager: PracticeTopicsManager) {
+    init(
+        topicsManager: PracticeTopicsManager,
+        router: AppRouter
+    ) {
         self.topicsManager = topicsManager
-        state = topicsManager.state
-
-        bindTopicsManager()
+        self.router = router
     }
 
     // MARK: - Public methods -
 
     func loadTopics() async {
-        await topicsManager.fetch()
+        if topics.isEmpty {
+            state = .loading
+        }
+
+        do {
+            let topics = try await topicsManager.fetch()
+            setLoadedState(topics: topics)
+        } catch is CancellationError {
+            return
+        } catch {
+            state = .failed(UserFacingErrorMessage.message(for: error))
+        }
     }
 
     func loadMoreTopicsIfNeeded(currentTopicID: String) async {
-        await topicsManager.loadMoreTopicsIfNeeded(currentTopicID: currentTopicID)
+        setLoadMoreState(.loading)
+
+        do {
+            let topics = try await topicsManager.loadMoreIfNeeded(currentTopicID: currentTopicID)
+            setLoadedState(topics: topics)
+        } catch is CancellationError {
+            setLoadMoreState(.idle)
+        } catch {
+            setLoadMoreState(.failed(UserFacingErrorMessage.message(for: error)))
+        }
     }
 
     func retryLoadMoreTopics() async {
-        await topicsManager.loadMore()
+        setLoadMoreState(.loading)
+
+        do {
+            let topics = try await topicsManager.loadMore()
+            setLoadedState(topics: topics)
+        } catch is CancellationError {
+            setLoadMoreState(.idle)
+        } catch {
+            setLoadMoreState(.failed(UserFacingErrorMessage.message(for: error)))
+        }
     }
 
     func refreshTopics() async {
-        await topicsManager.refresh()
+        do {
+            let topics = try await topicsManager.refresh()
+            setLoadedState(topics: topics)
+        } catch is CancellationError {
+            return
+        } catch {
+            state = .failed(UserFacingErrorMessage.message(for: error))
+        }
+    }
+
+    func selectTopic(_ topic: PracticeCategory) {
+        router.push(.exercise(id: topic.id, title: topic.title, attemptID: UUID()))
     }
 
     // MARK: - Private methods -
 
-    private func bindTopicsManager() {
-        topicsManager.$state
-            .sink { [weak self] state in
-                self?.state = state
-            }
-            .store(in: &cancellables)
+    private func setLoadedState(
+        topics: [PracticeCategory],
+        moreLoadingState: PracticeTopicsMoreLoadingState = .idle
+    ) {
+        state = .loaded(
+            topics: topics,
+            moreLoadingState: moreLoadingState
+        )
+    }
+
+    private func setLoadMoreState(_ moreLoadingState: PracticeTopicsMoreLoadingState) {
+        guard case let .loaded(topics, _) = state else {
+            return
+        }
+
+        setLoadedState(
+            topics: topics,
+            moreLoadingState: moreLoadingState
+        )
     }
 }

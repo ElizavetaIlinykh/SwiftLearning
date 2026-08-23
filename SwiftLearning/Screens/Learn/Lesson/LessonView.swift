@@ -5,7 +5,6 @@ struct LessonView: View {
 
     // MARK: - Init -
 
-    @Environment(AppRouter.self) private var router
     @StateObject private var viewModel: LessonViewModel
     init(viewModel: LessonViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -81,7 +80,7 @@ struct LessonView: View {
             }
 
             PrimaryButton(title: "Continue") {
-                router.push(.quiz(lessonID: lesson.id))
+                viewModel.continueToQuiz(lessonID: lesson.id)
             }
         }
     }
@@ -136,12 +135,15 @@ struct LessonView: View {
 }
 
 #Preview {
+    let router = AppRouter()
+
     NavigationStack {
         LessonModuleAssembler.assemble(
             lessonID: "57451d1d-27d4-40a3-86a1-3c06b176be68",
             totalLessonsCount: 1,
-            dependencies: AppDependenciesAssembler.assemble()
+            dependencies: AppDependenciesAssembler.assemble(),
+            router: router
         )
-        .environment(AppRouter())
+        .environment(router)
     }
 }

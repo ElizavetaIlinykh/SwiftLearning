@@ -1,4 +1,3 @@
-import Combine
 import Foundation
 
 enum PracticeTopicsMoreLoadingState: Equatable {
@@ -17,38 +16,35 @@ enum PracticeTopicsLoadingState: Equatable {
     case failed(String)
 }
 
+/// Coordinates practice topic loading and pagination.
+///
+/// `PracticeTopicsManager` owns topic paging, caching, and next-page checks.
+/// UI state is handled by `PracticeViewModel`.
 @MainActor
-final class PracticeTopicsManager: ObservableObject {
+final class PracticeTopicsManager {
     // MARK: - Private properties -
 
     private enum Constants {
         static let pageLimit = 20
+        static let prefetchThreshold = 5
     }
-
-    @Published private(set) var state: PracticeTopicsLoadingState = .idle
 
     private let pageLoader: PaginationLoader<PracticeCategory>
 
+    /// Cached topics from all loaded pages.
     private var loadedTopics: [PracticeCategory] = []
+
+    /// Indicates whether another topic page is available.
     private var hasMore = false
-    private var moreLoadingState: PracticeTopicsMoreLoadingState = .idle
-    private var isRefreshing = false
 
-    private var isLoading: Bool {
-        switch state {
-        case .loading:
-            true
-
-        case let .loaded(_, moreLoadingState):
-            moreLoadingState == .loading
-
-        case .idle, .failed:
-            false
-        }
-    }
+    /// The currently running request. Regular requests are skipped while it exists.
+    private var currentTask: Task<[PracticeCategory], Error>?
 
     // MARK: - Init -
 
+    /// Creates a manager backed by the provided practice service.
+    ///
+    /// - Parameter practiceService: Service used by `PaginationLoader` to fetch topic pages.
     init(practiceService: PracticeServicing) {
         pageLoader = PaginationLoader(
             contract: .init(
@@ -66,115 +62,105 @@ final class PracticeTopicsManager: ObservableObject {
 
     // MARK: - Public methods -
 
-    func fetch() async {
+    /// Loads the first page if topics have not been loaded yet.
+    ///
+    /// - Returns: The current topic cache after the operation completes.
+    func fetch() async throws -> [PracticeCategory] {
         guard loadedTopics.isEmpty else {
-            return
+            return loadedTopics
         }
 
-        await fetchInitial()
+        guard currentTask == nil else {
+            return loadedTopics
+        }
+
+        return try await performInitialFetch()
     }
 
-    func loadMoreTopicsIfNeeded(currentTopicID: String) async {
+    /// Loads the next topic page if the current item is close to the end of the cache.
+    ///
+    /// - Parameter currentTopicID: Topic currently visible to the user.
+    /// - Returns: The current topic cache after the operation completes.
+    func loadMoreIfNeeded(currentTopicID: String) async throws -> [PracticeCategory] {
         guard shouldLoadMore(currentTopicID: currentTopicID) else {
-            return
+            return loadedTopics
         }
 
-        await fetchNext()
+        return try await loadMore()
     }
 
-    func loadMore() async {
-        await fetchNext()
+    /// Loads and appends the next topic page when available.
+    ///
+    /// - Returns: The full topic cache after the operation completes.
+    func loadMore() async throws -> [PracticeCategory] {
+        guard hasMore else {
+            return loadedTopics
+        }
+
+        guard currentTask == nil else {
+            return loadedTopics
+        }
+
+        return try await performLoadMore()
     }
 
-    func refresh() async {
-        guard !isRefreshing, !isLoading else {
-            return
-        }
+    /// Cancels any in-flight request and reloads the first page.
+    ///
+    /// - Returns: The refreshed topic cache.
+    func refresh() async throws -> [PracticeCategory] {
+        await cancelCurrentTask()
 
-        guard !loadedTopics.isEmpty else {
-            await fetchInitial()
-            return
-        }
-
-        isRefreshing = true
-        defer {
-            isRefreshing = false
-        }
-
-        do {
-            let response = try await pageLoader.fetch()
-
-            loadedTopics = response.result
-            hasMore = response.hasNext
-            moreLoadingState = .idle
-
-            publishLoadedState()
-        } catch is CancellationError {
-            return
-        } catch {
-            publishLoadedState()
-        }
+        return try await performInitialFetch()
     }
 
     // MARK: - Private methods -
 
-    private func fetchInitial() async {
-        guard !isLoading, !isRefreshing else {
-            return
-        }
-
-        state = .loading
-
-        do {
+    private func performInitialFetch() async throws -> [PracticeCategory] {
+        let task = Task { @MainActor in
             let response = try await pageLoader.fetch()
+
+            try Task.checkCancellation()
 
             loadedTopics = response.result
             hasMore = response.hasNext
-            moreLoadingState = .idle
 
-            publishLoadedState()
-        } catch is CancellationError {
-            return
-        } catch {
-            loadedTopics = []
-            state = .failed(
-                UserFacingErrorMessage.message(for: error)
-            )
+            return loadedTopics
         }
+
+        currentTask = task
+
+        defer {
+            currentTask = nil
+        }
+
+        return try await task.value
     }
 
-    private func fetchNext() async {
-        guard hasMore, !isLoading, !isRefreshing else {
-            return
-        }
-
-        moreLoadingState = .loading
-        publishLoadedState()
-
-        do {
+    private func performLoadMore() async throws -> [PracticeCategory] {
+        let task = Task { @MainActor in
             let response = try await pageLoader.loadNext()
+
+            try Task.checkCancellation()
 
             loadedTopics.append(
                 contentsOf: response.result
             )
-
             hasMore = response.hasNext
-            moreLoadingState = .idle
 
-            publishLoadedState()
-        } catch is CancellationError {
-            return
-        } catch {
-            moreLoadingState = .failed(
-                UserFacingErrorMessage.message(for: error)
-            )
-
-            publishLoadedState()
+            return loadedTopics
         }
+
+        currentTask = task
+
+        defer {
+            currentTask = nil
+        }
+
+        return try await task.value
     }
 
     private func shouldLoadMore(currentTopicID: String) -> Bool {
-        guard hasMore, !isLoading else {
+        guard hasMore, currentTask == nil else {
             return false
         }
 
@@ -183,13 +169,20 @@ final class PracticeTopicsManager: ObservableObject {
             return false
         }
 
-        return index >= max(orderedTopics.count - 5, 0)
+        return index >= max(orderedTopics.count - Constants.prefetchThreshold, 0)
     }
 
-    private func publishLoadedState() {
-        state = .loaded(
-            topics: loadedTopics,
-            moreLoadingState: moreLoadingState
-        )
+    private func cancelCurrentTask() async {
+        guard let currentTask else {
+            return
+        }
+
+        currentTask.cancel()
+
+        do {
+            _ = try await currentTask.value
+        } catch {
+            // Cancellation is expected here.
+        }
     }
 }

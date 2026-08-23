@@ -5,7 +5,6 @@ struct PracticeView: View {
 
     // MARK: - Init -
 
-    @Environment(AppRouter.self) private var router
     @StateObject private var viewModel: PracticeViewModel
     init(viewModel: PracticeViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -55,7 +54,7 @@ struct PracticeView: View {
         VStack(spacing: 14) {
             ForEach(viewModel.topics) { topic in
                 PracticeCategoryCard(category: topic) {
-                    router.push(.exercise(id: topic.id, title: topic.title, attemptID: UUID()))
+                    viewModel.selectTopic(topic)
                 }
                 .onAppear {
                     Task {
@@ -156,8 +155,13 @@ struct PracticeView: View {
 }
 
 #Preview {
+    let router = AppRouter()
+
     NavigationStack {
-        PracticeModuleAssembler.assemble(dependencies: AppDependenciesAssembler.assemble())
-            .environment(AppRouter())
+        PracticeModuleAssembler.assemble(
+            dependencies: AppDependenciesAssembler.assemble(),
+            router: router
+        )
+        .environment(router)
     }
 }

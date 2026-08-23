@@ -12,16 +12,17 @@ enum PracticeCompletionState: Equatable {
 final class PracticeSessionViewModel: ObservableObject {
     // MARK: - Private properties -
 
-    @Published private(set) var state: PracticeTasksLoadingState
-    @Published private(set) var hasMoreTasks: Bool
-    @Published private(set) var isLoadingMoreTasks: Bool
-    @Published private(set) var loadMoreTasksError: String?
-    @Published private(set) var completionState: PracticeCompletionState = .idle
     private let tasksManager: PracticeTasksManager
     private let practiceService: PracticeServicing
-    private var cancellables: Set<AnyCancellable> = []
+    private let router: AppRouter
 
     // MARK: - Public properties -
+
+    @Published private(set) var state: PracticeTasksLoadingState = .idle
+    @Published private(set) var hasMoreTasks = false
+    @Published private(set) var isLoadingMoreTasks = false
+    @Published private(set) var loadMoreTasksError: String?
+    @Published private(set) var completionState: PracticeCompletionState = .idle
 
     let topicID: String
     let topicTitle: String
@@ -37,32 +38,44 @@ final class PracticeSessionViewModel: ObservableObject {
         topicID: String,
         topicTitle: String,
         tasksManager: PracticeTasksManager,
-        practiceService: PracticeServicing
+        practiceService: PracticeServicing,
+        router: AppRouter
     ) {
         self.topicID = topicID
         self.topicTitle = topicTitle
         self.tasksManager = tasksManager
         self.practiceService = practiceService
-        state = tasksManager.state
-        hasMoreTasks = tasksManager.hasMore
-        isLoadingMoreTasks = tasksManager.isLoadingMore
-        loadMoreTasksError = tasksManager.loadMoreError
-
-        bindTasksManager()
+        self.router = router
     }
 
     // MARK: - Public methods -
 
     func loadTasks() async {
-        await tasksManager.loadTasks()
+        state = .loading
+        hasMoreTasks = false
+        isLoadingMoreTasks = false
+        loadMoreTasksError = nil
+
+        do {
+            let page = try await tasksManager.loadTasks()
+            setLoadedPage(page)
+        } catch is CancellationError {
+            return
+        } catch {
+            state = .failed(UserFacingErrorMessage.message(for: error))
+        }
     }
 
     func loadMoreTasksIfNeeded(currentTaskID: String) async {
-        await tasksManager.loadMoreTasksIfNeeded(currentTaskID: currentTaskID)
+        await loadMoreTasks { [tasksManager] in
+            try await tasksManager.loadMoreTasksIfNeeded(currentTaskID: currentTaskID)
+        }
     }
 
     func loadMoreTasks() async {
-        await tasksManager.loadMoreTasks()
+        await loadMoreTasks { [tasksManager] in
+            try await tasksManager.loadMoreTasks()
+        }
     }
 
     func saveResult(
@@ -88,31 +101,46 @@ final class PracticeSessionViewModel: ObservableObject {
         }
     }
 
+    func closePractice() {
+        router.popPracticeToRoot()
+    }
+
+    func openResult(progress: PracticeProgress) {
+        router.push(
+            .result(
+                topicID: topicID,
+                topicTitle: topicTitle,
+                progress: progress
+            )
+        )
+    }
+
     // MARK: - Private methods -
 
-    private func bindTasksManager() {
-        tasksManager.$state
-            .sink { [weak self] state in
-                self?.state = state
-            }
-            .store(in: &cancellables)
+    private func loadMoreTasks(
+        _ load: () async throws -> PracticeTasksPage
+    ) async {
+        guard hasMoreTasks, !isLoadingMoreTasks else {
+            return
+        }
 
-        tasksManager.$hasMore
-            .sink { [weak self] hasMoreTasks in
-                self?.hasMoreTasks = hasMoreTasks
-            }
-            .store(in: &cancellables)
+        isLoadingMoreTasks = true
+        loadMoreTasksError = nil
 
-        tasksManager.$isLoadingMore
-            .sink { [weak self] isLoadingMoreTasks in
-                self?.isLoadingMoreTasks = isLoadingMoreTasks
-            }
-            .store(in: &cancellables)
+        do {
+            let page = try await load()
+            setLoadedPage(page)
+        } catch is CancellationError {
+            return
+        } catch {
+            loadMoreTasksError = UserFacingErrorMessage.message(for: error)
+        }
 
-        tasksManager.$loadMoreError
-            .sink { [weak self] loadMoreTasksError in
-                self?.loadMoreTasksError = loadMoreTasksError
-            }
-            .store(in: &cancellables)
+        isLoadingMoreTasks = false
+    }
+
+    private func setLoadedPage(_ page: PracticeTasksPage) {
+        state = .loaded(page.tasks)
+        hasMoreTasks = page.hasMore
     }
 }

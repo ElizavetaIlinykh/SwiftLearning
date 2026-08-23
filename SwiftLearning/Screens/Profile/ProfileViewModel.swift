@@ -7,39 +7,37 @@ final class ProfileViewModel: ObservableObject {
 
     private let profileManager: ProfileManager
     private let session: SessionState
-    private var cancellables: Set<AnyCancellable> = []
+
+    // MARK: - Public properties -
+
+    @Published private(set) var state: ProfileLoadingState = .idle
 
     // MARK: - Init -
 
-    @Published private(set) var state: ProfileLoadingState
     init(
         profileManager: ProfileManager,
         session: SessionState
     ) {
         self.profileManager = profileManager
         self.session = session
-        state = profileManager.state
-
-        bindProfileManager()
     }
 
     // MARK: - Public methods -
 
     func loadProfile() async {
-        await profileManager.loadProfile()
+        state = .loading
+
+        do {
+            let content = try await profileManager.loadProfile()
+            state = .loaded(content)
+        } catch is CancellationError {
+            return
+        } catch {
+            state = .failed(UserFacingErrorMessage.message(for: error))
+        }
     }
 
     func logout() {
         session.logout()
-    }
-
-    // MARK: - Private methods -
-
-    private func bindProfileManager() {
-        profileManager.$state
-            .sink { [weak self] state in
-                self?.state = state
-            }
-            .store(in: &cancellables)
     }
 }

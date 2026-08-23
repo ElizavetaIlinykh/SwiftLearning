@@ -7,34 +7,43 @@ final class LessonCodeTaskViewModel: ObservableObject {
 
     private let codeTaskManager: LessonCodeTaskManager
     private let completionViewModel: LessonCompletionViewModel
-    private var cancellables: Set<AnyCancellable> = []
+    private let router: AppRouter
 
     // MARK: - Public properties -
 
     let lessonID: String
+    @Published private(set) var codeTaskState: LessonCodeTaskLoadingState = .idle
+    @Published private(set) var completionState: LessonCompletionViewModel.State = .idle
 
     // MARK: - Init -
 
-    @Published private(set) var codeTaskState: LessonCodeTaskLoadingState
-    @Published private(set) var completionState: LessonCompletionViewModel.State
     init(
         lessonID: String,
         codeTaskManager: LessonCodeTaskManager,
-        completionViewModel: LessonCompletionViewModel
+        completionViewModel: LessonCompletionViewModel,
+        router: AppRouter
     ) {
         self.lessonID = lessonID
         self.codeTaskManager = codeTaskManager
         self.completionViewModel = completionViewModel
-        codeTaskState = codeTaskManager.state
-        completionState = completionViewModel.state
-
-        bindManagers()
+        self.router = router
     }
 
     // MARK: - Public methods -
 
     func loadCodeTask() async {
-        await codeTaskManager.loadCodeTask()
+        codeTaskState = .loading
+
+        do {
+            let codeTask = try await codeTaskManager.loadCodeTask()
+            codeTaskState = .loaded(codeTask)
+        } catch is CancellationError {
+            return
+        } catch LessonCodeTaskError.notFound {
+            codeTaskState = .notAvailable
+        } catch {
+            codeTaskState = .failed(UserFacingErrorMessage.message(for: error))
+        }
     }
 
     func isCorrectAnswer(_ answer: String, for codeTask: LessonCodeTask) -> Bool {
@@ -42,22 +51,13 @@ final class LessonCodeTaskViewModel: ObservableObject {
     }
 
     func completeLesson() async -> Bool {
-        await completionViewModel.completeLesson()
+        completionState = .completing
+        let didComplete = await completionViewModel.completeLesson()
+        completionState = completionViewModel.state
+        return didComplete
     }
 
-    // MARK: - Private methods -
-
-    private func bindManagers() {
-        codeTaskManager.$state
-            .sink { [weak self] codeTaskState in
-                self?.codeTaskState = codeTaskState
-            }
-            .store(in: &cancellables)
-
-        completionViewModel.$state
-            .sink { [weak self] completionState in
-                self?.completionState = completionState
-            }
-            .store(in: &cancellables)
+    func openResult() {
+        router.push(.result(lessonID: lessonID))
     }
 }

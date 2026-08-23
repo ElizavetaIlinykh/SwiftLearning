@@ -57,10 +57,13 @@ struct MainTabView: View {
         @Bindable var router = router
 
         return NavigationStack(path: $router.practicePath) {
-            PracticeModuleAssembler.assemble(dependencies: dependencies)
-                .navigationDestination(for: PracticeRoute.self) { route in
-                    practiceDestination(for: route)
-                }
+            PracticeModuleAssembler.assemble(
+                dependencies: dependencies,
+                router: router
+            )
+            .navigationDestination(for: PracticeRoute.self) { route in
+                practiceDestination(for: route)
+            }
         }
     }
 
@@ -84,20 +87,28 @@ struct MainTabView: View {
             LessonModuleAssembler.assemble(
                 lessonID: id,
                 totalLessonsCount: totalLessonsCount,
-                dependencies: dependencies
+                dependencies: dependencies,
+                router: router
             )
         case let .quiz(lessonID):
             LessonQuizModuleAssembler.assemble(
                 lessonID: lessonID,
-                dependencies: dependencies
+                dependencies: dependencies,
+                router: router
             )
         case let .codeTask(lessonID):
             LessonCodeTaskAssembler.assemble(
                 lessonID: lessonID,
-                dependencies: dependencies
+                dependencies: dependencies,
+                router: router
             )
         case let .result(lessonID):
-            LessonCompletionResultView(lessonID: lessonID)
+            LessonCompletionResultView(
+                viewModel: LessonCompletionResultViewModel(
+                    lessonID: lessonID,
+                    router: router
+                )
+            )
         }
     }
 
@@ -108,7 +119,8 @@ struct MainTabView: View {
             PracticeModuleAssembler.assembleSession(
                 topicID: id,
                 topicTitle: title,
-                dependencies: dependencies
+                dependencies: dependencies,
+                router: router
             )
         case let .result(topicID, topicTitle, progress):
             PracticeResultView(

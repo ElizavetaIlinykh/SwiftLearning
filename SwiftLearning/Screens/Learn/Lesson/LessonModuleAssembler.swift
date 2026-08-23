@@ -7,7 +7,8 @@ enum LessonModuleAssembler {
     static func assemble(
         lessonID: String,
         totalLessonsCount: Int,
-        dependencies: AppDependencies
+        dependencies: AppDependencies,
+        router: AppRouter
     ) -> LessonView {
         let lessonDetailsManager = LessonDetailsManager(
             lessonID: lessonID,
@@ -15,7 +16,8 @@ enum LessonModuleAssembler {
         )
         let viewModel = LessonViewModel(
             lessonDetailsManager: lessonDetailsManager,
-            totalLessonsCount: totalLessonsCount
+            totalLessonsCount: totalLessonsCount,
+            router: router
         )
 
         return LessonView(viewModel: viewModel)

@@ -6,7 +6,8 @@ enum LessonQuizModuleAssembler {
 
     static func assemble(
         lessonID: String,
-        dependencies: AppDependencies
+        dependencies: AppDependencies,
+        router: AppRouter
     ) -> LessonQuizRouteView {
         let quizManager = LessonQuizManager(
             lessonID: lessonID,
@@ -14,7 +15,8 @@ enum LessonQuizModuleAssembler {
         )
         let viewModel = LessonQuizViewModel(
             lessonID: lessonID,
-            quizManager: quizManager
+            quizManager: quizManager,
+            router: router
         )
 
         return LessonQuizRouteView(viewModel: viewModel)

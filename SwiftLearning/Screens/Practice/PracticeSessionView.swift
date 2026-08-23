@@ -3,7 +3,6 @@ import SwiftUI
 struct PracticeSessionView: View {
     // MARK: - Private properties -
 
-    @Environment(AppRouter.self) private var router
     @StateObject private var viewModel: PracticeSessionViewModel
 
     // MARK: - Init -
@@ -206,7 +205,7 @@ struct PracticeSessionView: View {
                 .foregroundStyle(.secondary)
 
             Button("Done") {
-                router.popPracticeToRoot()
+                viewModel.closePractice()
             }
             .font(.headline)
             .foregroundStyle(.secondary)
@@ -302,13 +301,7 @@ struct PracticeSessionView: View {
             return
         }
 
-        router.push(
-            .result(
-                topicID: viewModel.topicID,
-                topicTitle: viewModel.topicTitle,
-                progress: progress
-            )
-        )
+        viewModel.openResult(progress: progress)
     }
 
     private func actionButtonTitle(totalTasks: Int) -> String {
@@ -336,12 +329,15 @@ struct PracticeSessionView: View {
 }
 
 #Preview {
+    let router = AppRouter()
+
     NavigationStack {
         PracticeModuleAssembler.assembleSession(
             topicID: "topic-uuid",
             topicTitle: "Variables and Constants",
-            dependencies: AppDependenciesAssembler.assemble()
+            dependencies: AppDependenciesAssembler.assemble(),
+            router: router
         )
-        .environment(AppRouter())
+        .environment(router)
     }
 }

@@ -3,12 +3,16 @@ import SwiftUI
 struct LessonCompletionResultView: View {
     // MARK: - Private properties -
 
-    // MARK: - Public properties -
-
-    @Environment(AppRouter.self) private var router
-    let lessonID: String
-
+    private let viewModel: LessonCompletionResultViewModel
     @State private var isVisible = false
+
+    // MARK: - Init -
+
+    init(viewModel: LessonCompletionResultViewModel) {
+        self.viewModel = viewModel
+    }
+
+    // MARK: - Public properties -
 
     var body: some View {
         VStack(spacing: 28) {
@@ -45,7 +49,7 @@ struct LessonCompletionResultView: View {
             Spacer()
 
             PrimaryButton(title: "Continue") {
-                router.popLessonsToRoot()
+                viewModel.continueLearning()
             }
         }
         .padding(24)
@@ -59,6 +63,13 @@ struct LessonCompletionResultView: View {
 }
 
 #Preview {
-    LessonCompletionResultView(lessonID: "57451d1d-27d4-40a3-86a1-3c06b176be68")
-        .environment(AppRouter())
+    let router = AppRouter()
+
+    LessonCompletionResultView(
+        viewModel: LessonCompletionResultViewModel(
+            lessonID: "57451d1d-27d4-40a3-86a1-3c06b176be68",
+            router: router
+        )
+    )
+    .environment(router)
 }

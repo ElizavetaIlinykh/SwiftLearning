@@ -3,7 +3,6 @@ import SwiftUI
 struct LessonQuizRouteView: View {
     // MARK: - Private properties -
 
-    @Environment(AppRouter.self) private var router
     @StateObject private var viewModel: LessonQuizViewModel
 
     // MARK: - Init -
@@ -146,7 +145,7 @@ struct LessonQuizRouteView: View {
                 .foregroundStyle(.secondary)
 
             PrimaryButton(title: "Continue") {
-                router.push(.codeTask(lessonID: viewModel.lessonID))
+                viewModel.openCodeTask()
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -206,7 +205,7 @@ struct LessonQuizRouteView: View {
 
     private func advance(totalQuestions: Int) {
         if isLastQuestion(totalQuestions: totalQuestions) {
-            router.push(.codeTask(lessonID: viewModel.lessonID))
+            viewModel.openCodeTask()
         } else {
             currentQuestionIndex += 1
             selectedAnswerIndex = nil
@@ -219,11 +218,14 @@ struct LessonQuizRouteView: View {
 }
 
 #Preview {
+    let router = AppRouter()
+
     NavigationStack {
         LessonQuizModuleAssembler.assemble(
             lessonID: "57451d1d-27d4-40a3-86a1-3c06b176be68",
-            dependencies: AppDependenciesAssembler.assemble()
+            dependencies: AppDependenciesAssembler.assemble(),
+            router: router
         )
-        .environment(AppRouter())
+        .environment(router)
     }
 }

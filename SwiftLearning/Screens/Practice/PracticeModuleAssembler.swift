@@ -4,9 +4,15 @@ import SwiftUI
 enum PracticeModuleAssembler {
     // MARK: - Public methods -
 
-    static func assemble(dependencies: AppDependencies) -> PracticeView {
+    static func assemble(
+        dependencies: AppDependencies,
+        router: AppRouter
+    ) -> PracticeView {
         let topicsManager = PracticeTopicsManager(practiceService: dependencies.services.practiceService)
-        let viewModel = PracticeViewModel(topicsManager: topicsManager)
+        let viewModel = PracticeViewModel(
+            topicsManager: topicsManager,
+            router: router
+        )
 
         return PracticeView(viewModel: viewModel)
     }
@@ -14,7 +20,8 @@ enum PracticeModuleAssembler {
     static func assembleSession(
         topicID: String,
         topicTitle: String,
-        dependencies: AppDependencies
+        dependencies: AppDependencies,
+        router: AppRouter
     ) -> PracticeSessionView {
         let tasksManager = PracticeTasksManager(
             topicID: topicID,
@@ -24,7 +31,8 @@ enum PracticeModuleAssembler {
             topicID: topicID,
             topicTitle: topicTitle,
             tasksManager: tasksManager,
-            practiceService: dependencies.services.practiceService
+            practiceService: dependencies.services.practiceService,
+            router: router
         )
 
         return PracticeSessionView(viewModel: viewModel)

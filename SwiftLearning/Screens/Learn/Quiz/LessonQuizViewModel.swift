@@ -6,39 +6,41 @@ final class LessonQuizViewModel: ObservableObject {
     // MARK: - Private properties -
 
     private let quizManager: LessonQuizManager
-    private var cancellables: Set<AnyCancellable> = []
+    private let router: AppRouter
 
     // MARK: - Public properties -
 
     let lessonID: String
+    @Published private(set) var state: LessonQuizLoadingState = .idle
 
     // MARK: - Init -
 
-    @Published private(set) var state: LessonQuizLoadingState
     init(
         lessonID: String,
-        quizManager: LessonQuizManager
+        quizManager: LessonQuizManager,
+        router: AppRouter
     ) {
         self.lessonID = lessonID
         self.quizManager = quizManager
-        state = quizManager.state
-
-        bindQuizManager()
+        self.router = router
     }
 
     // MARK: - Public methods -
 
     func loadQuestions() async {
-        await quizManager.loadQuestions()
+        state = .loading
+
+        do {
+            let questions = try await quizManager.loadQuestions()
+            state = .loaded(questions)
+        } catch is CancellationError {
+            return
+        } catch {
+            state = .failed(UserFacingErrorMessage.message(for: error))
+        }
     }
 
-    // MARK: - Private methods -
-
-    private func bindQuizManager() {
-        quizManager.$state
-            .sink { [weak self] state in
-                self?.state = state
-            }
-            .store(in: &cancellables)
+    func openCodeTask() {
+        router.push(.codeTask(lessonID: lessonID))
     }
 }

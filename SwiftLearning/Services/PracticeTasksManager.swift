@@ -1,24 +1,42 @@
-import Combine
 import Foundation
+
+struct PracticeTasksPage: Equatable {
+    // MARK: - Public properties -
+
+    let tasks: [PracticeTask]
+    let hasMore: Bool
+}
 
 typealias PracticeTasksLoadingState = LoadingState<[PracticeTask]>
 
+/// Coordinates practice task loading and pagination for one topic.
+///
+/// The manager owns offsets, page accumulation, duplicate filtering, and next-page checks.
+/// UI state is handled by `PracticeSessionViewModel`.
 @MainActor
-final class PracticeTasksManager: ObservableObject {
+final class PracticeTasksManager {
     // MARK: - Private properties -
 
-    @Published private(set) var state: PracticeTasksLoadingState = .idle
-    @Published private(set) var hasMore = false
-    @Published private(set) var isLoadingMore = false
-    @Published private(set) var loadMoreError: String?
+    private enum Constants {
+        static let pageLimit = 20
+        static let prefetchThreshold = 5
+    }
+
     private let topicID: String
     private let practiceService: PracticeServicing
-    private let pageLimit = 20
+
     private var loadedTasks: [PracticeTask] = []
+    private var hasMore = false
     private var currentOffset = 0
+    private var currentTask: Task<PracticeTasksPage, Error>?
 
     // MARK: - Init -
 
+    /// Creates a manager for a practice topic.
+    ///
+    /// - Parameters:
+    ///   - topicID: Identifier of the topic whose tasks should be loaded.
+    ///   - practiceService: Service used to fetch task pages.
     init(
         topicID: String,
         practiceService: PracticeServicing
@@ -29,48 +47,84 @@ final class PracticeTasksManager: ObservableObject {
 
     // MARK: - Public methods -
 
-    func loadTasks() async {
-        guard state != .loading else { return }
+    /// Loads the first task page and resets pagination.
+    ///
+    /// - Returns: A snapshot containing loaded tasks and next-page availability.
+    func loadTasks() async throws -> PracticeTasksPage {
+        guard currentTask == nil else {
+            return currentPage
+        }
 
-        state = .loading
-        hasMore = false
-        isLoadingMore = false
-        loadMoreError = nil
-        currentOffset = 0
+        return try await performInitialFetch()
+    }
 
-        do {
-            let response = try await practiceService.fetchTasks(
-                topicID: topicID,
-                offset: currentOffset,
-                limit: pageLimit
-            )
+    /// Loads the next page when the current task is close to the end of the cache.
+    ///
+    /// - Parameter currentTaskID: Task currently visible to the user.
+    /// - Returns: The current page snapshot after the operation completes.
+    func loadMoreTasksIfNeeded(currentTaskID: String) async throws -> PracticeTasksPage {
+        guard shouldLoadMore(currentTaskID: currentTaskID) else {
+            return currentPage
+        }
+
+        return try await loadMoreTasks()
+    }
+
+    /// Loads and appends the next task page when available.
+    ///
+    /// - Returns: The current page snapshot after the operation completes.
+    func loadMoreTasks() async throws -> PracticeTasksPage {
+        guard hasMore else {
+            return currentPage
+        }
+
+        guard currentTask == nil else {
+            return currentPage
+        }
+
+        return try await performLoadMore()
+    }
+
+    // MARK: - Private properties -
+
+    private var currentPage: PracticeTasksPage {
+        PracticeTasksPage(
+            tasks: loadedTasks,
+            hasMore: hasMore
+        )
+    }
+
+    // MARK: - Private methods -
+
+    private func performInitialFetch() async throws -> PracticeTasksPage {
+        let task = Task { @MainActor in
+            currentOffset = 0
+            let response = try await fetchTasks(offset: currentOffset)
+
+            try Task.checkCancellation()
+
             loadedTasks = response.items
             currentOffset = response.offset + response.items.count
             hasMore = response.hasMore && !response.items.isEmpty
-            state = .loaded(loadedTasks)
-        } catch {
-            loadedTasks = []
-            state = .failed(UserFacingErrorMessage.message(for: error))
+
+            return currentPage
         }
+
+        currentTask = task
+
+        defer {
+            currentTask = nil
+        }
+
+        return try await task.value
     }
 
-    func loadMoreTasksIfNeeded(currentTaskID: String) async {
-        guard shouldLoadMore(currentTaskID: currentTaskID) else { return }
-        await loadMoreTasks()
-    }
+    private func performLoadMore() async throws -> PracticeTasksPage {
+        let task = Task { @MainActor in
+            let response = try await fetchTasks(offset: currentOffset)
 
-    func loadMoreTasks() async {
-        guard hasMore, !isLoadingMore else { return }
+            try Task.checkCancellation()
 
-        isLoadingMore = true
-        loadMoreError = nil
-
-        do {
-            let response = try await practiceService.fetchTasks(
-                topicID: topicID,
-                offset: currentOffset,
-                limit: pageLimit
-            )
             currentOffset = response.offset + response.items.count
 
             if response.items.isEmpty {
@@ -80,21 +134,31 @@ final class PracticeTasksManager: ObservableObject {
                 hasMore = response.hasMore
             }
 
-            state = .loaded(loadedTasks)
-        } catch {
-            loadMoreError = UserFacingErrorMessage.message(for: error)
+            return currentPage
         }
 
-        isLoadingMore = false
+        currentTask = task
+
+        defer {
+            currentTask = nil
+        }
+
+        return try await task.value
     }
 
-    // MARK: - Private methods -
+    private func fetchTasks(offset: Int) async throws -> PaginatedResponse<PracticeTask> {
+        try await practiceService.fetchTasks(
+            topicID: topicID,
+            offset: offset,
+            limit: Constants.pageLimit
+        )
+    }
 
     private func shouldLoadMore(currentTaskID: String) -> Bool {
-        guard hasMore, !isLoadingMore else { return false }
+        guard hasMore, currentTask == nil else { return false }
         let orderedTasks = loadedTasks.sorted { $0.order < $1.order }
         guard let index = orderedTasks.firstIndex(where: { $0.id == currentTaskID }) else { return false }
-        return index >= max(orderedTasks.count - 5, 0)
+        return index >= max(orderedTasks.count - Constants.prefetchThreshold, 0)
     }
 }
 
