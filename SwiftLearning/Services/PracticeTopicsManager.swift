@@ -1,19 +1,9 @@
 import Foundation
 
-enum PracticeTopicsMoreLoadingState: Equatable {
+enum PracticeTopicsMoreLoadingState {
     case idle
     case loading
-    case failed(String)
-}
-
-enum PracticeTopicsLoadingState: Equatable {
-    case idle
-    case loading
-    case loaded(
-        topics: [PracticeCategory],
-        moreLoadingState: PracticeTopicsMoreLoadingState
-    )
-    case failed(String)
+    case failed(Error)
 }
 
 /// Coordinates practice topic loading and pagination.
@@ -39,6 +29,10 @@ final class PracticeTopicsManager {
 
     /// The currently running request. Regular requests are skipped while it exists.
     private var currentTask: Task<[PracticeCategory], Error>?
+
+    // MARK: - Public properties -
+
+    private(set) var moreLoadingState: PracticeTopicsMoreLoadingState = .idle
 
     // MARK: - Init -
 
@@ -74,6 +68,7 @@ final class PracticeTopicsManager {
             return loadedTopics
         }
 
+        moreLoadingState = .idle
         return try await performInitialFetch()
     }
 
@@ -94,6 +89,7 @@ final class PracticeTopicsManager {
     /// - Returns: The full topic cache after the operation completes.
     func loadMore() async throws -> [PracticeCategory] {
         guard hasMore else {
+            moreLoadingState = .idle
             return loadedTopics
         }
 
@@ -101,7 +97,19 @@ final class PracticeTopicsManager {
             return loadedTopics
         }
 
-        return try await performLoadMore()
+        moreLoadingState = .loading
+
+        do {
+            let topics = try await performLoadMore()
+            moreLoadingState = .idle
+            return topics
+        } catch is CancellationError {
+            moreLoadingState = .idle
+            throw CancellationError()
+        } catch {
+            moreLoadingState = .failed(error)
+            throw error
+        }
     }
 
     /// Cancels any in-flight request and reloads the first page.
@@ -109,6 +117,7 @@ final class PracticeTopicsManager {
     /// - Returns: The refreshed topic cache.
     func refresh() async throws -> [PracticeCategory] {
         await cancelCurrentTask()
+        moreLoadingState = .idle
 
         return try await performInitialFetch()
     }

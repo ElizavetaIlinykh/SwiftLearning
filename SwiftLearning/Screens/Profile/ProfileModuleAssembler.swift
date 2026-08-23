@@ -8,6 +8,7 @@ enum ProfileModuleAssembler {
         let profileManager = ProfileManager(userService: dependencies.services.userService)
         let viewModel = ProfileViewModel(
             profileManager: profileManager,
+            contentBuilder: ProfileContentBuilder(),
             session: dependencies.session
         )
 

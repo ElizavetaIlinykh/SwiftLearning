@@ -4,7 +4,6 @@ import Foundation
 enum PracticeCompletionState: Equatable {
     case idle
     case saving
-    case saved(PracticeProgress)
     case failed(String)
 }
 
@@ -13,12 +12,14 @@ final class PracticeSessionViewModel: ObservableObject {
     // MARK: - Private properties -
 
     private let tasksManager: PracticeTasksManager
+    private let taskBuilder: PracticeTaskBuilder
     private let practiceService: PracticeServicing
     private let router: AppRouter
+    private var tasks: [PracticeTask] = []
 
     // MARK: - Public properties -
 
-    @Published private(set) var state: PracticeTasksLoadingState = .idle
+    @Published private(set) var state: PracticeSessionViewState = .loading
     @Published private(set) var hasMoreTasks = false
     @Published private(set) var isLoadingMoreTasks = false
     @Published private(set) var loadMoreTasksError: String?
@@ -27,9 +28,8 @@ final class PracticeSessionViewModel: ObservableObject {
     let topicID: String
     let topicTitle: String
 
-    var tasks: [PracticeTask] {
-        guard case let .loaded(tasks) = state else { return [] }
-        return tasks.sorted { $0.order < $1.order }
+    var taskCount: Int {
+        tasks.count
     }
 
     // MARK: - Init -
@@ -38,12 +38,14 @@ final class PracticeSessionViewModel: ObservableObject {
         topicID: String,
         topicTitle: String,
         tasksManager: PracticeTasksManager,
+        taskBuilder: PracticeTaskBuilder,
         practiceService: PracticeServicing,
         router: AppRouter
     ) {
         self.topicID = topicID
         self.topicTitle = topicTitle
         self.tasksManager = tasksManager
+        self.taskBuilder = taskBuilder
         self.practiceService = practiceService
         self.router = router
     }
@@ -52,6 +54,7 @@ final class PracticeSessionViewModel: ObservableObject {
 
     func loadTasks() async {
         state = .loading
+        tasks = []
         hasMoreTasks = false
         isLoadingMoreTasks = false
         loadMoreTasksError = nil
@@ -62,7 +65,7 @@ final class PracticeSessionViewModel: ObservableObject {
         } catch is CancellationError {
             return
         } catch {
-            state = .failed(UserFacingErrorMessage.message(for: error))
+            state = .error(UserFacingErrorMessage.message(for: error))
         }
     }
 
@@ -93,7 +96,7 @@ final class PracticeSessionViewModel: ObservableObject {
                 correctAnswersCount: correctAnswersCount,
                 totalAnswersCount: totalAnswersCount
             )
-            completionState = .saved(progress)
+            completionState = .idle
             return progress
         } catch {
             completionState = .failed(UserFacingErrorMessage.message(for: error))
@@ -140,7 +143,20 @@ final class PracticeSessionViewModel: ObservableObject {
     }
 
     private func setLoadedPage(_ page: PracticeTasksPage) {
-        state = .loaded(page.tasks)
+        tasks = page.tasks
         hasMoreTasks = page.hasMore
+        updateStateFromTasks()
+    }
+
+    private func updateStateFromTasks() {
+        if tasks.isEmpty {
+            state = .empty
+        } else {
+            state = .content(
+                PracticeSessionContentViewModel(
+                    tasks: taskBuilder.build(tasks: tasks)
+                )
+            )
+        }
     }
 }

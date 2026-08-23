@@ -4,17 +4,17 @@ struct LessonQuizRouteView: View {
     // MARK: - Private properties -
 
     @StateObject private var viewModel: LessonQuizViewModel
-
-    // MARK: - Init -
-
     @State private var currentQuestionIndex = 0
     @State private var selectedAnswerIndex: Int?
-    init(viewModel: LessonQuizViewModel) {
-        _viewModel = StateObject(wrappedValue: viewModel)
-    }
 
     private var isAnswered: Bool {
         selectedAnswerIndex != nil
+    }
+
+    // MARK: - Init -
+
+    init(viewModel: LessonQuizViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
     }
 
     // MARK: - Public properties -
@@ -33,6 +33,8 @@ struct LessonQuizRouteView: View {
             await viewModel.loadQuestions()
         }
         .refreshable {
+            currentQuestionIndex = 0
+            selectedAnswerIndex = nil
             await viewModel.loadQuestions()
         }
     }
@@ -40,26 +42,22 @@ struct LessonQuizRouteView: View {
     @ViewBuilder
     private var content: some View {
         switch viewModel.state {
-        case .idle, .loading:
+        case .loading:
             loadingView
-        case let .failed(message):
+        case let .error(message):
             errorView(message: message)
-        case let .loaded(questions):
-            let sortedQuestions = questions.sorted { $0.order < $1.order }
-
-            if sortedQuestions.isEmpty {
-                emptyView
-            } else {
-                questionView(sortedQuestions)
-            }
+        case .empty:
+            emptyView
+        case let .content(contentViewModel):
+            questionView(contentViewModel.questions)
         }
     }
 
     // MARK: - Private methods -
 
-    private func questionView(_ questions: [LessonQuizQuestion]) -> some View {
-        let question = questions[currentQuestionIndex]
-        let answers = question.answers.sorted { $0.order < $1.order }
+    private func questionView(_ questions: [LessonQuizQuestionViewModel]) -> some View {
+        let safeQuestionIndex = min(currentQuestionIndex, questions.count - 1)
+        let question = questions[safeQuestionIndex]
 
         return VStack(alignment: .leading, spacing: 24) {
             questionProgress(totalQuestions: questions.count)
@@ -76,10 +74,10 @@ struct LessonQuizRouteView: View {
             }
 
             VStack(spacing: 12) {
-                ForEach(answers.indices, id: \.self) { index in
+                ForEach(question.answers.indices, id: \.self) { index in
                     AnswerOptionView(
-                        title: answers[index].text,
-                        state: optionState(for: index, in: answers)
+                        title: question.answers[index].text,
+                        state: optionState(for: index, in: question.answers)
                     ) {
                         selectAnswer(index)
                     }
@@ -88,7 +86,7 @@ struct LessonQuizRouteView: View {
             }
 
             if isAnswered {
-                feedbackView(answers)
+                feedbackView(question.answers)
 
                 PrimaryButton(title: isLastQuestion(totalQuestions: questions.count) ? "Continue" : "Next Question") {
                     advance(totalQuestions: questions.count)
@@ -129,29 +127,17 @@ struct LessonQuizRouteView: View {
     }
 
     private var emptyView: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text("No questions yet")
-                .font(.headline)
-
-            Text("Continue to the code task.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-
+        EmptyStateView(
+            title: "No questions yet",
+            message: "Continue to the code task."
+        ) {
             PrimaryButton(title: "Continue") {
                 viewModel.openCodeTask()
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(20)
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .stroke(Color.primary.opacity(0.06), lineWidth: 1)
-        )
     }
 
-    private func feedbackView(_ answers: [LessonQuizAnswer]) -> some View {
+    private func feedbackView(_ answers: [LessonQuizAnswerViewModel]) -> some View {
         let isCorrect = selectedAnswerIndex.map { answers[$0].isCorrect } ?? false
 
         return VStack(alignment: .leading, spacing: 10) {
@@ -172,7 +158,7 @@ struct LessonQuizRouteView: View {
 
     private func optionState(
         for index: Int,
-        in answers: [LessonQuizAnswer]
+        in answers: [LessonQuizAnswerViewModel]
     ) -> AnswerOptionState {
         guard let selectedAnswerIndex else { return .neutral }
 

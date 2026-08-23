@@ -16,6 +16,7 @@ enum LessonQuizModuleAssembler {
         let viewModel = LessonQuizViewModel(
             lessonID: lessonID,
             quizManager: quizManager,
+            contentBuilder: LessonQuizContentBuilder(),
             router: router
         )
 

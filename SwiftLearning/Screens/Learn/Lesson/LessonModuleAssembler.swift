@@ -14,9 +14,14 @@ enum LessonModuleAssembler {
             lessonID: lessonID,
             lessonsService: dependencies.services.lessonsService
         )
+        let builders = LessonBuilders(
+            progressBuilder: LessonProgressBuilder(),
+            contentBuilder: LessonContentBuilder()
+        )
         let viewModel = LessonViewModel(
             lessonDetailsManager: lessonDetailsManager,
             totalLessonsCount: totalLessonsCount,
+            builders: builders,
             router: router
         )
 

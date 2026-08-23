@@ -3,9 +3,10 @@ import SwiftUI
 struct LessonView: View {
     // MARK: - Private properties -
 
+    @StateObject private var viewModel: LessonViewModel
+
     // MARK: - Init -
 
-    @StateObject private var viewModel: LessonViewModel
     init(viewModel: LessonViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
@@ -20,7 +21,7 @@ struct LessonView: View {
             .padding(20)
         }
         .background(Color(.systemGroupedBackground))
-        .navigationTitle(navigationTitle)
+        .navigationTitle(viewModel.navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await viewModel.loadLesson()
@@ -30,40 +31,41 @@ struct LessonView: View {
         }
     }
 
-    private var navigationTitle: String {
-        guard case let .loaded(lesson) = viewModel.state else { return "Lesson" }
-        return lesson.title
-    }
-
     @ViewBuilder
     private var content: some View {
         switch viewModel.state {
-        case .idle, .loading:
+        case .loading:
             loadingView
-        case let .failed(message):
+        case let .error(message):
             errorView(message: message)
-        case let .loaded(lesson):
-            lessonContent(lesson)
+        case let .content(progressViewModel, contentViewModel):
+            lessonContent(
+                contentViewModel,
+                progressViewModel: progressViewModel
+            )
         }
     }
 
     // MARK: - Private methods -
 
-    private func lessonContent(_ lesson: LessonDetails) -> some View {
+    private func lessonContent(
+        _ contentViewModel: LessonContentViewModel,
+        progressViewModel: LessonProgressViewModel
+    ) -> some View {
         VStack(alignment: .leading, spacing: 24) {
-            lessonProgress(lesson)
+            lessonProgress(progressViewModel)
 
             VStack(alignment: .leading, spacing: 12) {
-                Text("THEORY")
+                Text(contentViewModel.theorySectionTitle)
                     .font(.caption)
                     .fontWeight(.bold)
                     .foregroundStyle(.secondary)
 
-                Text(lesson.title)
+                Text(contentViewModel.title)
                     .font(.title)
                     .fontWeight(.bold)
 
-                Text(lesson.theory)
+                Text(contentViewModel.theory)
                     .font(.body)
                     .lineSpacing(6)
                     .multilineTextAlignment(.leading)
@@ -71,37 +73,37 @@ struct LessonView: View {
             }
 
             VStack(alignment: .leading, spacing: 10) {
-                Text("CODE EXAMPLE")
+                Text(contentViewModel.codeSectionTitle)
                     .font(.caption)
                     .fontWeight(.bold)
                     .foregroundStyle(.secondary)
 
-                CodeBlockView(code: lesson.codeExample)
+                CodeBlockView(code: contentViewModel.codeExample)
             }
 
             PrimaryButton(title: "Continue") {
-                viewModel.continueToQuiz(lessonID: lesson.id)
+                viewModel.continueToQuiz(lessonID: contentViewModel.lessonID)
             }
         }
     }
 
-    private func lessonProgress(_ lesson: LessonDetails) -> some View {
+    private func lessonProgress(_ progressViewModel: LessonProgressViewModel) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("Lesson \(lesson.order) of \(viewModel.totalLessonsCount)")
+                Text(progressViewModel.title)
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .foregroundStyle(.secondary)
 
                 Spacer()
 
-                Text("\(lesson.order) / \(viewModel.totalLessonsCount)")
+                Text(progressViewModel.valueTitle)
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .foregroundStyle(.secondary)
             }
 
-            ProgressView(value: courseProgress(for: lesson))
+            ProgressView(value: progressViewModel.progress)
                 .tint(.accentColor)
         }
     }
@@ -119,11 +121,6 @@ struct LessonView: View {
                 await viewModel.loadLesson()
             }
         }
-    }
-
-    private func courseProgress(for lesson: LessonDetails) -> Double {
-        guard viewModel.totalLessonsCount > 0 else { return 0 }
-        return Double(lesson.order) / Double(viewModel.totalLessonsCount)
     }
 }
 

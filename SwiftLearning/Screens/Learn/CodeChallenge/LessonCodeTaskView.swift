@@ -33,16 +33,14 @@ struct LessonCodeTaskView: View {
 
     @ViewBuilder
     private var content: some View {
-        switch viewModel.codeTaskState {
-        case .idle, .loading:
+        switch viewModel.state {
+        case .loading:
             loadingView
-        case .loaded:
-            if let contentViewModel = viewModel.codeTaskContentViewModel {
-                codeTaskContent(contentViewModel)
-            }
+        case let .content(contentViewModel):
+            codeTaskContent(contentViewModel)
         case .notAvailable:
             noCodeTaskView
-        case let .failed(message):
+        case let .error(message):
             errorView(message: message)
         }
     }
@@ -124,24 +122,12 @@ struct LessonCodeTaskView: View {
     }
 
     private var noCodeTaskView: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text("No code task")
-                .font(.headline)
-
-            Text("Continue to complete this lesson.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-
+        EmptyStateView(
+            title: "No code task",
+            message: "Continue to complete this lesson."
+        ) {
             primaryButton
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(20)
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .stroke(Color.primary.opacity(0.06), lineWidth: 1)
-        )
     }
 
     private var loadingView: some View {

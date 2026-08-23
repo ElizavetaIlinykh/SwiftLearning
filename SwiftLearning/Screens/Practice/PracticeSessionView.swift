@@ -40,25 +40,23 @@ struct PracticeSessionView: View {
     @ViewBuilder
     private var content: some View {
         switch viewModel.state {
-        case .idle, .loading:
+        case .loading:
             loadingView
-        case let .failed(message):
+        case let .error(message):
             errorView(message: message)
-        case .loaded:
-            if viewModel.tasks.isEmpty {
-                emptyView
-            } else {
-                taskContent(viewModel.tasks)
-            }
+        case .empty:
+            emptyView
+        case let .content(contentViewModel):
+            taskContent(contentViewModel.tasks)
         }
     }
 
     // MARK: - Private methods -
 
-    private func taskContent(_ tasks: [PracticeTask]) -> some View {
+    private func taskContent(_ tasks: [PracticeTaskViewModel]) -> some View {
         let safeTaskIndex = min(currentTaskIndex, tasks.count - 1)
         let task = tasks[safeTaskIndex]
-        let answers = task.answers.sorted { $0.order < $1.order }
+        let answers = task.answers
 
         return VStack(alignment: .leading, spacing: 22) {
             taskProgress(totalTasks: tasks.count)
@@ -130,7 +128,7 @@ struct PracticeSessionView: View {
         }
     }
 
-    private func feedbackView(_ answers: [PracticeAnswer]) -> some View {
+    private func feedbackView(_ answers: [PracticeAnswerViewModel]) -> some View {
         let isCorrect = selectedAnswerIndex.map { answers[$0].isCorrect } ?? false
 
         return VStack(alignment: .leading, spacing: 10) {
@@ -189,14 +187,10 @@ struct PracticeSessionView: View {
     }
 
     private var emptyView: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text("No tasks yet")
-                .font(.headline)
-
-            Text("Tasks will appear here when the server returns them.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-
+        EmptyStateView(
+            title: "No tasks yet",
+            message: "Tasks will appear here when the server returns them."
+        ) {
             Button("Done") {
                 viewModel.closePractice()
             }
@@ -205,14 +199,6 @@ struct PracticeSessionView: View {
             .frame(maxWidth: .infinity)
             .frame(height: 48)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(20)
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .stroke(Color.primary.opacity(0.06), lineWidth: 1)
-        )
     }
 
     private func refreshTasks() async {
@@ -226,7 +212,7 @@ struct PracticeSessionView: View {
 
     private func optionState(
         for index: Int,
-        in answers: [PracticeAnswer]
+        in answers: [PracticeAnswerViewModel]
     ) -> AnswerOptionState {
         guard let selectedAnswerIndex else { return .neutral }
 
@@ -247,7 +233,7 @@ struct PracticeSessionView: View {
 
     private func selectAnswer(
         _ index: Int,
-        in answers: [PracticeAnswer]
+        in answers: [PracticeAnswerViewModel]
     ) {
         guard !isAnswered else { return }
 
@@ -262,10 +248,10 @@ struct PracticeSessionView: View {
 
     private func advance(totalTasks: Int) async {
         if isLastTask(totalTasks: totalTasks), viewModel.hasMoreTasks {
-            let previousTaskCount = viewModel.tasks.count
+            let previousTaskCount = viewModel.taskCount
             await viewModel.loadMoreTasks()
 
-            if viewModel.tasks.count > previousTaskCount {
+            if viewModel.taskCount > previousTaskCount {
                 moveToNextTask()
             } else if !viewModel.hasMoreTasks {
                 await saveResult()

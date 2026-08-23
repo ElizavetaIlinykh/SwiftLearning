@@ -47,32 +47,32 @@ struct ProfileView: View {
     @ViewBuilder
     private var content: some View {
         switch viewModel.state {
-        case .idle, .loading:
+        case .loading:
             loadingView
-        case let .failed(message):
+        case let .error(message):
             errorView(message: message)
-        case let .loaded(content):
-            profileHeader(user: content.user)
-            progressSection(statistics: content.statistics)
-            statisticsSection(statistics: content.statistics)
-            achievementsSection(statistics: content.statistics)
+        case let .content(contentViewModel):
+            profileHeader(viewModel: contentViewModel.header)
+            progressSection(viewModel: contentViewModel.progress)
+            statisticsSection(statistics: contentViewModel.statistics)
+            achievementsSection(achievements: contentViewModel.achievements)
         }
     }
 
     // MARK: - Private methods -
 
-    private func profileHeader(user: UserProfile) -> some View {
+    private func profileHeader(viewModel: ProfileHeaderViewModel) -> some View {
         VStack(spacing: 12) {
             Image(systemName: "person.crop.circle.fill")
                 .font(.system(size: 92, weight: .regular))
                 .foregroundStyle(Color.accentColor)
 
             VStack(spacing: 5) {
-                Text(user.name)
+                Text(viewModel.name)
                     .font(.title2)
                     .fontWeight(.bold)
 
-                Text(user.email)
+                Text(viewModel.email)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -82,7 +82,7 @@ struct ProfileView: View {
         .padding(.top, 8)
     }
 
-    private func progressSection(statistics: UserStatistics) -> some View {
+    private func progressSection(viewModel: ProfileProgressViewModel) -> some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Your Progress")
                 .font(.title2)
@@ -90,21 +90,21 @@ struct ProfileView: View {
 
             VStack(alignment: .leading, spacing: 14) {
                 HStack(alignment: .firstTextBaseline) {
-                    Text("\(statistics.completedLessonsCount) of \(statistics.totalLessonsCount) lessons completed")
+                    Text(viewModel.title)
                         .font(.headline)
 
                     Spacer()
 
-                    Text("\(statistics.progressPercent)%")
+                    Text(viewModel.percentTitle)
                         .font(.headline)
                         .fontWeight(.bold)
                         .foregroundStyle(Color.accentColor)
                 }
 
-                ProgressView(value: progressValue(for: statistics))
+                ProgressView(value: viewModel.progress)
                     .tint(.accentColor)
 
-                if isCourseCompleted(statistics) {
+                if viewModel.isCourseCompleted {
                     courseCompletedCard
                 }
             }
@@ -140,32 +140,32 @@ struct ProfileView: View {
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
-    private func statisticsSection(statistics: UserStatistics) -> some View {
+    private func statisticsSection(statistics: [StatCardViewModel]) -> some View {
         VStack(alignment: .leading, spacing: 14) {
             Text("Statistics")
                 .font(.title2)
                 .fontWeight(.bold)
 
             LazyVGrid(columns: statisticColumns, spacing: 12) {
-                StatCard(title: "Level", value: "\(statistics.currentLevel)", systemImage: "bolt.fill")
-                StatCard(
-                    title: "Lessons",
-                    value: "\(statistics.completedLessonsCount) / \(statistics.totalLessonsCount)",
-                    systemImage: "book.fill"
-                )
-                StatCard(title: "Progress", value: "\(statistics.progressPercent)%", systemImage: "target")
+                ForEach(statistics) { statistic in
+                    StatCard(
+                        title: statistic.title,
+                        value: statistic.value,
+                        systemImage: statistic.systemImage
+                    )
+                }
             }
         }
     }
 
-    private func achievementsSection(statistics: UserStatistics) -> some View {
+    private func achievementsSection(achievements: [Achievement]) -> some View {
         VStack(alignment: .leading, spacing: 14) {
             Text("Achievements")
                 .font(.title2)
                 .fontWeight(.bold)
 
             VStack(spacing: 12) {
-                ForEach(achievements(for: statistics)) { achievement in
+                ForEach(achievements) { achievement in
                     AchievementCard(achievement: achievement)
                 }
             }
@@ -185,49 +185,6 @@ struct ProfileView: View {
                 await viewModel.loadProfile()
             }
         }
-    }
-
-    private func achievements(for statistics: UserStatistics) -> [Achievement] {
-        let completedCount = statistics.completedLessonsCount
-
-        return [
-            Achievement(
-                id: "first-step",
-                title: "First Step",
-                description: "Complete your first lesson",
-                systemImage: "figure.walk",
-                isUnlocked: completedCount >= 1
-            ),
-            Achievement(
-                id: "swift-beginner",
-                title: "Swift Beginner",
-                description: "Complete 3 lessons",
-                systemImage: "chevron.left.forwardslash.chevron.right",
-                isUnlocked: completedCount >= 3
-            ),
-            Achievement(
-                id: "halfway-there",
-                title: "Halfway There",
-                description: "Complete 4 lessons",
-                systemImage: "flag.fill",
-                isUnlocked: completedCount >= 4
-            ),
-            Achievement(
-                id: "swift-explorer",
-                title: "Swift Explorer",
-                description: "Complete all lessons",
-                systemImage: "trophy.fill",
-                isUnlocked: isCourseCompleted(statistics)
-            )
-        ]
-    }
-
-    private func progressValue(for statistics: UserStatistics) -> Double {
-        Double(statistics.progressPercent) / 100
-    }
-
-    private func isCourseCompleted(_ statistics: UserStatistics) -> Bool {
-        statistics.totalLessonsCount > 0 && statistics.completedLessonsCount == statistics.totalLessonsCount
     }
 }
 

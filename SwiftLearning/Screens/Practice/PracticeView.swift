@@ -3,9 +3,10 @@ import SwiftUI
 struct PracticeView: View {
     // MARK: - Private properties -
 
+    @StateObject private var viewModel: PracticeViewModel
+
     // MARK: - Init -
 
-    @StateObject private var viewModel: PracticeViewModel
     init(viewModel: PracticeViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
@@ -32,38 +33,40 @@ struct PracticeView: View {
         .refreshable {
             await viewModel.refreshTopics()
         }
+        .onScrollTargetVisibilityChange(
+            idType: String.self,
+            threshold: 0.3
+        ) { visibleIDs in
+            loadMoreIfNeeded(visibleTopicIDs: visibleIDs)
+        }
     }
 
     @ViewBuilder
     private var content: some View {
         switch viewModel.state {
-        case .idle, .loading:
+        case .loading:
             loadingView
-        case let .failed(message):
+        case let .error(message):
             errorView(message: message)
-        case let .loaded(topics, _):
-            if topics.isEmpty {
-                emptyView
-            } else {
-                topicsList
-            }
+        case .empty:
+            emptyView
+        case let .content(contentViewModel):
+            topicsList(contentViewModel)
         }
     }
 
-    private var topicsList: some View {
+    private func topicsList(_ contentViewModel: PracticeContentViewModel) -> some View {
         VStack(spacing: 14) {
-            ForEach(viewModel.topics) { topic in
-                PracticeCategoryCard(category: topic) {
-                    viewModel.selectTopic(topic)
-                }
-                .onAppear {
-                    Task {
-                        await viewModel.loadMoreTopicsIfNeeded(currentTopicID: topic.id)
+            LazyVStack(spacing: 14) {
+                ForEach(contentViewModel.topics) { topic in
+                    PracticeCategoryCard(viewModel: topic) {
+                        viewModel.selectTopic(id: topic.id)
                     }
                 }
             }
+            .scrollTargetLayout()
 
-            LoadMoreView(state: viewModel.loadMoreState) {
+            LoadMoreView(state: contentViewModel.loadMoreState) {
                 await viewModel.retryLoadMoreTopics()
             }
         }
@@ -116,6 +119,20 @@ struct PracticeView: View {
 
     // MARK: - Private methods -
 
+    private func loadMoreIfNeeded(visibleTopicIDs: [String]) {
+        let preloadIDs = viewModel.topicCards
+            .suffix(5)
+            .map(\.id)
+
+        guard let currentTopicID = preloadIDs.first(where: visibleTopicIDs.contains) else {
+            return
+        }
+
+        Task {
+            await viewModel.loadMoreTopicsIfNeeded(currentTopicID: currentTopicID)
+        }
+    }
+
     private func errorView(message: String) -> some View {
         ErrorStateView(
             title: "Could not load practice topics",
@@ -128,21 +145,9 @@ struct PracticeView: View {
     }
 
     private var emptyView: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("No practice topics yet")
-                .font(.headline)
-
-            Text("Topics will appear here when the server returns them.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(20)
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+        EmptyStateView(
+            title: "No practice topics yet",
+            message: "Topics will appear here when the server returns them."
         )
     }
 }

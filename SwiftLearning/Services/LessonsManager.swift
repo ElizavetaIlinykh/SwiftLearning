@@ -1,5 +1,11 @@
 import Foundation
 
+enum LessonsMoreLoadingState {
+    case idle
+    case loading
+    case failed(Error)
+}
+
 /// Coordinates lesson list loading and pagination.
 @MainActor
 final class LessonsManager {
@@ -19,6 +25,10 @@ final class LessonsManager {
 
     /// The currently running request. Regular requests are skipped while it exists; refresh cancels it.
     private var currentTask: Task<[LessonSummary], Error>?
+
+    // MARK: - Public properties -
+
+    private(set) var moreLoadingState: LessonsMoreLoadingState = .idle
 
     // MARK: - Init -
 
@@ -57,6 +67,7 @@ final class LessonsManager {
             return loadedLessons
         }
 
+        moreLoadingState = .idle
         return try await performInitialFetch()
     }
 
@@ -69,6 +80,7 @@ final class LessonsManager {
     /// - Returns: The full lessons cache after the operation completes.
     func loadMore() async throws -> [LessonSummary] {
         guard hasMore else {
+            moreLoadingState = .idle
             return loadedLessons
         }
 
@@ -76,7 +88,19 @@ final class LessonsManager {
             return loadedLessons
         }
 
-        return try await performLoadMore()
+        moreLoadingState = .loading
+
+        do {
+            let lessons = try await performLoadMore()
+            moreLoadingState = .idle
+            return lessons
+        } catch is CancellationError {
+            moreLoadingState = .idle
+            throw CancellationError()
+        } catch {
+            moreLoadingState = .failed(error)
+            throw error
+        }
     }
 
     /// Cancels any in-flight request and reloads the first page.
@@ -87,6 +111,7 @@ final class LessonsManager {
     /// - Returns: The refreshed lessons cache.
     func refresh() async throws -> [LessonSummary] {
         await cancelCurrentTask()
+        moreLoadingState = .idle
 
         return try await performInitialFetch()
     }

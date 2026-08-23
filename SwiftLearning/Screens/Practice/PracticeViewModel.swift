@@ -6,36 +6,27 @@ final class PracticeViewModel: ObservableObject {
     // MARK: - Private properties -
 
     private let topicsManager: PracticeTopicsManager
+    private let categoryCardBuilder: PracticeCategoryCardBuilder
     private let router: AppRouter
+    private var topics: [PracticeCategory] = []
 
     // MARK: - Public properties -
 
-    @Published private(set) var state: PracticeTopicsLoadingState = .idle
+    @Published private(set) var state: PracticeViewState = .loading
 
-    var topics: [PracticeCategory] {
-        guard case let .loaded(topics, _) = state else { return [] }
-        return topics.sorted { $0.order < $1.order }
-    }
-
-    var loadMoreState: LoadMoreView.State {
-        guard case let .loaded(_, moreLoadingState) = state else { return .idle }
-        switch moreLoadingState {
-        case .loading:
-            return .loading
-        case let .failed(message):
-            return .error(message)
-        case .idle:
-            return .idle
-        }
+    var topicCards: [PracticeCategoryCardViewModel] {
+        categoryCardBuilder.build(categories: topics)
     }
 
     // MARK: - Init -
 
     init(
         topicsManager: PracticeTopicsManager,
+        categoryCardBuilder: PracticeCategoryCardBuilder,
         router: AppRouter
     ) {
         self.topicsManager = topicsManager
+        self.categoryCardBuilder = categoryCardBuilder
         self.router = router
     }
 
@@ -47,76 +38,99 @@ final class PracticeViewModel: ObservableObject {
         }
 
         do {
-            let topics = try await topicsManager.fetch()
-            setLoadedState(topics: topics)
+            topics = try await topicsManager.fetch()
+            updateStateFromTopics()
         } catch is CancellationError {
             return
         } catch {
-            state = .failed(UserFacingErrorMessage.message(for: error))
+            state = .error(UserFacingErrorMessage.message(for: error))
         }
     }
 
     func loadMoreTopicsIfNeeded(currentTopicID: String) async {
-        setLoadMoreState(.loading)
+        updateContentState(loadMoreState: .loading)
 
         do {
-            let topics = try await topicsManager.loadMoreIfNeeded(currentTopicID: currentTopicID)
-            setLoadedState(topics: topics)
+            topics = try await topicsManager.loadMoreIfNeeded(currentTopicID: currentTopicID)
+            updateStateFromTopics()
         } catch is CancellationError {
-            setLoadMoreState(.idle)
+            updateStateFromTopics()
         } catch {
-            setLoadMoreState(.failed(UserFacingErrorMessage.message(for: error)))
+            updateStateFromTopics()
         }
     }
 
     func retryLoadMoreTopics() async {
-        setLoadMoreState(.loading)
+        updateContentState(loadMoreState: .loading)
 
         do {
-            let topics = try await topicsManager.loadMore()
-            setLoadedState(topics: topics)
+            topics = try await topicsManager.loadMore()
+            updateStateFromTopics()
         } catch is CancellationError {
-            setLoadMoreState(.idle)
+            updateStateFromTopics()
         } catch {
-            setLoadMoreState(.failed(UserFacingErrorMessage.message(for: error)))
+            updateStateFromTopics()
         }
     }
 
     func refreshTopics() async {
         do {
-            let topics = try await topicsManager.refresh()
-            setLoadedState(topics: topics)
+            topics = try await topicsManager.refresh()
+            updateStateFromTopics()
         } catch is CancellationError {
             return
         } catch {
-            state = .failed(UserFacingErrorMessage.message(for: error))
+            state = .error(UserFacingErrorMessage.message(for: error))
         }
     }
 
-    func selectTopic(_ topic: PracticeCategory) {
+    func selectTopic(id: String) {
+        guard let topic = topics.first(where: { $0.id == id }) else {
+            return
+        }
+
         router.push(.exercise(id: topic.id, title: topic.title, attemptID: UUID()))
+    }
+
+    // MARK: - Private properties -
+
+    private var loadMoreState: LoadMoreView.State {
+        switch topicsManager.moreLoadingState {
+        case .loading:
+            .loading
+        case let .failed(error):
+            .error(UserFacingErrorMessage.message(for: error))
+        case .idle:
+            .idle
+        }
     }
 
     // MARK: - Private methods -
 
-    private func setLoadedState(
-        topics: [PracticeCategory],
-        moreLoadingState: PracticeTopicsMoreLoadingState = .idle
-    ) {
-        state = .loaded(
-            topics: topics,
-            moreLoadingState: moreLoadingState
+    private func updateStateFromTopics() {
+        if topics.isEmpty {
+            state = .empty
+        } else {
+            state = .content(makeContentViewModel())
+        }
+    }
+
+    private func makeContentViewModel(
+        loadMoreState: LoadMoreView.State? = nil
+    ) -> PracticeContentViewModel {
+        PracticeContentViewModel(
+            topics: topicCards,
+            loadMoreState: loadMoreState ?? self.loadMoreState
         )
     }
 
-    private func setLoadMoreState(_ moreLoadingState: PracticeTopicsMoreLoadingState) {
-        guard case let .loaded(topics, _) = state else {
+    private func updateContentState(loadMoreState: LoadMoreView.State) {
+        guard case .content = state else {
             return
         }
 
-        setLoadedState(
-            topics: topics,
-            moreLoadingState: moreLoadingState
+        state = .content(
+            makeContentViewModel(loadMoreState: loadMoreState)
         )
     }
 }

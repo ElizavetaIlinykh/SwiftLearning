@@ -3,9 +3,10 @@ import SwiftUI
 struct LearnView: View {
     // MARK: - Private properties -
 
+    @StateObject private var viewModel: LearnViewModel
+
     // MARK: - Init -
 
-    @StateObject private var viewModel: LearnViewModel
     init(viewModel: LearnViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
@@ -56,41 +57,41 @@ struct LearnView: View {
     @ViewBuilder
     private var content: some View {
         switch viewModel.state {
-        case .idle, .loading:
+        case .loading:
             loadingView
 
-        case let .failed(message):
+        case let .error(message):
             errorView(message: message)
 
-        case let .loaded(lessons, _):
-            if lessons.isEmpty {
-                emptyView
-            } else {
-                lessonsContent
-            }
+        case .empty:
+            emptyView
+
+        case let .content(contentViewModel):
+            lessonsContent(contentViewModel)
         }
     }
 
-    @ViewBuilder
-    private var lessonsContent: some View {
-        ProgressCard(viewModel: viewModel.progressCard)
+    private func lessonsContent(_ contentViewModel: LearnContentViewModel) -> some View {
+        VStack(alignment: .leading, spacing: 20) {
+            ProgressCard(viewModel: contentViewModel.progressCard)
 
-        VStack(alignment: .leading, spacing: 14) {
-            Text("Course")
-                .font(.title2)
-                .fontWeight(.bold)
+            VStack(alignment: .leading, spacing: 14) {
+                Text("Course")
+                    .font(.title2)
+                    .fontWeight(.bold)
 
-            LazyVStack(alignment: .leading, spacing: 14) {
-                ForEach(viewModel.lessonCards) { lessonCard in
-                    LessonCard(viewModel: lessonCard) {
-                        viewModel.selectLesson(id: lessonCard.id)
+                LazyVStack(alignment: .leading, spacing: 14) {
+                    ForEach(contentViewModel.lessonCards) { lessonCard in
+                        LessonCard(viewModel: lessonCard) {
+                            viewModel.selectLesson(id: lessonCard.id)
+                        }
                     }
                 }
-            }
-            .scrollTargetLayout()
+                .scrollTargetLayout()
 
-            LoadMoreView(state: viewModel.loadMoreState) {
-                await viewModel.retryLoadMoreLessons()
+                LoadMoreView(state: contentViewModel.loadMoreState) {
+                    await viewModel.retryLoadMoreLessons()
+                }
             }
         }
     }
@@ -127,32 +128,9 @@ struct LearnView: View {
     }
 
     private var emptyView: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("No lessons yet")
-                .font(.headline)
-
-            Text("Lessons will appear here when the server returns them.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(20)
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(
-            RoundedRectangle(
-                cornerRadius: 20,
-                style: .continuous
-            )
-        )
-        .overlay(
-            RoundedRectangle(
-                cornerRadius: 20,
-                style: .continuous
-            )
-            .stroke(
-                Color.primary.opacity(0.06),
-                lineWidth: 1
-            )
+        EmptyStateView(
+            title: "No lessons yet",
+            message: "Lessons will appear here when the server returns them."
         )
     }
 }

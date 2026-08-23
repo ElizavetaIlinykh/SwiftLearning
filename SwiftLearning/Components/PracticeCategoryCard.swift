@@ -3,13 +3,13 @@ import SwiftUI
 struct PracticeCategoryCard: View {
     // MARK: - Public properties -
 
-    let category: PracticeCategory
+    let viewModel: PracticeCategoryCardViewModel
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             HStack(spacing: 16) {
-                Image(systemName: category.systemImage)
+                Image(systemName: viewModel.systemImage)
                     .font(.system(size: 22, weight: .semibold))
                     .foregroundStyle(Color.accentColor)
                     .frame(width: 48, height: 48)
@@ -17,16 +17,16 @@ struct PracticeCategoryCard: View {
                     .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
 
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(category.title)
+                    Text(viewModel.title)
                         .font(.headline)
                         .foregroundStyle(.primary)
 
-                    Text(category.description)
+                    Text(viewModel.description)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.leading)
 
-                    Text("\(category.tasksCount) tasks")
+                    Text(viewModel.tasksCountTitle)
                         .font(.caption)
                         .fontWeight(.semibold)
                         .foregroundStyle(Color.accentColor)
@@ -53,12 +53,12 @@ struct PracticeCategoryCard: View {
 
 #Preview {
     PracticeCategoryCard(
-        category: PracticeCategory(
+        viewModel: PracticeCategoryCardViewModel(
             id: "topic-uuid",
             title: "Variables and Constants",
             description: "Practice variables and constants",
-            order: 1,
-            tasksCount: 3
+            tasksCountTitle: "3 tasks",
+            systemImage: "chevron.left.forwardslash.chevron.right"
         )
     ) {}
         .padding()

@@ -1,7 +1,7 @@
 import Foundation
 
 struct LessonCodeTaskContentContext {
-    let codeTaskState: LessonCodeTaskLoadingState
+    let codeTask: LessonCodeTask
     let answerState: AnswerState
 }
 
@@ -10,16 +10,12 @@ struct LessonCodeTaskContentBuilder {
 
     func build(
         context: LessonCodeTaskContentContext
-    ) -> LessonCodeTaskContentViewModel? {
-        guard case let .loaded(codeTask) = context.codeTaskState else {
-            return nil
-        }
-
-        return LessonCodeTaskContentViewModel(
-            title: codeTask.title,
-            description: codeTask.description,
+    ) -> LessonCodeTaskContentViewModel {
+        LessonCodeTaskContentViewModel(
+            title: context.codeTask.title,
+            description: context.codeTask.description,
             codeSectionTitle: codeSectionTitle(answerState: context.answerState),
-            code: codeTask.code
+            code: context.codeTask.code
         )
     }
 

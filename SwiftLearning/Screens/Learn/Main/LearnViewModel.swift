@@ -1,22 +1,6 @@
 import Combine
 import Foundation
 
-enum LessonsMoreLoadingState: Equatable {
-    case idle
-    case loading
-    case failed(String)
-}
-
-enum LessonsLoadingState: Equatable {
-    case idle
-    case loading
-    case loaded(
-        lessons: [LessonSummary],
-        moreLoadingState: LessonsMoreLoadingState
-    )
-    case failed(String)
-}
-
 @MainActor
 final class LearnViewModel: ObservableObject {
     // MARK: - Private properties -
@@ -25,47 +9,14 @@ final class LearnViewModel: ObservableObject {
     private let lessonCardBuilder: LearnLessonCardBuilder
     private let progressCardBuilder: LearnProgressCardBuilder
     private let router: AppRouter
+    private var lessons: [LessonSummary] = []
 
     // MARK: - Public properties -
 
-    @Published private(set) var state: LessonsLoadingState = .idle
-
-    var lessons: [LessonSummary] {
-        guard case let .loaded(lessons, _) = state else { return [] }
-        return lessons
-    }
+    @Published private(set) var state: LearnViewState = .loading
 
     var lessonCards: [LessonCardViewModel] {
-        lessonCardBuilder.build(lessons: lessons)
-    }
-
-    var progressCard: ProgressCardViewModel {
-        progressCardBuilder.build(
-            lessons: lessons,
-            action: continueLearningAction
-        )
-    }
-
-    var completedLessonsCount: Int {
-        lessons.filter { $0.status == .completed }.count
-    }
-
-    var nextAvailableLesson: LessonSummary? {
-        lessons
-            .sorted { $0.order < $1.order }
-            .first { $0.status == .available }
-    }
-
-    var loadMoreState: LoadMoreView.State {
-        guard case let .loaded(_, moreLoadingState) = state else { return .idle }
-        switch moreLoadingState {
-        case .loading:
-            return .loading
-        case let .failed(message):
-            return .error(message)
-        case .idle:
-            return .idle
-        }
+        lessonCardBuilder.build(lessons: sortedLessons)
     }
 
     // MARK: - Init -
@@ -90,31 +41,25 @@ final class LearnViewModel: ObservableObject {
         }
 
         do {
-            let lessons = try await lessonsManager.fetch()
-            setLoadedState(lessons: lessons)
+            lessons = try await lessonsManager.fetch()
+            updateStateFromLessons()
         } catch is CancellationError {
             return
         } catch {
-            state = .failed(
-                UserFacingErrorMessage.message(for: error)
-            )
+            state = .error(UserFacingErrorMessage.message(for: error))
         }
     }
 
     func loadMoreLessons() async {
-        setLoadMoreState(.loading)
+        updateContentState(loadMoreState: .loading)
 
         do {
-            let lessons = try await lessonsManager.loadMore()
-            setLoadedState(lessons: lessons)
+            lessons = try await lessonsManager.loadMore()
+            updateStateFromLessons()
         } catch is CancellationError {
-            setLoadMoreState(.idle)
+            updateStateFromLessons()
         } catch {
-            setLoadMoreState(
-                .failed(
-                    UserFacingErrorMessage.message(for: error)
-                )
-            )
+            updateStateFromLessons()
         }
     }
 
@@ -124,14 +69,12 @@ final class LearnViewModel: ObservableObject {
 
     func refreshLessons() async {
         do {
-            let lessons = try await lessonsManager.refresh()
-            setLoadedState(lessons: lessons)
+            lessons = try await lessonsManager.refresh()
+            updateStateFromLessons()
         } catch is CancellationError {
             return
         } catch {
-            state = .failed(
-                UserFacingErrorMessage.message(for: error)
-            )
+            state = .error(UserFacingErrorMessage.message(for: error))
         }
     }
 
@@ -141,6 +84,14 @@ final class LearnViewModel: ObservableObject {
 
     // MARK: - Private properties -
 
+    private var sortedLessons: [LessonSummary] {
+        lessons.sorted { $0.order < $1.order }
+    }
+
+    private var nextAvailableLesson: LessonSummary? {
+        sortedLessons.first { $0.status == .available }
+    }
+
     private var continueLearningAction: (() -> Void)? {
         guard nextAvailableLesson != nil else {
             return nil
@@ -149,26 +100,47 @@ final class LearnViewModel: ObservableObject {
         return continueLearning
     }
 
+    private var loadMoreState: LoadMoreView.State {
+        switch lessonsManager.moreLoadingState {
+        case .loading:
+            .loading
+        case let .failed(error):
+            .error(UserFacingErrorMessage.message(for: error))
+        case .idle:
+            .idle
+        }
+    }
+
     // MARK: - Private methods -
 
-    private func setLoadedState(
-        lessons: [LessonSummary],
-        moreLoadingState: LessonsMoreLoadingState = .idle
-    ) {
-        state = .loaded(
-            lessons: lessons,
-            moreLoadingState: moreLoadingState
+    private func updateStateFromLessons() {
+        if lessons.isEmpty {
+            state = .empty
+        } else {
+            state = .content(makeContentViewModel())
+        }
+    }
+
+    private func makeContentViewModel(
+        loadMoreState: LoadMoreView.State? = nil
+    ) -> LearnContentViewModel {
+        LearnContentViewModel(
+            progressCard: progressCardBuilder.build(
+                lessons: sortedLessons,
+                action: continueLearningAction
+            ),
+            lessonCards: lessonCards,
+            loadMoreState: loadMoreState ?? self.loadMoreState
         )
     }
 
-    private func setLoadMoreState(_ moreLoadingState: LessonsMoreLoadingState) {
-        guard case let .loaded(lessons, _) = state else {
+    private func updateContentState(loadMoreState: LoadMoreView.State) {
+        guard case .content = state else {
             return
         }
 
-        setLoadedState(
-            lessons: lessons,
-            moreLoadingState: moreLoadingState
+        state = .content(
+            makeContentViewModel(loadMoreState: loadMoreState)
         )
     }
 

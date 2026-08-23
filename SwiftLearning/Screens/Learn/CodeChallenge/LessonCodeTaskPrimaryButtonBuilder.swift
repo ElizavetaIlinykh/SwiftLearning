@@ -6,7 +6,7 @@ enum LessonCodeTaskPrimaryAction {
 }
 
 struct LessonCodeTaskPrimaryButtonContext {
-    let codeTaskState: LessonCodeTaskLoadingState
+    let viewState: LessonCodeTaskViewState
     let answerState: AnswerState
     let completionState: LessonCompletionState
 }
@@ -23,7 +23,7 @@ struct LessonCodeTaskPrimaryButtonBuilder {
     func build(
         context: LessonCodeTaskPrimaryButtonContext
     ) -> LessonCodeTaskPrimaryButtonViewModel {
-        switch context.codeTaskState {
+        switch context.viewState {
         case .notAvailable:
             finishLessonButton(completionState: context.completionState)
         default:

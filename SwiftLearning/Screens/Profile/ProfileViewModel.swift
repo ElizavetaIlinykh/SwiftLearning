@@ -6,19 +6,22 @@ final class ProfileViewModel: ObservableObject {
     // MARK: - Private properties -
 
     private let profileManager: ProfileManager
+    private let contentBuilder: ProfileContentBuilder
     private let session: SessionState
 
     // MARK: - Public properties -
 
-    @Published private(set) var state: ProfileLoadingState = .idle
+    @Published private(set) var state: ProfileViewState = .loading
 
     // MARK: - Init -
 
     init(
         profileManager: ProfileManager,
+        contentBuilder: ProfileContentBuilder,
         session: SessionState
     ) {
         self.profileManager = profileManager
+        self.contentBuilder = contentBuilder
         self.session = session
     }
 
@@ -29,11 +32,11 @@ final class ProfileViewModel: ObservableObject {
 
         do {
             let content = try await profileManager.loadProfile()
-            state = .loaded(content)
+            state = .content(contentBuilder.build(content: content))
         } catch is CancellationError {
             return
         } catch {
-            state = .failed(UserFacingErrorMessage.message(for: error))
+            state = .error(UserFacingErrorMessage.message(for: error))
         }
     }
 

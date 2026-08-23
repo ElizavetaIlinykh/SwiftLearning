@@ -11,6 +11,7 @@ enum PracticeModuleAssembler {
         let topicsManager = PracticeTopicsManager(practiceService: dependencies.services.practiceService)
         let viewModel = PracticeViewModel(
             topicsManager: topicsManager,
+            categoryCardBuilder: PracticeCategoryCardBuilder(),
             router: router
         )
 
@@ -31,6 +32,7 @@ enum PracticeModuleAssembler {
             topicID: topicID,
             topicTitle: topicTitle,
             tasksManager: tasksManager,
+            taskBuilder: PracticeTaskBuilder(),
             practiceService: dependencies.services.practiceService,
             router: router
         )

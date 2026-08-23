@@ -8,18 +8,15 @@ final class LessonCodeTaskViewModel: ObservableObject {
     private let codeTaskManager: LessonCodeTaskManager
     private let builders: LessonCodeTaskBuilders
     private let router: AppRouter
+    private var codeTask: LessonCodeTask?
 
     // MARK: - Public properties -
 
     let lessonID: String
     @Published var answer = ""
-    @Published private(set) var codeTaskState: LessonCodeTaskLoadingState = .idle
+    @Published private(set) var state: LessonCodeTaskViewState = .loading
     @Published private(set) var completionState: LessonCompletionState = .idle
     @Published private(set) var answerState: AnswerState = .idle
-
-    var codeTaskContentViewModel: LessonCodeTaskContentViewModel? {
-        builders.contentBuilder.build(context: codeTaskContentContext)
-    }
 
     var primaryButtonViewModel: LessonCodeTaskPrimaryButtonViewModel {
         builders.primaryButtonBuilder.build(context: primaryButtonContext)
@@ -42,18 +39,20 @@ final class LessonCodeTaskViewModel: ObservableObject {
     // MARK: - Public methods -
 
     func loadCodeTask() async {
-        codeTaskState = .loading
+        state = .loading
+        codeTask = nil
         resetAnswer()
 
         do {
-            let codeTask = try await codeTaskManager.loadCodeTask()
-            codeTaskState = .loaded(codeTask)
+            let loadedCodeTask = try await codeTaskManager.loadCodeTask()
+            codeTask = loadedCodeTask
+            state = makeContentState(codeTask: loadedCodeTask)
         } catch is CancellationError {
             return
         } catch LessonCodeTaskError.notFound {
-            codeTaskState = .notAvailable
+            state = .notAvailable
         } catch {
-            codeTaskState = .failed(UserFacingErrorMessage.message(for: error))
+            state = .error(UserFacingErrorMessage.message(for: error))
         }
     }
 
@@ -68,27 +67,21 @@ final class LessonCodeTaskViewModel: ObservableObject {
 
     // MARK: - Private methods -
 
-    private var codeTaskContentContext: LessonCodeTaskContentContext {
-        LessonCodeTaskContentContext(
-            codeTaskState: codeTaskState,
-            answerState: answerState
-        )
-    }
-
     private var primaryButtonContext: LessonCodeTaskPrimaryButtonContext {
         LessonCodeTaskPrimaryButtonContext(
-            codeTaskState: codeTaskState,
+            viewState: state,
             answerState: answerState,
             completionState: completionState
         )
     }
 
     private func checkCurrentAnswer() {
-        guard case let .loaded(codeTask) = codeTaskState else {
+        guard let codeTask else {
             return
         }
 
         answerState = isCorrectAnswer(answer, for: codeTask) ? .correct : .incorrect
+        state = makeContentState(codeTask: codeTask)
     }
 
     private func finishLesson() async {
@@ -120,6 +113,17 @@ final class LessonCodeTaskViewModel: ObservableObject {
     private func resetAnswer() {
         answer = ""
         answerState = .idle
+    }
+
+    private func makeContentState(codeTask: LessonCodeTask) -> LessonCodeTaskViewState {
+        .content(
+            builders.contentBuilder.build(
+                context: LessonCodeTaskContentContext(
+                    codeTask: codeTask,
+                    answerState: answerState
+                )
+            )
+        )
     }
 
     private func isCorrectAnswer(_ answer: String, for codeTask: LessonCodeTask) -> Bool {
