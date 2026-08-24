@@ -66,11 +66,13 @@ struct PracticeCoordinatorView: View {
             PracticeResultView(
                 topicTitle: topicTitle,
                 progress: progress,
-                onPracticeAgain: {
-                    router.restartPractice(topicID: topicID, topicTitle: topicTitle)
-                },
-                onDone: {
-                    router.popToRoot()
+                onAction: { action in
+                    switch action {
+                    case .practiceAgain:
+                        router.restartPractice(topicID: topicID, topicTitle: topicTitle)
+                    case .done:
+                        router.popToRoot()
+                    }
                 }
             )
         }

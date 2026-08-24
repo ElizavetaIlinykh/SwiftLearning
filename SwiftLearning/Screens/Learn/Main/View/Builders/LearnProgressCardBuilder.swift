@@ -13,14 +13,15 @@ struct LearnProgressCardBuilder {
 
     // MARK: - Public methods -
 
-    func build(
-        lessons: [LessonSummary],
-        action: (() -> Void)?
-    ) -> ProgressCardViewModel {
+    func build(lessons: [LessonSummary]) -> ProgressCardViewModel {
         let completedLessonsCount = lessons.filter { $0.status == .completed }.count
 
         return ProgressCardViewModel(
             courseTitle: courseTitle,
+            completedLessonsTitle: completedLessonsTitle(
+                completedLessonsCount: completedLessonsCount,
+                totalLessonsCount: lessons.count
+            ),
             completedLessonsCount: completedLessonsCount,
             totalLessonsCount: lessons.count,
             progress: progress(
@@ -30,8 +31,7 @@ struct LearnProgressCardBuilder {
             state: state(
                 completedLessonsCount: completedLessonsCount,
                 totalLessonsCount: lessons.count
-            ),
-            action: action
+            )
         )
     }
 
@@ -46,6 +46,13 @@ struct LearnProgressCardBuilder {
         }
 
         return Double(completedLessonsCount) / Double(totalLessonsCount)
+    }
+
+    private func completedLessonsTitle(
+        completedLessonsCount: Int,
+        totalLessonsCount: Int
+    ) -> String {
+        "\(completedLessonsCount) of \(totalLessonsCount) lessons completed"
     }
 
     private func state(

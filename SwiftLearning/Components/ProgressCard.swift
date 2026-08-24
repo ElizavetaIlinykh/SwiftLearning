@@ -1,26 +1,10 @@
 import SwiftUI
 
-enum ProgressCardState {
-    case notStarted
-    case inProgress
-    case completed
-}
-
-struct ProgressCardViewModel {
-    // MARK: - Public properties -
-
-    let courseTitle: String
-    let completedLessonsCount: Int
-    let totalLessonsCount: Int
-    let progress: Double
-    let state: ProgressCardState
-    let action: (() -> Void)?
-}
-
 struct ProgressCard: View {
     // MARK: - Public properties -
 
     let viewModel: ProgressCardViewModel
+    let onAction: (ProgressCardAction) -> Void
 
     // MARK: - Public properties -
 
@@ -31,7 +15,7 @@ struct ProgressCard: View {
                     .font(.title3)
                     .fontWeight(.bold)
 
-                Text("\(viewModel.completedLessonsCount) of \(viewModel.totalLessonsCount) lessons completed")
+                Text(viewModel.completedLessonsTitle)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -71,13 +55,13 @@ struct ProgressCard: View {
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
 
         case .notStarted:
-            if let action = viewModel.action {
-                PrimaryButton(title: "Start Learning", action: action)
+            PrimaryButton(title: "Start Learning") {
+                onAction(.startLearning)
             }
 
         case .inProgress:
-            if let action = viewModel.action {
-                PrimaryButton(title: "Continue Learning", action: action)
+            PrimaryButton(title: "Continue Learning") {
+                onAction(.continueLearning)
             }
         }
     }
@@ -87,12 +71,13 @@ struct ProgressCard: View {
     ProgressCard(
         viewModel: ProgressCardViewModel(
             courseTitle: "Swift Basics",
+            completedLessonsTitle: "0 of 8 lessons completed",
             completedLessonsCount: 0,
             totalLessonsCount: 8,
             progress: 0,
-            state: .notStarted,
-            action: {}
-        )
+            state: .notStarted
+        ),
+        onAction: { _ in }
     )
     .padding()
     .background(Color(.systemGroupedBackground))

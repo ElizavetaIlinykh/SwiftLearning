@@ -73,7 +73,10 @@ struct LearnView: View {
 
     private func lessonsContent(_ contentViewModel: LearnContentViewModel) -> some View {
         VStack(alignment: .leading, spacing: 20) {
-            ProgressCard(viewModel: contentViewModel.progressCard)
+            ProgressCard(
+                viewModel: contentViewModel.progressCard,
+                onAction: viewModel.handleProgressCardAction
+            )
 
             VStack(alignment: .leading, spacing: 14) {
                 Text("Course")

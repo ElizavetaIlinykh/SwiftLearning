@@ -1,12 +1,16 @@
 import SwiftUI
 
+enum PracticeResultAction {
+    case practiceAgain
+    case done
+}
+
 struct PracticeResultView: View {
     // MARK: - Public properties -
 
     let topicTitle: String
     let progress: PracticeProgress
-    let onPracticeAgain: () -> Void
-    let onDone: () -> Void
+    let onAction: (PracticeResultAction) -> Void
 
     // MARK: - Private properties -
 
@@ -67,13 +71,17 @@ struct PracticeResultView: View {
             Spacer()
 
             VStack(spacing: 12) {
-                PrimaryButton(title: "Practice Again", action: onPracticeAgain)
+                PrimaryButton(title: "Practice Again") {
+                    onAction(.practiceAgain)
+                }
 
-                Button("Done", action: onDone)
-                    .font(.headline)
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 48)
+                Button("Done") {
+                    onAction(.done)
+                }
+                .font(.headline)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity)
+                .frame(height: 48)
             }
         }
         .padding(24)
@@ -93,5 +101,5 @@ struct PracticeResultView: View {
             scorePercent: 80,
             completedAt: Date()
         )
-    ) {} onDone: {}
+    ) { _ in }
 }
