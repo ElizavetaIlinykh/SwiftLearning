@@ -90,7 +90,7 @@ struct LessonQuizRouteView: View {
             if isAnswered {
                 feedbackView(question.answers)
 
-                PrimaryButton(title: isLastQuestion(totalQuestions: questions.count) ? "Continue" : "Next Question") {
+                PrimaryButtonView(title: isLastQuestion(totalQuestions: questions.count) ? "Continue" : "Next Question") {
                     advance(totalQuestions: questions.count)
                 }
             }
@@ -133,7 +133,7 @@ struct LessonQuizRouteView: View {
             title: "No questions yet",
             message: "Continue to the code task."
         ) {
-            PrimaryButton(title: "Continue") {
+            PrimaryButtonView(title: "Continue") {
                 viewModel.openCodeTask()
             }
         }

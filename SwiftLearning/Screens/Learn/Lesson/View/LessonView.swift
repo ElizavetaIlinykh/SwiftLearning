@@ -83,7 +83,7 @@ struct LessonView: View {
                 )
             }
 
-            PrimaryButton(title: "Continue") {
+            PrimaryButtonView(title: "Continue") {
                 viewModel.continueToQuiz(lessonID: contentViewModel.lessonID)
             }
         }

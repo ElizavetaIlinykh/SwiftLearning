@@ -48,7 +48,7 @@ struct LessonCompletionResultView: View {
 
             Spacer()
 
-            PrimaryButton(title: "Continue") {
+            PrimaryButtonView(title: "Continue") {
                 viewModel.continueLearning()
             }
         }

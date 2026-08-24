@@ -73,7 +73,7 @@ struct LearnView: View {
 
     private func lessonsContent(_ contentViewModel: LearnContentViewModel) -> some View {
         VStack(alignment: .leading, spacing: 20) {
-            ProgressCard(
+            ProgressCardView(
                 viewModel: contentViewModel.progressCard,
                 onAction: viewModel.handleProgressCardAction
             )
@@ -85,7 +85,7 @@ struct LearnView: View {
 
                 LazyVStack(alignment: .leading, spacing: 14) {
                     ForEach(contentViewModel.lessonCards) { lessonCard in
-                        LessonCard(viewModel: lessonCard) {
+                        LessonCardView(viewModel: lessonCard) {
                             viewModel.selectLesson(id: lessonCard.id)
                         }
                     }

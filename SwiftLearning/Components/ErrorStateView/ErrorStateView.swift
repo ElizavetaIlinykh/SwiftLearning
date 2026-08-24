@@ -43,7 +43,7 @@ struct ErrorStateView: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
-            PrimaryButton(title: viewModel.retryTitle, action: retryAction)
+            PrimaryButtonView(title: viewModel.retryTitle, action: retryAction)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(20)

@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct AchievementCard: View {
+struct AchievementCardView: View {
     // MARK: - Public properties -
 
     let viewModel: AchievementCardViewModel
@@ -66,7 +66,7 @@ struct AchievementCard: View {
 
 #Preview {
     VStack(spacing: 12) {
-        AchievementCard(
+        AchievementCardView(
             viewModel: AchievementCardViewModel(
                 id: "first-step",
                 title: "First Step",
@@ -75,7 +75,7 @@ struct AchievementCard: View {
                 isUnlocked: true
             )
         )
-        AchievementCard(
+        AchievementCardView(
             viewModel: AchievementCardViewModel(
                 id: "explorer",
                 title: "Swift Explorer",

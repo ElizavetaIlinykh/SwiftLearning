@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct StatCard: View {
+struct StatCardView: View {
     // MARK: - Public properties -
 
     let viewModel: StatCardViewModel
@@ -39,7 +39,7 @@ struct StatCard: View {
 }
 
 #Preview {
-    StatCard(
+    StatCardView(
         viewModel: StatCardViewModel(
             title: "XP",
             value: "80",

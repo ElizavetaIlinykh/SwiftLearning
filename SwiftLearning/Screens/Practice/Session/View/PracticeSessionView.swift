@@ -98,7 +98,7 @@ struct PracticeSessionView: View {
                 completionErrorView
                 loadMoreTasksView
 
-                PrimaryButton(
+                PrimaryButtonView(
                     title: actionButtonTitle(totalTasks: tasks.count),
                     action: {
                         Task {

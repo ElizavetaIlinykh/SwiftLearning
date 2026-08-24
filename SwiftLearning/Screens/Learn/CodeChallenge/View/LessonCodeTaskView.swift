@@ -93,7 +93,7 @@ struct LessonCodeTaskView: View {
     private var primaryButton: some View {
         let buttonViewModel = viewModel.primaryButtonViewModel
 
-        return PrimaryButton(title: buttonViewModel.title) {
+        return PrimaryButtonView(title: buttonViewModel.title) {
             Task {
                 await viewModel.performPrimaryAction(buttonViewModel.action)
             }

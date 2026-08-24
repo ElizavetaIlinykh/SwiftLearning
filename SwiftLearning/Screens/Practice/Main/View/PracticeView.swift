@@ -59,7 +59,7 @@ struct PracticeView: View {
         VStack(spacing: 14) {
             LazyVStack(spacing: 14) {
                 ForEach(contentViewModel.topics) { topic in
-                    PracticeCategoryCard(viewModel: topic) {
+                    PracticeCategoryCardView(viewModel: topic) {
                         viewModel.selectTopic(id: topic.id)
                     }
                 }

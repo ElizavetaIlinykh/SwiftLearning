@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ProgressCard: View {
+struct ProgressCardView: View {
     // MARK: - Public properties -
 
     let viewModel: ProgressCardViewModel
@@ -55,12 +55,12 @@ struct ProgressCard: View {
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
 
         case .notStarted:
-            PrimaryButton(title: "Start Learning") {
+            PrimaryButtonView(title: "Start Learning") {
                 onAction(.startLearning)
             }
 
         case .inProgress:
-            PrimaryButton(title: "Continue Learning") {
+            PrimaryButtonView(title: "Continue Learning") {
                 onAction(.continueLearning)
             }
         }
@@ -68,7 +68,7 @@ struct ProgressCard: View {
 }
 
 #Preview {
-    ProgressCard(
+    ProgressCardView(
         viewModel: ProgressCardViewModel(
             courseTitle: "Swift Basics",
             completedLessonsTitle: "0 of 8 lessons completed",

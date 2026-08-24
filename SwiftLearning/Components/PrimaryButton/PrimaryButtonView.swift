@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct PrimaryButton: View {
+struct PrimaryButtonView: View {
     // MARK: - Public properties -
 
     let viewModel: PrimaryButtonViewModel
@@ -42,6 +42,6 @@ struct PrimaryButton: View {
 }
 
 #Preview {
-    PrimaryButton(title: "Start Learning") {}
+    PrimaryButtonView(title: "Start Learning") {}
         .padding()
 }

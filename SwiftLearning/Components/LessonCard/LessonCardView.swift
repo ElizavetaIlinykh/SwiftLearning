@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct LessonCard: View {
+struct LessonCardView: View {
     // MARK: - Public properties -
 
     let viewModel: LessonCardViewModel
@@ -107,7 +107,7 @@ struct LessonCard: View {
 
 #Preview {
     VStack(spacing: 12) {
-        LessonCard(
+        LessonCardView(
             viewModel: LessonCardViewModel(
                 id: "1",
                 title: "Variables",
@@ -117,7 +117,7 @@ struct LessonCard: View {
                 actionTitle: "Start"
             )
         ) {}
-        LessonCard(
+        LessonCardView(
             viewModel: LessonCardViewModel(
                 id: "2",
                 title: "Conditions",
@@ -127,7 +127,7 @@ struct LessonCard: View {
                 actionTitle: "Continue"
             )
         ) {}
-        LessonCard(
+        LessonCardView(
             viewModel: LessonCardViewModel(
                 id: "3",
                 title: "Functions",

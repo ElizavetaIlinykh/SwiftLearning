@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct PracticeCategoryCard: View {
+struct PracticeCategoryCardView: View {
     // MARK: - Public properties -
 
     let viewModel: PracticeCategoryCardViewModel
@@ -52,7 +52,7 @@ struct PracticeCategoryCard: View {
 }
 
 #Preview {
-    PracticeCategoryCard(
+    PracticeCategoryCardView(
         viewModel: PracticeCategoryCardViewModel(
             id: "topic-uuid",
             title: "Variables and Constants",

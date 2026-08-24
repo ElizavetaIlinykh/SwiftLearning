@@ -148,7 +148,7 @@ struct ProfileView: View {
 
             LazyVGrid(columns: statisticColumns, spacing: 12) {
                 ForEach(statistics) { statistic in
-                    StatCard(viewModel: statistic)
+                    StatCardView(viewModel: statistic)
                 }
             }
         }
@@ -162,7 +162,7 @@ struct ProfileView: View {
 
             VStack(spacing: 12) {
                 ForEach(achievements) { achievement in
-                    AchievementCard(viewModel: achievement)
+                    AchievementCardView(viewModel: achievement)
                 }
             }
         }

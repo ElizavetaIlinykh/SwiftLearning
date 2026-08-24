@@ -71,7 +71,7 @@ struct PracticeResultView: View {
             Spacer()
 
             VStack(spacing: 12) {
-                PrimaryButton(title: "Practice Again") {
+                PrimaryButtonView(title: "Practice Again") {
                     onAction(.practiceAgain)
                 }
 

@@ -70,7 +70,7 @@ struct RegisterView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
 
-            PrimaryButton(title: isLoading ? "Creating..." : "Register") {
+            PrimaryButtonView(title: isLoading ? "Creating..." : "Register") {
                 Task {
                     await register()
                 }

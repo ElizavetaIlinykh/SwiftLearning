@@ -63,7 +63,7 @@ struct LoginView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
 
-            PrimaryButton(title: isLoading ? "Signing In..." : "Login") {
+            PrimaryButtonView(title: isLoading ? "Signing In..." : "Login") {
                 Task {
                     await login()
                 }
