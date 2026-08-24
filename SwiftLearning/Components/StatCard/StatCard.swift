@@ -3,13 +3,11 @@ import SwiftUI
 struct StatCard: View {
     // MARK: - Public properties -
 
-    let title: String
-    let value: String
-    let systemImage: String
+    let viewModel: StatCardViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Image(systemName: systemImage)
+            Image(systemName: viewModel.systemImage)
                 .font(.headline)
                 .foregroundStyle(Color.accentColor)
                 .frame(width: 34, height: 34)
@@ -17,12 +15,12 @@ struct StatCard: View {
                 .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(title)
+                Text(viewModel.title)
                     .font(.caption)
                     .fontWeight(.semibold)
                     .foregroundStyle(.secondary)
 
-                Text(value)
+                Text(viewModel.value)
                     .font(.title3)
                     .fontWeight(.bold)
                     .foregroundStyle(.primary)
@@ -41,7 +39,13 @@ struct StatCard: View {
 }
 
 #Preview {
-    StatCard(title: "XP", value: "80", systemImage: "bolt.fill")
-        .padding()
-        .background(Color(.systemGroupedBackground))
+    StatCard(
+        viewModel: StatCardViewModel(
+            title: "XP",
+            value: "80",
+            systemImage: "bolt.fill"
+        )
+    )
+    .padding()
+    .background(Color(.systemGroupedBackground))
 }

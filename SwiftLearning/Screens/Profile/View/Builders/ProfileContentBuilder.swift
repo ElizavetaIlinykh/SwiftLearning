@@ -38,32 +38,32 @@ struct ProfileContentBuilder {
         ]
     }
 
-    private func achievements(statistics: UserStatistics) -> [Achievement] {
+    private func achievements(statistics: UserStatistics) -> [AchievementCardViewModel] {
         let completedCount = statistics.completedLessonsCount
 
         return [
-            Achievement(
+            AchievementCardViewModel(
                 id: "first-step",
                 title: "First Step",
                 description: "Complete your first lesson",
                 systemImage: "figure.walk",
                 isUnlocked: completedCount >= 1
             ),
-            Achievement(
+            AchievementCardViewModel(
                 id: "swift-beginner",
                 title: "Swift Beginner",
                 description: "Complete 3 lessons",
                 systemImage: "chevron.left.forwardslash.chevron.right",
                 isUnlocked: completedCount >= 3
             ),
-            Achievement(
+            AchievementCardViewModel(
                 id: "halfway-there",
                 title: "Halfway There",
                 description: "Complete 4 lessons",
                 systemImage: "flag.fill",
                 isUnlocked: completedCount >= 4
             ),
-            Achievement(
+            AchievementCardViewModel(
                 id: "swift-explorer",
                 title: "Swift Explorer",
                 description: "Complete all lessons",

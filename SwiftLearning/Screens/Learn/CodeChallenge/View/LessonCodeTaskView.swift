@@ -84,7 +84,9 @@ struct LessonCodeTaskView: View {
                 .fontWeight(.bold)
                 .foregroundStyle(.secondary)
 
-            CodeBlockView(code: contentViewModel.code)
+            CodeBlockView(
+                viewModel: CodeBlockViewModel(code: contentViewModel.code)
+            )
         }
     }
 

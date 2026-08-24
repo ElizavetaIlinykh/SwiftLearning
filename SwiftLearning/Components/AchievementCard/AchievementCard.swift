@@ -3,11 +3,11 @@ import SwiftUI
 struct AchievementCard: View {
     // MARK: - Public properties -
 
-    let achievement: Achievement
+    let viewModel: AchievementCardViewModel
 
     var body: some View {
         HStack(spacing: 16) {
-            Image(systemName: achievement.systemImage)
+            Image(systemName: viewModel.systemImage)
                 .font(.system(size: 22, weight: .semibold))
                 .foregroundStyle(iconColor)
                 .frame(width: 48, height: 48)
@@ -15,11 +15,11 @@ struct AchievementCard: View {
                 .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
 
             VStack(alignment: .leading, spacing: 5) {
-                Text(achievement.title)
+                Text(viewModel.title)
                     .font(.headline)
                     .foregroundStyle(titleColor)
 
-                Text(achievement.description)
+                Text(viewModel.description)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.leading)
@@ -27,9 +27,9 @@ struct AchievementCard: View {
 
             Spacer(minLength: 12)
 
-            Image(systemName: achievement.isUnlocked ? "checkmark.circle.fill" : "lock.fill")
+            Image(systemName: viewModel.isUnlocked ? "checkmark.circle.fill" : "lock.fill")
                 .font(.headline)
-                .foregroundStyle(achievement.isUnlocked ? .green : .secondary)
+                .foregroundStyle(viewModel.isUnlocked ? .green : .secondary)
         }
         .padding(16)
         .background(cardBackground)
@@ -38,36 +38,36 @@ struct AchievementCard: View {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(borderColor, lineWidth: 1)
         )
-        .opacity(achievement.isUnlocked ? 1 : 0.68)
+        .opacity(viewModel.isUnlocked ? 1 : 0.68)
     }
 
     // MARK: - Private properties -
 
     private var iconColor: Color {
-        achievement.isUnlocked ? Color.accentColor : .secondary
+        viewModel.isUnlocked ? Color.accentColor : .secondary
     }
 
     private var iconBackground: Color {
-        achievement.isUnlocked ? Color.accentColor.opacity(0.12) : Color.secondary.opacity(0.10)
+        viewModel.isUnlocked ? Color.accentColor.opacity(0.12) : Color.secondary.opacity(0.10)
     }
 
     private var titleColor: Color {
-        achievement.isUnlocked ? .primary : .secondary
+        viewModel.isUnlocked ? .primary : .secondary
     }
 
     private var cardBackground: Color {
-        achievement.isUnlocked ? Color(.secondarySystemGroupedBackground) : Color.secondary.opacity(0.08)
+        viewModel.isUnlocked ? Color(.secondarySystemGroupedBackground) : Color.secondary.opacity(0.08)
     }
 
     private var borderColor: Color {
-        achievement.isUnlocked ? Color.primary.opacity(0.06) : Color.secondary.opacity(0.12)
+        viewModel.isUnlocked ? Color.primary.opacity(0.06) : Color.secondary.opacity(0.12)
     }
 }
 
 #Preview {
     VStack(spacing: 12) {
         AchievementCard(
-            achievement: Achievement(
+            viewModel: AchievementCardViewModel(
                 id: "first-step",
                 title: "First Step",
                 description: "Complete your first lesson",
@@ -76,7 +76,7 @@ struct AchievementCard: View {
             )
         )
         AchievementCard(
-            achievement: Achievement(
+            viewModel: AchievementCardViewModel(
                 id: "explorer",
                 title: "Swift Explorer",
                 description: "Complete all lessons",

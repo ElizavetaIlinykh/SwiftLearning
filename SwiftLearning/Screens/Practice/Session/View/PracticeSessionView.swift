@@ -73,7 +73,9 @@ struct PracticeSessionView: View {
                     .multilineTextAlignment(.leading)
 
                 if let code = task.code {
-                    CodeBlockView(code: code)
+                    CodeBlockView(
+                        viewModel: CodeBlockViewModel(code: code)
+                    )
                 }
             }
 

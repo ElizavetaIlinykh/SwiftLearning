@@ -3,12 +3,32 @@ import SwiftUI
 struct PrimaryButton: View {
     // MARK: - Public properties -
 
-    let title: String
+    let viewModel: PrimaryButtonViewModel
     let action: () -> Void
+
+    // MARK: - Init -
+
+    init(
+        title: String,
+        action: @escaping () -> Void
+    ) {
+        self.init(
+            viewModel: PrimaryButtonViewModel(title: title),
+            action: action
+        )
+    }
+
+    init(
+        viewModel: PrimaryButtonViewModel,
+        action: @escaping () -> Void
+    ) {
+        self.viewModel = viewModel
+        self.action = action
+    }
 
     var body: some View {
         Button(action: action) {
-            Text(title)
+            Text(viewModel.title)
                 .font(.headline)
                 .fontWeight(.semibold)
                 .foregroundStyle(.white)

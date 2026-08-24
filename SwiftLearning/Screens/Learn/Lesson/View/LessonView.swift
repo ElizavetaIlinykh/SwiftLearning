@@ -78,7 +78,9 @@ struct LessonView: View {
                     .fontWeight(.bold)
                     .foregroundStyle(.secondary)
 
-                CodeBlockView(code: contentViewModel.codeExample)
+                CodeBlockView(
+                    viewModel: CodeBlockViewModel(code: contentViewModel.codeExample)
+                )
             }
 
             PrimaryButton(title: "Continue") {

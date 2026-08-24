@@ -4,7 +4,7 @@ struct ProfileContentViewModel {
     let header: ProfileHeaderViewModel
     let progress: ProfileProgressViewModel
     let statistics: [StatCardViewModel]
-    let achievements: [Achievement]
+    let achievements: [AchievementCardViewModel]
 }
 
 struct ProfileHeaderViewModel {
@@ -17,20 +17,6 @@ struct ProfileProgressViewModel {
     let percentTitle: String
     let progress: Double
     let isCourseCompleted: Bool
-}
-
-struct StatCardViewModel: Identifiable {
-    let id: String
-    let title: String
-    let value: String
-    let systemImage: String
-
-    init(title: String, value: String, systemImage: String) {
-        id = title
-        self.title = title
-        self.value = value
-        self.systemImage = systemImage
-    }
 }
 
 enum ProfileViewState {
