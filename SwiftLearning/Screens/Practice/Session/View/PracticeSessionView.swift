@@ -80,8 +80,10 @@ struct PracticeSessionView: View {
             VStack(spacing: 12) {
                 ForEach(answers.indices, id: \.self) { index in
                     AnswerOptionView(
-                        title: answers[index].text,
-                        state: optionState(for: index, in: answers)
+                        viewModel: AnswerOptionViewModel(
+                            title: answers[index].text,
+                            state: optionState(for: index, in: answers)
+                        )
                     ) {
                         selectAnswer(index, in: answers)
                     }

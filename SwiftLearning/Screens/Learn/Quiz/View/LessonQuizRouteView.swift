@@ -76,8 +76,10 @@ struct LessonQuizRouteView: View {
             VStack(spacing: 12) {
                 ForEach(question.answers.indices, id: \.self) { index in
                     AnswerOptionView(
-                        title: question.answers[index].text,
-                        state: optionState(for: index, in: question.answers)
+                        viewModel: AnswerOptionViewModel(
+                            title: question.answers[index].text,
+                            state: optionState(for: index, in: question.answers)
+                        )
                     ) {
                         selectAnswer(index)
                     }

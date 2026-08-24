@@ -1,23 +1,15 @@
 import SwiftUI
 
-enum AnswerOptionState {
-    case neutral
-    case selectedCorrect
-    case selectedIncorrect
-    case correct
-}
-
 struct AnswerOptionView: View {
     // MARK: - Public properties -
 
-    let title: String
-    let state: AnswerOptionState
+    let viewModel: AnswerOptionViewModel
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             HStack(spacing: 12) {
-                Text(title)
+                Text(viewModel.title)
                     .font(.headline)
                     .foregroundStyle(textColor)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -43,7 +35,7 @@ struct AnswerOptionView: View {
     // MARK: - Private properties -
 
     private var backgroundColor: Color {
-        switch state {
+        switch viewModel.state {
         case .neutral:
             Color(.secondarySystemGroupedBackground)
         case .selectedCorrect, .correct:
@@ -54,7 +46,7 @@ struct AnswerOptionView: View {
     }
 
     private var borderColor: Color {
-        switch state {
+        switch viewModel.state {
         case .neutral:
             Color.primary.opacity(0.08)
         case .selectedCorrect, .correct:
@@ -65,7 +57,7 @@ struct AnswerOptionView: View {
     }
 
     private var textColor: Color {
-        switch state {
+        switch viewModel.state {
         case .neutral:
             .primary
         case .selectedCorrect, .correct:
@@ -76,7 +68,7 @@ struct AnswerOptionView: View {
     }
 
     private var iconColor: Color {
-        switch state {
+        switch viewModel.state {
         case .selectedCorrect, .correct:
             .green
         case .selectedIncorrect:
@@ -87,7 +79,7 @@ struct AnswerOptionView: View {
     }
 
     private var systemImageName: String? {
-        switch state {
+        switch viewModel.state {
         case .selectedCorrect, .correct:
             "checkmark.circle.fill"
         case .selectedIncorrect:
@@ -100,9 +92,24 @@ struct AnswerOptionView: View {
 
 #Preview {
     VStack(spacing: 12) {
-        AnswerOptionView(title: "print()", state: .neutral) {}
-        AnswerOptionView(title: "print()", state: .selectedCorrect) {}
-        AnswerOptionView(title: "show()", state: .selectedIncorrect) {}
+        AnswerOptionView(
+            viewModel: AnswerOptionViewModel(
+                title: "print()",
+                state: .neutral
+            )
+        ) {}
+        AnswerOptionView(
+            viewModel: AnswerOptionViewModel(
+                title: "print()",
+                state: .selectedCorrect
+            )
+        ) {}
+        AnswerOptionView(
+            viewModel: AnswerOptionViewModel(
+                title: "show()",
+                state: .selectedIncorrect
+            )
+        ) {}
     }
     .padding()
     .background(Color(.systemGroupedBackground))
