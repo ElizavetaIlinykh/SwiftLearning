@@ -15,7 +15,8 @@ struct LearnLessonCardBuilder {
             title: lesson.title,
             description: lesson.description,
             order: lesson.order,
-            state: state(for: lesson.status)
+            state: state(for: lesson.status),
+            actionTitle: actionTitle(for: lesson)
         )
     }
 
@@ -28,5 +29,9 @@ struct LearnLessonCardBuilder {
         case .locked:
             .locked
         }
+    }
+
+    private func actionTitle(for lesson: LessonSummary) -> String {
+        lesson.order == 1 ? "Start" : "Continue"
     }
 }

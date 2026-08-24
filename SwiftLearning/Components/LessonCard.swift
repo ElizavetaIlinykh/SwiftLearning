@@ -1,25 +1,5 @@
 import SwiftUI
 
-enum LessonState {
-    case completed
-    case current
-    case locked
-}
-
-struct LessonCardViewModel: Identifiable, Hashable {
-    // MARK: - Public properties -
-
-    let id: String
-    let title: String
-    let description: String
-    let order: Int
-    let state: LessonState
-
-    var actionTitle: String {
-        order == 1 ? "Start" : "Continue"
-    }
-}
-
 struct LessonCard: View {
     // MARK: - Public properties -
 
@@ -133,7 +113,8 @@ struct LessonCard: View {
                 title: "Variables",
                 description: "Basics",
                 order: 1,
-                state: .current
+                state: .current,
+                actionTitle: "Start"
             )
         ) {}
         LessonCard(
@@ -142,7 +123,8 @@ struct LessonCard: View {
                 title: "Conditions",
                 description: "Control flow",
                 order: 2,
-                state: .locked
+                state: .locked,
+                actionTitle: "Continue"
             )
         ) {}
         LessonCard(
@@ -151,7 +133,8 @@ struct LessonCard: View {
                 title: "Functions",
                 description: "Reusable code",
                 order: 3,
-                state: .completed
+                state: .completed,
+                actionTitle: "Continue"
             )
         ) {}
     }
