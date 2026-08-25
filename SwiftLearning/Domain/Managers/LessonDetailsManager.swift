@@ -11,7 +11,7 @@ final class LessonDetailsManager {
 
     private let lessonID: String
     private let lessonsService: LessonsServicing
-    private var isLoading = false
+    private var currentTask: Task<LessonDetails, Error>?
 
     // MARK: - Init -
 
@@ -30,19 +30,23 @@ final class LessonDetailsManager {
 
     // MARK: - Public methods -
 
-    /// Loads lesson details unless a request is already running.
+    /// Loads lesson details, sharing an in-flight request when one is already running.
     ///
     /// - Returns: Loaded lesson details.
     func loadLesson() async throws -> LessonDetails {
-        guard !isLoading else {
-            throw CancellationError()
+        if let currentTask {
+            return try await currentTask.value
         }
 
-        isLoading = true
+        let task = Task { @MainActor in
+            try await lessonsService.fetchLesson(id: lessonID)
+        }
+        currentTask = task
+
         defer {
-            isLoading = false
+            currentTask = nil
         }
 
-        return try await lessonsService.fetchLesson(id: lessonID)
+        return try await task.value
     }
 }

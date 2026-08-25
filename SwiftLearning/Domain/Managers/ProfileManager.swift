@@ -17,7 +17,7 @@ final class ProfileManager {
     // MARK: - Private properties -
 
     private let userService: UserServicing
-    private var isLoading = false
+    private var currentTask: Task<ProfileContent, Error>?
 
     // MARK: - Init -
 
@@ -30,25 +30,29 @@ final class ProfileManager {
 
     // MARK: - Public methods -
 
-    /// Loads user profile and statistics.
+    /// Loads user profile and statistics, sharing an in-flight request when one is already running.
     ///
     /// - Returns: Combined profile content.
     func loadProfile() async throws -> ProfileContent {
-        guard !isLoading else {
-            throw CancellationError()
+        if let currentTask {
+            return try await currentTask.value
         }
 
-        isLoading = true
+        let task = Task { @MainActor in
+            async let user = userService.fetchUser()
+            async let statistics = userService.fetchStatistics()
+
+            return try await ProfileContent(
+                user: user,
+                statistics: statistics
+            )
+        }
+        currentTask = task
+
         defer {
-            isLoading = false
+            currentTask = nil
         }
 
-        async let user = userService.fetchUser()
-        async let statistics = userService.fetchStatistics()
-
-        return try await ProfileContent(
-            user: user,
-            statistics: statistics
-        )
+        return try await task.value
     }
 }

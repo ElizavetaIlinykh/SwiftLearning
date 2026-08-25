@@ -18,8 +18,8 @@ final class LessonCodeTaskManager {
 
     private let lessonID: String
     private let lessonsService: LessonsServicing
-    private var isLoadingCodeTask = false
-    private var isCompletingLesson = false
+    private var currentCodeTask: Task<LessonCodeTask, Error>?
+    private var currentCompletionTask: Task<LessonProgress, Error>?
 
     // MARK: - Init -
 
@@ -38,35 +38,43 @@ final class LessonCodeTaskManager {
 
     // MARK: - Public methods -
 
-    /// Loads the lesson code task unless another code task load request is already running.
+    /// Loads the lesson code task, sharing an in-flight request when one is already running.
     ///
     /// - Returns: The loaded code task.
     func loadCodeTask() async throws -> LessonCodeTask {
-        guard !isLoadingCodeTask else {
-            throw CancellationError()
+        if let currentCodeTask {
+            return try await currentCodeTask.value
         }
 
-        isLoadingCodeTask = true
+        let task = Task { @MainActor in
+            try await lessonsService.fetchLessonCodeTask(lessonID: lessonID)
+        }
+        currentCodeTask = task
+
         defer {
-            isLoadingCodeTask = false
+            currentCodeTask = nil
         }
 
-        return try await lessonsService.fetchLessonCodeTask(lessonID: lessonID)
+        return try await task.value
     }
 
-    /// Marks the lesson as completed unless completion is already in progress.
+    /// Marks the lesson as completed, sharing an in-flight request when one is already running.
     ///
     /// - Returns: Saved lesson progress.
     func completeLesson() async throws -> LessonProgress {
-        guard !isCompletingLesson else {
-            throw CancellationError()
+        if let currentCompletionTask {
+            return try await currentCompletionTask.value
         }
 
-        isCompletingLesson = true
+        let task = Task { @MainActor in
+            try await lessonsService.completeLesson(id: lessonID)
+        }
+        currentCompletionTask = task
+
         defer {
-            isCompletingLesson = false
+            currentCompletionTask = nil
         }
 
-        return try await lessonsService.completeLesson(id: lessonID)
+        return try await task.value
     }
 }

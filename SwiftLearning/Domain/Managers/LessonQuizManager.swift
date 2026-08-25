@@ -11,7 +11,7 @@ final class LessonQuizManager {
 
     private let lessonID: String
     private let lessonsService: LessonsServicing
-    private var isLoading = false
+    private var currentTask: Task<[LessonQuizQuestion], Error>?
 
     // MARK: - Init -
 
@@ -30,19 +30,23 @@ final class LessonQuizManager {
 
     // MARK: - Public methods -
 
-    /// Loads quiz questions unless another load request is already running.
+    /// Loads quiz questions, sharing an in-flight request when one is already running.
     ///
     /// - Returns: Questions returned by the backend.
     func loadQuestions() async throws -> [LessonQuizQuestion] {
-        guard !isLoading else {
-            throw CancellationError()
+        if let currentTask {
+            return try await currentTask.value
         }
 
-        isLoading = true
+        let task = Task { @MainActor in
+            try await lessonsService.fetchLessonQuestions(lessonID: lessonID)
+        }
+        currentTask = task
+
         defer {
-            isLoading = false
+            currentTask = nil
         }
 
-        return try await lessonsService.fetchLessonQuestions(lessonID: lessonID)
+        return try await task.value
     }
 }
