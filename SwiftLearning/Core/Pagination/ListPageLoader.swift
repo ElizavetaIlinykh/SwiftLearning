@@ -5,7 +5,7 @@ public final class PaginationLoader<Value: INetworkEntity & Sendable>: IPaginati
     // MARK: - Private properties -
 
     private var offset: Int
-    private let fetcher: (Int, Int) async throws -> [Value]
+    private let pageFetcher: (Int, Int) async throws -> PaginationResponse<Value>
 
     // MARK: - Public properties -
 
@@ -19,7 +19,22 @@ public final class PaginationLoader<Value: INetworkEntity & Sendable>: IPaginati
     ) {
         offset = contract.initalOffset
         self.contract = contract
-        self.fetcher = fetcher
+        pageFetcher = { offset, limit in
+            let result = try await fetcher(offset, limit)
+            return PaginationResponse(
+                result: result,
+                hasNext: result.count >= limit
+            )
+        }
+    }
+
+    public init(
+        contract: PaginationLoaderContract,
+        pageFetcher: @escaping (Int, Int) async throws -> PaginationResponse<Value>
+    ) {
+        offset = contract.initalOffset
+        self.contract = contract
+        self.pageFetcher = pageFetcher
     }
 
     // MARK: - Public methods -
@@ -34,8 +49,8 @@ public final class PaginationLoader<Value: INetworkEntity & Sendable>: IPaginati
     }
 
     private func loadItems() async throws -> PaginationResponse<Value> {
-        let result = try await fetcher(offset, contract.limit)
-        offset += result.count
-        return .init(result: result, hasNext: result.count >= contract.limit)
+        let response = try await pageFetcher(offset, contract.limit)
+        offset += response.result.count
+        return response
     }
 }

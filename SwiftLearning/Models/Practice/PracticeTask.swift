@@ -1,6 +1,6 @@
 import Foundation
 
-struct PracticeTask: Identifiable, Hashable, Decodable {
+struct PracticeTask: Identifiable, Hashable, INetworkEntity, Sendable {
     // MARK: - Public properties -
 
     let id: String
@@ -10,7 +10,7 @@ struct PracticeTask: Identifiable, Hashable, Decodable {
     let answers: [PracticeAnswer]
 }
 
-struct PracticeAnswer: Identifiable, Hashable, Decodable {
+struct PracticeAnswer: Identifiable, Hashable, Codable, Sendable {
     // MARK: - Public properties -
 
     let id: String

@@ -45,6 +45,32 @@ struct PaginationManagerTests {
     }
 
     @Test
+    func practiceTasksManagerLoadMoreUsesPaginatedOffsets() async throws {
+        let firstPage = (1 ... 20).map { practiceTask(id: "task-\($0)", order: $0) }
+        let service = PracticeServiceMock(
+            taskPages: [
+                firstPage,
+                [practiceTask(id: "task-21", order: 21)]
+            ]
+        )
+        let manager = PracticeTasksManager(
+            topicID: "topic",
+            practiceService: service
+        )
+
+        let loadedFirstPage = try await manager.loadTasks()
+        let loadedNextPage = try await manager.loadMoreTasks()
+
+        #expect(loadedFirstPage.tasks.count == 20)
+        #expect(loadedFirstPage.hasMore)
+        #expect(loadedNextPage.tasks.count == 21)
+        #expect(loadedNextPage.tasks.last?.id == "task-21")
+        #expect(!loadedNextPage.hasMore)
+        #expect(service.fetchTasksRequests.map(\.offset) == [0, 20])
+        #expect(service.fetchTasksRequests.map(\.limit) == [20, 20])
+    }
+
+    @Test
     func practiceTasksManagerCompletesTopicThroughService() async throws {
         let service = PracticeServiceMock()
         let manager = PracticeTasksManager(
@@ -77,6 +103,23 @@ private func lesson(
         description: "Description \(order)",
         order: order,
         status: status
+    )
+}
+
+private func practiceTask(id: String, order: Int) -> PracticeTask {
+    PracticeTask(
+        id: id,
+        question: "Question \(order)",
+        code: nil,
+        order: order,
+        answers: [
+            PracticeAnswer(
+                id: "answer-\(order)",
+                text: "Answer \(order)",
+                order: 1,
+                isCorrect: true
+            )
+        ]
     )
 }
 
@@ -122,14 +165,36 @@ private final class LessonsServiceMock: LessonsServicing {
 
 @MainActor
 private final class PracticeServiceMock: PracticeServicing {
+    private let taskPages: [[PracticeTask]]
     private(set) var completionRequest: CompletionRequest?
+    private(set) var fetchTasksRequests: [FetchTasksRequest] = []
+
+    init(taskPages: [[PracticeTask]] = []) {
+        self.taskPages = taskPages
+    }
 
     func fetchTopics(offset _: Int, limit _: Int) async throws -> PaginatedResponse<PracticeCategory> {
         throw TestError.unimplemented
     }
 
-    func fetchTasks(topicID _: String, offset _: Int, limit _: Int) async throws -> PaginatedResponse<PracticeTask> {
-        throw TestError.unimplemented
+    func fetchTasks(topicID: String, offset: Int, limit: Int) async throws -> PaginatedResponse<PracticeTask> {
+        let pageIndex = fetchTasksRequests.count
+        fetchTasksRequests.append(
+            FetchTasksRequest(
+                topicID: topicID,
+                offset: offset,
+                limit: limit
+            )
+        )
+        let items = pageIndex < taskPages.count ? taskPages[pageIndex] : []
+
+        return PaginatedResponse(
+            items: items,
+            total: taskPages.flatMap(\.self).count,
+            limit: limit,
+            offset: offset,
+            hasMore: pageIndex < taskPages.count - 1
+        )
     }
 
     func completeTopic(
@@ -154,6 +219,12 @@ private final class PracticeServiceMock: PracticeServicing {
 
     func fetchPracticeProgress() async throws -> [PracticeProgress] {
         throw TestError.unimplemented
+    }
+
+    struct FetchTasksRequest: Equatable {
+        let topicID: String
+        let offset: Int
+        let limit: Int
     }
 
     struct CompletionRequest: Equatable {
