@@ -133,3 +133,11 @@ Builders should:
 - Keep reusable UI in `Components`.
 - Keep backend DTOs and app models in `Models`.
 - Add tests for ViewModels, builders, managers, and error mapping when changing behavior.
+
+## App Configuration
+
+App-wide configuration lives in `Core/Configuration`.
+
+`AppConfiguration` owns the API base URL. It reads `API_BASE_URL` from the process environment first, then from Info.plist, and falls back to the local development server URL.
+
+`NetworkManager` should receive its `baseURL` from `AppDependenciesAssembler`; do not add feature-specific base URLs or hardcoded backend hosts in services.

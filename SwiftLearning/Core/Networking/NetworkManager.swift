@@ -49,7 +49,7 @@ final class NetworkManager: NetworkManaging {
     // MARK: - Init -
 
     init(
-        baseURL: URL = URL(string: "http://127.0.0.1:8000")!,
+        baseURL: URL,
         session: URLSession = .shared,
         tokenStorage: TokenStoring? = nil
     ) {

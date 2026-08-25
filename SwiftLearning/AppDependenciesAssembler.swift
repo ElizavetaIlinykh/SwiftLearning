@@ -3,8 +3,12 @@ enum AppDependenciesAssembler {
     // MARK: - Public methods -
 
     static func assemble() -> AppDependencies {
+        let configuration = AppConfiguration.load()
         let tokenStorage = KeychainTokenStorage()
-        let networkManager = NetworkManager(tokenStorage: tokenStorage)
+        let networkManager = NetworkManager(
+            baseURL: configuration.baseURL,
+            tokenStorage: tokenStorage
+        )
         let authService = AuthService(
             networkManager: networkManager,
             tokenStorage: tokenStorage

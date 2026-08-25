@@ -30,7 +30,7 @@ final class LessonsService: LessonsServicing {
 
     // MARK: - Init -
 
-    init(networkManager: NetworkManaging = NetworkManager()) {
+    init(networkManager: NetworkManaging) {
         self.networkManager = networkManager
     }
 
