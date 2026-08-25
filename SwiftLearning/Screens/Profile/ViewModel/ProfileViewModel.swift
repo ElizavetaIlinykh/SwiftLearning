@@ -1,13 +1,17 @@
 import Combine
 import Foundation
 
+enum ProfileOutput {
+    case logout
+}
+
 @MainActor
 final class ProfileViewModel: ObservableObject {
     // MARK: - Private properties -
 
     private let profileManager: ProfileManager
     private let contentBuilder: ProfileContentBuilder
-    private let session: SessionState
+    private let output: (ProfileOutput) -> Void
 
     // MARK: - Public properties -
 
@@ -18,11 +22,11 @@ final class ProfileViewModel: ObservableObject {
     init(
         profileManager: ProfileManager,
         contentBuilder: ProfileContentBuilder,
-        session: SessionState
+        output: @escaping (ProfileOutput) -> Void
     ) {
         self.profileManager = profileManager
         self.contentBuilder = contentBuilder
-        self.session = session
+        self.output = output
     }
 
     // MARK: - Public methods -
@@ -41,6 +45,6 @@ final class ProfileViewModel: ObservableObject {
     }
 
     func logout() {
-        session.logout()
+        output(.logout)
     }
 }

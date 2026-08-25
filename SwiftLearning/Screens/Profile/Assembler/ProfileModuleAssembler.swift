@@ -8,9 +8,13 @@ enum ProfileModuleAssembler {
         let profileManager = ProfileManager(userService: dependencies.services.userService)
         let viewModel = ProfileViewModel(
             profileManager: profileManager,
-            contentBuilder: ProfileContentBuilder(),
-            session: dependencies.session
-        )
+            contentBuilder: ProfileContentBuilder()
+        ) { output in
+            switch output {
+            case .logout:
+                dependencies.session.logout()
+            }
+        }
 
         return ProfileView(viewModel: viewModel)
     }
