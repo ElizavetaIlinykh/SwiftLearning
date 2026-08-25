@@ -1,19 +1,15 @@
 import SwiftUI
 
 struct RegisterView: View {
-    // MARK: - Public properties -
-
-    @ObservedObject var session: SessionState
-
-    let output: (AuthOutput) -> Void
-
     // MARK: - Private properties -
 
-    @State private var name = ""
-    @State private var email = ""
-    @State private var password = ""
-    @State private var errorMessage: String?
-    @State private var isLoading = false
+    @StateObject private var viewModel: RegisterViewModel
+
+    // MARK: - Init -
+
+    init(viewModel: RegisterViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
@@ -42,13 +38,13 @@ struct RegisterView: View {
 
     private var form: some View {
         VStack(spacing: 16) {
-            TextField("Name", text: $name)
+            TextField("Name", text: $viewModel.name)
                 .textContentType(.name)
                 .padding(14)
                 .background(Color(.secondarySystemGroupedBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
 
-            TextField("Email", text: $email)
+            TextField("Email", text: $viewModel.email)
                 .textContentType(.emailAddress)
                 .keyboardType(.emailAddress)
                 .textInputAutocapitalization(.never)
@@ -57,55 +53,40 @@ struct RegisterView: View {
                 .background(Color(.secondarySystemGroupedBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
 
-            SecureField("Password", text: $password)
+            SecureField("Password", text: $viewModel.password)
                 .textContentType(.newPassword)
                 .padding(14)
                 .background(Color(.secondarySystemGroupedBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
 
-            if let errorMessage {
+            if let errorMessage = viewModel.state.errorMessage {
                 Text(errorMessage)
                     .font(.subheadline)
                     .foregroundStyle(.red)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
 
-            PrimaryButtonView(title: isLoading ? "Creating..." : "Register") {
+            PrimaryButtonView(title: viewModel.buttonTitle) {
                 Task {
-                    await register()
+                    await viewModel.register()
                 }
             }
-            .disabled(isLoading)
+            .disabled(viewModel.state.isLoading)
 
             Button("Back to login") {
-                output(.openLogin)
+                viewModel.openLogin()
             }
             .font(.headline)
             .frame(maxWidth: .infinity)
         }
     }
-
-    // MARK: - Private methods -
-
-    private func register() async {
-        guard !isLoading else { return }
-
-        isLoading = true
-        errorMessage = nil
-
-        do {
-            try await session.register(name: name, email: email, password: password)
-        } catch {
-            errorMessage = UserFacingErrorMessage.message(for: error)
-        }
-
-        isLoading = false
-    }
 }
 
 #Preview {
     RegisterView(
-        session: AppDependenciesAssembler.assemble().session,
-        output: { _ in }
+        viewModel: RegisterViewModel(
+            session: AppDependenciesAssembler.assemble().session,
+            output: { _ in }
+        )
     )
 }

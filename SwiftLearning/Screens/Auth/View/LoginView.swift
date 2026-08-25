@@ -1,18 +1,15 @@
 import SwiftUI
 
 struct LoginView: View {
-    // MARK: - Public properties -
-
-    @ObservedObject var session: SessionState
-
-    let output: (AuthOutput) -> Void
-
     // MARK: - Private properties -
 
-    @State private var email = ""
-    @State private var password = ""
-    @State private var errorMessage: String?
-    @State private var isLoading = false
+    @StateObject private var viewModel: LoginViewModel
+
+    // MARK: - Init -
+
+    init(viewModel: LoginViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
@@ -41,7 +38,7 @@ struct LoginView: View {
 
     private var form: some View {
         VStack(spacing: 16) {
-            TextField("Email", text: $email)
+            TextField("Email", text: $viewModel.email)
                 .textContentType(.emailAddress)
                 .keyboardType(.emailAddress)
                 .textInputAutocapitalization(.never)
@@ -50,55 +47,40 @@ struct LoginView: View {
                 .background(Color(.secondarySystemGroupedBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
 
-            SecureField("Password", text: $password)
+            SecureField("Password", text: $viewModel.password)
                 .textContentType(.password)
                 .padding(14)
                 .background(Color(.secondarySystemGroupedBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
 
-            if let errorMessage {
+            if let errorMessage = viewModel.state.errorMessage {
                 Text(errorMessage)
                     .font(.subheadline)
                     .foregroundStyle(.red)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
 
-            PrimaryButtonView(title: isLoading ? "Signing In..." : "Login") {
+            PrimaryButtonView(title: viewModel.buttonTitle) {
                 Task {
-                    await login()
+                    await viewModel.login()
                 }
             }
-            .disabled(isLoading)
+            .disabled(viewModel.state.isLoading)
 
             Button("Create an account") {
-                output(.openRegistration)
+                viewModel.openRegistration()
             }
             .font(.headline)
             .frame(maxWidth: .infinity)
         }
     }
-
-    // MARK: - Private methods -
-
-    private func login() async {
-        guard !isLoading else { return }
-
-        isLoading = true
-        errorMessage = nil
-
-        do {
-            try await session.login(email: email, password: password)
-        } catch {
-            errorMessage = UserFacingErrorMessage.message(for: error)
-        }
-
-        isLoading = false
-    }
 }
 
 #Preview {
     LoginView(
-        session: AppDependenciesAssembler.assemble().session,
-        output: { _ in }
+        viewModel: LoginViewModel(
+            session: AppDependenciesAssembler.assemble().session,
+            output: { _ in }
+        )
     )
 }

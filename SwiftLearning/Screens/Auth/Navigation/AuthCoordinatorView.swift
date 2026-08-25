@@ -24,35 +24,30 @@ struct AuthCoordinatorView: View {
     }
 
     private var loginView: some View {
-        LoginView(
-            session: dependencies.session,
-            output: { output in
-                switch output {
-                case .openRegistration:
-                    router.navigate(to: .registration)
-                case .openLogin:
-                    router.popToRoot()
-                }
-            }
+        AuthModuleAssembler.assembleLogin(
+            dependencies: dependencies,
+            output: handleOutput
         )
     }
 
     // MARK: - Private methods -
 
+    private func handleOutput(_ output: AuthOutput) {
+        switch output {
+        case .openRegistration:
+            router.navigate(to: .registration)
+        case .openLogin:
+            router.popToRoot()
+        }
+    }
+
     @ViewBuilder
     private func destination(for route: AuthRouter.Route) -> some View {
         switch route {
         case .registration:
-            RegisterView(
-                session: dependencies.session,
-                output: { output in
-                    switch output {
-                    case .openRegistration:
-                        router.navigate(to: .registration)
-                    case .openLogin:
-                        router.popToRoot()
-                    }
-                }
+            AuthModuleAssembler.assembleRegister(
+                dependencies: dependencies,
+                output: handleOutput
             )
         }
     }
