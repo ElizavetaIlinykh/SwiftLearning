@@ -12,6 +12,17 @@ Dependencies should point only to the next layer when possible. UI code should n
 
 ## Layers
 
+The main source folders follow the same layer split:
+
+```text
+Core/      Shared infrastructure: auth state, token storage, networking, pagination, error mapping.
+Data/      Backend API services and service protocols.
+Domain/    Feature workflows/managers and reusable domain loading state.
+Screens/   Feature UI, navigation, assemblers, view models, and builders.
+Models/    App and backend data models.
+Components/Reusable SwiftUI components.
+```
+
 ### View
 
 SwiftUI views render state and forward user actions.
@@ -65,6 +76,8 @@ Services should:
 - Map backend-specific API errors when appropriate.
 - Avoid UI state and navigation decisions.
 
+Services live under `Data/Services`.
+
 ### Network
 
 The network layer owns HTTP transport details.
@@ -76,6 +89,8 @@ It should:
 - Attach authentication headers.
 - Surface transport/server/decoding errors.
 - Avoid feature-specific business decisions.
+
+Networking, auth infrastructure, pagination helpers, and shared error mapping live under `Core`.
 
 ## Feature Module Shape
 
@@ -118,4 +133,3 @@ Builders should:
 - Keep reusable UI in `Components`.
 - Keep backend DTOs and app models in `Models`.
 - Add tests for ViewModels, builders, managers, and error mapping when changing behavior.
-
