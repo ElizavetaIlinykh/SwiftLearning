@@ -32,16 +32,12 @@ final class PracticeService: PracticeServicing {
     // MARK: - Public methods -
 
     func fetchTopics(offset: Int, limit: Int) async throws -> PaginatedResponse<PracticeCategory> {
-        try await networkManager.get(
-            "/practice/topics",
-            queryItems: paginationQueryItems(offset: offset, limit: limit)
-        )
+        try await networkManager.get(.practiceTopics(offset: offset, limit: limit))
     }
 
     func fetchTasks(topicID: String, offset: Int, limit: Int) async throws -> PaginatedResponse<PracticeTask> {
         try await networkManager.get(
-            "/practice/topics/\(topicID)/tasks",
-            queryItems: paginationQueryItems(offset: offset, limit: limit)
+            .practiceTasks(topicID: topicID, offset: offset, limit: limit)
         )
     }
 
@@ -51,7 +47,7 @@ final class PracticeService: PracticeServicing {
         totalAnswersCount: Int
     ) async throws -> PracticeProgress {
         try await networkManager.post(
-            "/practice/topics/\(topicID)/complete",
+            .completePracticeTopic(topicID: topicID),
             body: PracticeCompletionRequest(
                 correctAnswersCount: correctAnswersCount,
                 totalAnswersCount: totalAnswersCount
@@ -60,6 +56,6 @@ final class PracticeService: PracticeServicing {
     }
 
     func fetchPracticeProgress() async throws -> [PracticeProgress] {
-        try await networkManager.get("/me/practice-progress")
+        try await networkManager.get(.practiceProgress)
     }
 }

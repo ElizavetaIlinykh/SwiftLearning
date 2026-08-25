@@ -1,36 +1,19 @@
 import Foundation
 
 protocol NetworkManaging {
-    func get<Response: Decodable>(
-        _ path: String,
-        queryItems: [URLQueryItem]
-    ) async throws -> Response
+    func get<Response: Decodable>(_ endpoint: APIEndpoint) async throws -> Response
 
     func post<Response: Decodable>(
-        _ path: String,
-        body: some Encodable,
-        queryItems: [URLQueryItem]
+        _ endpoint: APIEndpoint,
+        body: some Encodable
     ) async throws -> Response
 
     func put<Response: Decodable>(
-        _ path: String,
+        _ endpoint: APIEndpoint,
         body: some Encodable
     ) async throws -> Response
 
-    func delete<Response: Decodable>(_ path: String) async throws -> Response
-}
-
-extension NetworkManaging {
-    func get<Response: Decodable>(_ path: String) async throws -> Response {
-        try await get(path, queryItems: [])
-    }
-
-    func post<Response: Decodable>(
-        _ path: String,
-        body: some Encodable
-    ) async throws -> Response {
-        try await post(path, body: body, queryItems: [])
-    }
+    func delete<Response: Decodable>(_ endpoint: APIEndpoint) async throws -> Response
 }
 
 final class NetworkManager: NetworkManaging {
@@ -84,41 +67,40 @@ final class NetworkManager: NetworkManaging {
 
     // MARK: - Public methods -
 
-    func get<Response: Decodable>(
-        _ path: String,
-        queryItems: [URLQueryItem] = []
-    ) async throws -> Response {
-        let request = try makeRequest(path: path, method: .get, queryItems: queryItems)
-        return try await send(request)
+    func get<Response: Decodable>(_ endpoint: APIEndpoint) async throws -> Response {
+        let request = try makeRequest(endpoint: endpoint, method: .get)
+        return try await send(request, endpoint: endpoint)
     }
 
     func post<Response: Decodable>(
-        _ path: String,
-        body: some Encodable,
-        queryItems: [URLQueryItem] = []
+        _ endpoint: APIEndpoint,
+        body: some Encodable
     ) async throws -> Response {
-        var request = try makeRequest(path: path, method: .post, queryItems: queryItems)
+        var request = try makeRequest(endpoint: endpoint, method: .post)
         request.httpBody = try encoder.encode(body)
-        return try await send(request)
+        return try await send(request, endpoint: endpoint)
     }
 
     func put<Response: Decodable>(
-        _ path: String,
+        _ endpoint: APIEndpoint,
         body: some Encodable
     ) async throws -> Response {
-        var request = try makeRequest(path: path, method: .put)
+        var request = try makeRequest(endpoint: endpoint, method: .put)
         request.httpBody = try encoder.encode(body)
-        return try await send(request)
+        return try await send(request, endpoint: endpoint)
     }
 
-    func delete<Response: Decodable>(_ path: String) async throws -> Response {
-        let request = try makeRequest(path: path, method: .delete)
-        return try await send(request)
+    func delete<Response: Decodable>(_ endpoint: APIEndpoint) async throws -> Response {
+        let request = try makeRequest(endpoint: endpoint, method: .delete)
+        return try await send(request, endpoint: endpoint)
     }
 
     // MARK: - Private methods -
 
-    private func send<Response: Decodable>(_ request: URLRequest) async throws -> Response {
+    private func send<Response: Decodable>(
+        _ request: URLRequest,
+        endpoint: APIEndpoint
+    ) async throws -> Response {
         let (data, response) = try await session.data(for: request)
 
         guard let httpResponse = response as? HTTPURLResponse else {
@@ -126,7 +108,7 @@ final class NetworkManager: NetworkManaging {
         }
 
         guard (200 ... 299).contains(httpResponse.statusCode) else {
-            if httpResponse.statusCode == 401, !isAuthEndpoint(request) {
+            if httpResponse.statusCode == 401, endpoint.requiresAuthorization {
                 unauthorizedHandler?()
             }
             throw NetworkError.serverError(statusCode: httpResponse.statusCode, data: data)
@@ -144,19 +126,18 @@ final class NetworkManager: NetworkManaging {
     }
 
     private func makeRequest(
-        path: String,
-        method: HTTPMethod,
-        queryItems: [URLQueryItem] = []
+        endpoint: APIEndpoint,
+        method: HTTPMethod
     ) throws -> URLRequest {
         guard var components = URLComponents(
-            url: baseURL.appendingPathComponent(path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))),
+            url: baseURL.appendingPathComponent(endpoint.path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))),
             resolvingAgainstBaseURL: false
         ) else {
             throw NetworkError.invalidURL
         }
 
-        if !queryItems.isEmpty {
-            components.queryItems = queryItems
+        if !endpoint.queryItems.isEmpty {
+            components.queryItems = endpoint.queryItems
         }
 
         guard let url = components.url else {
@@ -168,21 +149,11 @@ final class NetworkManager: NetworkManaging {
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
-        if !isAuthEndpoint(path), let accessToken = try tokenStorage?.fetchAccessToken() {
+        if endpoint.requiresAuthorization, let accessToken = try tokenStorage?.fetchAccessToken() {
             request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         }
 
         return request
-    }
-
-    private func isAuthEndpoint(_ request: URLRequest) -> Bool {
-        guard let path = request.url?.path else { return false }
-        return isAuthEndpoint(path)
-    }
-
-    private func isAuthEndpoint(_ path: String) -> Bool {
-        let normalizedPath = path.hasPrefix("/") ? path : "/\(path)"
-        return normalizedPath == "/auth/register" || normalizedPath == "/auth/login"
     }
 }
 

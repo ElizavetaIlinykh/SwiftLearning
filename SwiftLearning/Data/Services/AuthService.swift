@@ -29,7 +29,7 @@ final class AuthService: AuthServicing {
     func register(name: String, email: String, password: String) async throws -> UserProfile {
         do {
             let response: AuthResponse = try await networkManager.post(
-                "/auth/register",
+                .register,
                 body: RegisterRequest(email: email, name: name, password: password)
             )
             try tokenStorage.saveAccessToken(response.accessToken)
@@ -42,7 +42,7 @@ final class AuthService: AuthServicing {
     func login(email: String, password: String) async throws -> UserProfile {
         do {
             let response: AuthResponse = try await networkManager.post(
-                "/auth/login",
+                .login,
                 body: AuthRequest(email: email, password: password)
             )
             try tokenStorage.saveAccessToken(response.accessToken)
@@ -54,7 +54,7 @@ final class AuthService: AuthServicing {
 
     func fetchCurrentUser() async throws -> UserProfile {
         do {
-            return try await networkManager.get("/me")
+            return try await networkManager.get(.currentUser)
         } catch let NetworkManager.NetworkError.serverError(statusCode, _) where statusCode == 401 {
             throw AuthError.unauthorized
         } catch {

@@ -37,23 +37,20 @@ final class LessonsService: LessonsServicing {
     // MARK: - Public methods -
 
     func fetchLessons(offset: Int, limit: Int) async throws -> PaginatedResponse<LessonSummary> {
-        try await networkManager.get(
-            "/me/lessons",
-            queryItems: paginationQueryItems(offset: offset, limit: limit)
-        )
+        try await networkManager.get(.userLessons(offset: offset, limit: limit))
     }
 
     func fetchLesson(id: String) async throws -> LessonDetails {
-        try await networkManager.get("/lessons/\(id)")
+        try await networkManager.get(.lesson(id: id))
     }
 
     func fetchLessonQuestions(lessonID: String) async throws -> [LessonQuizQuestion] {
-        try await networkManager.get("/lessons/\(lessonID)/questions")
+        try await networkManager.get(.lessonQuestions(lessonID: lessonID))
     }
 
     func fetchLessonCodeTask(lessonID: String) async throws -> LessonCodeTask {
         do {
-            return try await networkManager.get("/lessons/\(lessonID)/code-task")
+            return try await networkManager.get(.lessonCodeTask(lessonID: lessonID))
         } catch let NetworkManager.NetworkError.serverError(statusCode, _) where statusCode == 404 {
             throw LessonCodeTaskError.notFound
         }
@@ -61,7 +58,7 @@ final class LessonsService: LessonsServicing {
 
     func completeLesson(id: String) async throws -> LessonProgress {
         try await networkManager.post(
-            "/lessons/\(id)/complete",
+            .completeLesson(id: id),
             body: EmptyRequestBody()
         )
     }

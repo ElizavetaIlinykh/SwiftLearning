@@ -19,10 +19,10 @@ final class UserService: UserServicing {
     // MARK: - Public methods -
 
     func fetchUser() async throws -> UserProfile {
-        try await networkManager.get("/me")
+        try await networkManager.get(.currentUser)
     }
 
     func fetchStatistics() async throws -> UserStatistics {
-        try await networkManager.get("/me/statistics")
+        try await networkManager.get(.userStatistics)
     }
 }
