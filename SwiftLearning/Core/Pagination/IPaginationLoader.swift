@@ -1,9 +1,10 @@
 import Foundation
 
+@MainActor
 public protocol IPaginationLoader: Sendable {
     // MARK: - Associated types -
 
-    associatedtype Value: INetworkEntity
+    associatedtype Value: INetworkEntity & Sendable
 
     // MARK: - Public properties -
 

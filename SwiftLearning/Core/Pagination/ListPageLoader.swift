@@ -1,6 +1,7 @@
 import Foundation
 
-public final class PaginationLoader<Value: INetworkEntity & Sendable>: IPaginationLoader, @unchecked Sendable {
+@MainActor
+public final class PaginationLoader<Value: INetworkEntity & Sendable>: IPaginationLoader {
     // MARK: - Private properties -
 
     private var offset: Int
@@ -13,7 +14,7 @@ public final class PaginationLoader<Value: INetworkEntity & Sendable>: IPaginati
     // MARK: - Init -
 
     public init(
-        contract: PaginationLoaderContract = .init(),
+        contract: PaginationLoaderContract,
         fetcher: @escaping (Int, Int) async throws -> [Value]
     ) {
         offset = contract.initalOffset
