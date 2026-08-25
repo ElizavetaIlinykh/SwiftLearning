@@ -25,10 +25,8 @@ struct PracticeView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Practice")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear {
-            Task {
-                await viewModel.loadTopics()
-            }
+        .task {
+            await viewModel.loadTopics()
         }
         .refreshable {
             await viewModel.refreshTopics()

@@ -34,10 +34,8 @@ struct ProfileView: View {
                 viewModel.logout()
             }
         }
-        .onAppear {
-            Task {
-                await viewModel.loadProfile()
-            }
+        .task {
+            await viewModel.loadProfile()
         }
         .refreshable {
             await viewModel.loadProfile()

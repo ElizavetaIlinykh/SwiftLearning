@@ -60,10 +60,8 @@ struct PracticeSessionView: View {
 
         return VStack(alignment: .leading, spacing: 22) {
             taskProgress(totalTasks: tasks.count)
-                .onAppear {
-                    Task {
-                        await viewModel.loadMoreTasksIfNeeded(currentTaskID: task.id)
-                    }
+                .task {
+                    await viewModel.loadMoreTasksIfNeeded(currentTaskID: task.id)
                 }
 
             VStack(alignment: .leading, spacing: 14) {
