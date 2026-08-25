@@ -18,7 +18,6 @@ final class PracticeSessionViewModel: ObservableObject {
 
     private let tasksManager: PracticeTasksManager
     private let taskBuilder: PracticeTaskBuilder
-    private let practiceService: PracticeServicing
     private let output: (PracticeSessionOutput) -> Void
     private var tasks: [PracticeTask] = []
 
@@ -44,14 +43,12 @@ final class PracticeSessionViewModel: ObservableObject {
         topicTitle: String,
         tasksManager: PracticeTasksManager,
         taskBuilder: PracticeTaskBuilder,
-        practiceService: PracticeServicing,
         output: @escaping (PracticeSessionOutput) -> Void
     ) {
         self.topicID = topicID
         self.topicTitle = topicTitle
         self.tasksManager = tasksManager
         self.taskBuilder = taskBuilder
-        self.practiceService = practiceService
         self.output = output
     }
 
@@ -96,8 +93,7 @@ final class PracticeSessionViewModel: ObservableObject {
         completionState = .saving
 
         do {
-            let progress = try await practiceService.completeTopic(
-                topicID: topicID,
+            let progress = try await tasksManager.completeTopic(
                 correctAnswersCount: correctAnswersCount,
                 totalAnswersCount: totalAnswersCount
             )

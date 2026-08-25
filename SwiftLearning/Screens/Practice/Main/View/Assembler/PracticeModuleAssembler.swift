@@ -33,7 +33,6 @@ enum PracticeModuleAssembler {
             topicTitle: topicTitle,
             tasksManager: tasksManager,
             taskBuilder: PracticeTaskBuilder(),
-            practiceService: dependencies.services.practiceService,
             output: output
         )
 

@@ -85,6 +85,23 @@ final class PracticeTasksManager {
         return try await performLoadMore()
     }
 
+    /// Saves the completed practice topic result.
+    ///
+    /// - Parameters:
+    ///   - correctAnswersCount: Number of correctly answered tasks.
+    ///   - totalAnswersCount: Total number of answered tasks.
+    /// - Returns: Updated practice progress returned by the backend.
+    func completeTopic(
+        correctAnswersCount: Int,
+        totalAnswersCount: Int
+    ) async throws -> PracticeProgress {
+        try await practiceService.completeTopic(
+            topicID: topicID,
+            correctAnswersCount: correctAnswersCount,
+            totalAnswersCount: totalAnswersCount
+        )
+    }
+
     // MARK: - Private properties -
 
     private var currentPage: PracticeTasksPage {
