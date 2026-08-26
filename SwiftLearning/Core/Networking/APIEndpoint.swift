@@ -37,7 +37,9 @@ extension APIEndpoint {
 
     static let currentUser = APIEndpoint(path: "/me")
     static let userStatistics = APIEndpoint(path: "/me/statistics")
-    static let practiceProgress = APIEndpoint(path: "/me/practice-progress")
+    static func practiceProgress(userID: String) -> APIEndpoint {
+        APIEndpoint(path: "/users/\(pathComponent(userID))/practice-progress")
+    }
 
     static func userLessons(offset: Int, limit: Int) -> APIEndpoint {
         APIEndpoint(

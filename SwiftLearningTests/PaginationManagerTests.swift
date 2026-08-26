@@ -112,6 +112,9 @@ private func practiceTask(id: String, order: Int) -> PracticeTask {
         question: "Question \(order)",
         code: nil,
         order: order,
+        explanation: "Explanation \(order)",
+        difficulty: .easy,
+        tags: [],
         answers: [
             PracticeAnswer(
                 id: "answer-\(order)",
@@ -217,7 +220,7 @@ private final class PracticeServiceMock: PracticeServicing {
         )
     }
 
-    func fetchPracticeProgress() async throws -> [PracticeProgress] {
+    func fetchPracticeProgress(userID _: String) async throws -> [PracticeProgress] {
         throw TestError.unimplemented
     }
 

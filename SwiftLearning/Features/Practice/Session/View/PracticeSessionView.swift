@@ -65,6 +65,12 @@ struct PracticeSessionView: View {
                 }
 
             VStack(alignment: .leading, spacing: 14) {
+                DifficultyBadgeView(difficulty: task.difficulty)
+
+                if !task.tags.isEmpty {
+                    TagsView(tags: task.tags)
+                }
+
                 Text(task.question)
                     .font(.title2)
                     .fontWeight(.bold)
@@ -92,7 +98,7 @@ struct PracticeSessionView: View {
             }
 
             if isAnswered {
-                feedbackView(answers)
+                feedbackView(task)
                 completionErrorView
                 loadMoreTasksView
 
@@ -130,23 +136,16 @@ struct PracticeSessionView: View {
         }
     }
 
-    private func feedbackView(_ answers: [PracticeAnswerViewModel]) -> some View {
-        let isCorrect = selectedAnswerIndex.map { answers[$0].isCorrect } ?? false
+    private func feedbackView(_ task: PracticeTaskViewModel) -> some View {
+        let isCorrect = selectedAnswerIndex.map { task.answers[$0].isCorrect } ?? false
 
-        return VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 8) {
-                Image(systemName: isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
-                    .foregroundStyle(isCorrect ? .green : .red)
-
-                Text(isCorrect ? "Correct!" : "Not quite")
-                    .font(.headline)
-                    .foregroundStyle(isCorrect ? .green : .red)
-            }
-        }
-        .padding(18)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        return AnswerExplanationView(
+            viewModel: AnswerExplanationViewModel(
+                isCorrect: isCorrect,
+                explanation: task.explanation,
+                correctAnswer: isCorrect ? nil : correctAnswerText(in: task.answers)
+            )
+        )
     }
 
     @ViewBuilder
@@ -231,6 +230,10 @@ struct PracticeSessionView: View {
         }
 
         return .neutral
+    }
+
+    private func correctAnswerText(in answers: [PracticeAnswerViewModel]) -> String? {
+        answers.first { $0.isCorrect }?.text
     }
 
     private func selectAnswer(

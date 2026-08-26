@@ -7,6 +7,9 @@ struct PracticeTask: Identifiable, Hashable, INetworkEntity, Sendable {
     let question: String
     let code: String?
     let order: Int
+    let explanation: String
+    let difficulty: Difficulty
+    let tags: [String]
     let answers: [PracticeAnswer]
 }
 

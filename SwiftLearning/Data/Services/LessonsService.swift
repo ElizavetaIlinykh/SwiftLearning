@@ -4,6 +4,7 @@ private struct EmptyRequestBody: Encodable {}
 
 enum LessonCodeTaskError: LocalizedError {
     case notFound
+    case missingProgress
 
     // MARK: - Public properties -
 
@@ -11,6 +12,8 @@ enum LessonCodeTaskError: LocalizedError {
         switch self {
         case .notFound:
             "No code task is available for this lesson."
+        case .missingProgress:
+            "Lesson completion did not return progress."
         }
     }
 }
@@ -57,9 +60,15 @@ final class LessonsService: LessonsServicing {
     }
 
     func completeLesson(id: String) async throws -> LessonProgress {
-        try await networkManager.post(
+        let progress: [LessonProgress] = try await networkManager.post(
             .completeLesson(id: id),
             body: EmptyRequestBody()
         )
+
+        guard let lessonProgress = progress.first(where: { $0.lessonId.uuidString.lowercased() == id.lowercased() }) ?? progress.first else {
+            throw LessonCodeTaskError.missingProgress
+        }
+
+        return lessonProgress
     }
 }

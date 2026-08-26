@@ -15,7 +15,7 @@ protocol PracticeServicing {
         correctAnswersCount: Int,
         totalAnswersCount: Int
     ) async throws -> PracticeProgress
-    func fetchPracticeProgress() async throws -> [PracticeProgress]
+    func fetchPracticeProgress(userID: String) async throws -> [PracticeProgress]
 }
 
 final class PracticeService: PracticeServicing {
@@ -55,7 +55,7 @@ final class PracticeService: PracticeServicing {
         )
     }
 
-    func fetchPracticeProgress() async throws -> [PracticeProgress] {
-        try await networkManager.get(.practiceProgress)
+    func fetchPracticeProgress(userID: String) async throws -> [PracticeProgress] {
+        try await networkManager.get(.practiceProgress(userID: userID))
     }
 }

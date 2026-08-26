@@ -5,7 +5,7 @@ struct LessonSummary: INetworkEntity {
 
     let id: String
     let title: String
-    let description: String
+    let description: String?
     let order: Int
     let status: LessonStatus
 }

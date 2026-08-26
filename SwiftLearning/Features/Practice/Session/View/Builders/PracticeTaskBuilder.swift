@@ -16,6 +16,9 @@ struct PracticeTaskBuilder {
             id: task.id,
             question: task.question,
             code: task.code,
+            explanation: task.explanation,
+            difficulty: task.difficulty,
+            tags: task.tags,
             answers: task.answers
                 .sorted { $0.order < $1.order }
                 .map(build(answer:))

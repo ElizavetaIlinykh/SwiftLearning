@@ -8,9 +8,9 @@ struct LessonContentBuilder {
             lessonID: lesson.id,
             theorySectionTitle: "THEORY",
             title: lesson.title,
-            theory: lesson.theory,
+            theory: lesson.theory ?? "",
             codeSectionTitle: "CODE EXAMPLE",
-            codeExample: lesson.codeExample
+            codeExample: lesson.codeExample ?? ""
         )
     }
 }

@@ -13,7 +13,7 @@ struct LearnLessonCardBuilder {
         LessonCardViewModel(
             id: lesson.id,
             title: lesson.title,
-            description: lesson.description,
+            description: lesson.description ?? "",
             order: lesson.order,
             state: state(for: lesson.status),
             actionTitle: actionTitle(for: lesson)

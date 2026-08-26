@@ -4,12 +4,6 @@ struct LessonQuizRouteView: View {
     // MARK: - Private properties -
 
     @StateObject private var viewModel: LessonQuizViewModel
-    @State private var currentQuestionIndex = 0
-    @State private var selectedAnswerIndex: Int?
-
-    private var isAnswered: Bool {
-        selectedAnswerIndex != nil
-    }
 
     // MARK: - Init -
 
@@ -33,8 +27,6 @@ struct LessonQuizRouteView: View {
             await viewModel.loadQuestions()
         }
         .refreshable {
-            currentQuestionIndex = 0
-            selectedAnswerIndex = nil
             await viewModel.loadQuestions()
         }
     }
@@ -49,58 +41,71 @@ struct LessonQuizRouteView: View {
         case .empty:
             emptyView
         case let .content(contentViewModel):
-            questionView(contentViewModel.questions)
+            questionView(contentViewModel)
         }
     }
 
     // MARK: - Private methods -
 
-    private func questionView(_ questions: [LessonQuizQuestionViewModel]) -> some View {
-        let safeQuestionIndex = min(currentQuestionIndex, questions.count - 1)
-        let question = questions[safeQuestionIndex]
+    private func questionView(_ contentViewModel: LessonQuizContentViewModel) -> some View {
+        VStack(alignment: .leading, spacing: 24) {
+            questionProgress(contentViewModel)
 
-        return VStack(alignment: .leading, spacing: 24) {
-            questionProgress(totalQuestions: questions.count)
+            questionHeader(contentViewModel.question)
 
-            VStack(alignment: .leading, spacing: 10) {
-                Text("Quick Check")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
+            answersView(contentViewModel)
 
-                Text(question.text)
-                    .font(.title3)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.secondary)
-            }
+            if contentViewModel.isAnswered {
+                feedbackView(contentViewModel)
 
-            VStack(spacing: 12) {
-                ForEach(question.answers.indices, id: \.self) { index in
-                    AnswerOptionView(
-                        viewModel: AnswerOptionViewModel(
-                            title: question.answers[index].text,
-                            state: optionState(for: index, in: question.answers)
-                        )
-                    ) {
-                        selectAnswer(index)
-                    }
-                    .disabled(isAnswered)
-                }
-            }
-
-            if isAnswered {
-                feedbackView(question.answers)
-
-                PrimaryButtonView(title: isLastQuestion(totalQuestions: questions.count) ? "Continue" : "Next Question") {
-                    advance(totalQuestions: questions.count)
+                PrimaryButtonView(title: contentViewModel.primaryButtonTitle) {
+                    viewModel.advance()
                 }
             }
         }
     }
 
-    private func questionProgress(totalQuestions: Int) -> some View {
+    private func questionHeader(_ question: LessonQuizQuestionViewModel) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            DifficultyBadgeView(difficulty: question.difficulty)
+
+            if !question.tags.isEmpty {
+                TagsView(tags: question.tags)
+            }
+
+            Text("Quick Check")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+
+            Text(question.text)
+                .font(.title3)
+                .fontWeight(.semibold)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private func answersView(_ contentViewModel: LessonQuizContentViewModel) -> some View {
+        VStack(spacing: 12) {
+            ForEach(contentViewModel.question.answers.indices, id: \.self) { index in
+                let answer = contentViewModel.question.answers[index]
+
+                AnswerOptionView(
+                    viewModel: AnswerOptionViewModel(
+                        title: answer.text,
+                        state: answer.state
+                    )
+                ) {
+                    viewModel.selectAnswer(at: index)
+                }
+                .disabled(contentViewModel.isAnswered)
+            }
+        }
+    }
+
+    private func questionProgress(_ contentViewModel: LessonQuizContentViewModel) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("Question \(currentQuestionIndex + 1) of \(totalQuestions)")
+                Text(contentViewModel.progressTitle)
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .foregroundStyle(.secondary)
@@ -108,7 +113,7 @@ struct LessonQuizRouteView: View {
                 Spacer()
             }
 
-            ProgressView(value: Double(currentQuestionIndex + 1) / Double(totalQuestions))
+            ProgressView(value: contentViewModel.progressValue)
                 .tint(.accentColor)
         }
     }
@@ -139,62 +144,11 @@ struct LessonQuizRouteView: View {
         }
     }
 
-    private func feedbackView(_ answers: [LessonQuizAnswerViewModel]) -> some View {
-        let isCorrect = selectedAnswerIndex.map { answers[$0].isCorrect } ?? false
-
-        return VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 8) {
-                Image(systemName: isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
-                    .foregroundStyle(isCorrect ? .green : .red)
-
-                Text(isCorrect ? "Correct!" : "Not quite")
-                    .font(.headline)
-                    .foregroundStyle(isCorrect ? .green : .red)
-            }
+    @ViewBuilder
+    private func feedbackView(_ contentViewModel: LessonQuizContentViewModel) -> some View {
+        if let answerExplanationViewModel = contentViewModel.answerExplanationViewModel {
+            AnswerExplanationView(viewModel: answerExplanationViewModel)
         }
-        .padding(18)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-    }
-
-    private func optionState(
-        for index: Int,
-        in answers: [LessonQuizAnswerViewModel]
-    ) -> AnswerOptionState {
-        guard let selectedAnswerIndex else { return .neutral }
-
-        if index == selectedAnswerIndex, answers[index].isCorrect {
-            return .selectedCorrect
-        }
-
-        if index == selectedAnswerIndex {
-            return .selectedIncorrect
-        }
-
-        if answers[index].isCorrect {
-            return .correct
-        }
-
-        return .neutral
-    }
-
-    private func selectAnswer(_ index: Int) {
-        guard selectedAnswerIndex == nil else { return }
-        selectedAnswerIndex = index
-    }
-
-    private func advance(totalQuestions: Int) {
-        if isLastQuestion(totalQuestions: totalQuestions) {
-            viewModel.openCodeTask()
-        } else {
-            currentQuestionIndex += 1
-            selectedAnswerIndex = nil
-        }
-    }
-
-    private func isLastQuestion(totalQuestions: Int) -> Bool {
-        currentQuestionIndex == totalQuestions - 1
     }
 }
 
