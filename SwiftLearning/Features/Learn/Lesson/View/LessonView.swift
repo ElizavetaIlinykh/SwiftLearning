@@ -18,9 +18,9 @@ struct LessonView: View {
             VStack(alignment: .leading, spacing: 24) {
                 content
             }
-            .padding(20)
+            .padding(AppSpacing.screen)
         }
-        .background(Color(.systemGroupedBackground))
+        .background(AppColors.screenBackground)
         .navigationTitle(viewModel.navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
         .task {

@@ -24,9 +24,9 @@ struct ProfileView: View {
             VStack(alignment: .leading, spacing: 28) {
                 content
             }
-            .padding(20)
+            .padding(AppSpacing.screen)
         }
-        .background(Color(.systemGroupedBackground))
+        .background(AppColors.screenBackground)
         .navigationTitle(L10n.string("profile.navigationTitle"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -115,12 +115,9 @@ struct ProfileView: View {
                     courseCompletedCard
                 }
             }
-            .padding(20)
-            .background(Color(.secondarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+            .appCard(
+                radius: AppRadius.largeCard,
+                padding: AppSpacing.section
             )
         }
     }
@@ -142,9 +139,11 @@ struct ProfileView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(14)
-        .background(Color.green.opacity(0.10))
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .padding(AppSpacing.large)
+        .appRoundedBackground(
+            Color.green.opacity(AppOpacity.tintFill),
+            radius: AppRadius.card
+        )
     }
 
     private func statisticsSection(statistics: [StatCardViewModel]) -> some View {

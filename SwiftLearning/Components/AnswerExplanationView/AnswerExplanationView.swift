@@ -27,10 +27,11 @@ struct AnswerExplanationView: View {
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
-        .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .appCard(
+            radius: AppRadius.largeCard,
+            padding: AppSpacing.section
+        )
         .accessibilityElement(children: .combine)
         .accessibilityLabel(viewModel.accessibilityLabel)
     }

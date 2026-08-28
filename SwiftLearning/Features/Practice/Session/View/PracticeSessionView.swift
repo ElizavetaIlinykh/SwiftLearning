@@ -23,9 +23,9 @@ struct PracticeSessionView: View {
             VStack(alignment: .leading, spacing: 22) {
                 content
             }
-            .padding(20)
+            .padding(AppSpacing.screen)
         }
-        .background(Color(.systemGroupedBackground))
+        .background(AppColors.screenBackground)
         .navigationTitle(viewModel.topicTitle)
         .navigationBarTitleDisplayMode(.inline)
         .animation(.easeInOut(duration: 0.2), value: currentTaskIndex)

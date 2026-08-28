@@ -12,10 +12,10 @@ struct CodeBlockView: View {
                 .foregroundStyle(Color.white.opacity(0.94))
                 .multilineTextAlignment(.leading)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(18)
+                .padding(AppSpacing.section)
         }
         .background(Color(red: 0.10, green: 0.11, blue: 0.13))
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.card, style: .continuous))
     }
 }
 

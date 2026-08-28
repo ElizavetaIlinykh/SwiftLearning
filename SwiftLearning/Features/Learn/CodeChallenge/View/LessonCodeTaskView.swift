@@ -18,9 +18,9 @@ struct LessonCodeTaskView: View {
             VStack(alignment: .leading, spacing: 24) {
                 content
             }
-            .padding(20)
+            .padding(AppSpacing.screen)
         }
-        .background(Color(.systemGroupedBackground))
+        .background(AppColors.screenBackground)
         .navigationTitle(L10n.string("codeTask.navigationTitle"))
         .navigationBarTitleDisplayMode(.inline)
         .task {
@@ -112,12 +112,9 @@ struct LessonCodeTaskView: View {
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .font(.body.monospaced())
-                .padding(14)
-                .background(Color(.secondarySystemGroupedBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .stroke(answerBorderColor, lineWidth: 1.5)
+                .appInputField(
+                    borderColor: answerBorderColor,
+                    lineWidth: 1.5
                 )
                 .disabled(viewModel.answerState == .correct)
         }
@@ -193,10 +190,11 @@ struct LessonCodeTaskView: View {
                 .font(.body)
                 .foregroundStyle(.secondary)
         }
-        .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .appCard(
+            radius: AppRadius.largeCard,
+            padding: AppSpacing.section
+        )
     }
 
     private var answerBorderColor: Color {

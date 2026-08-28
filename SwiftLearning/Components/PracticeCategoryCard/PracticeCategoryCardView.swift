@@ -13,8 +13,7 @@ struct PracticeCategoryCardView: View {
                     .font(.system(size: 22, weight: .semibold))
                     .foregroundStyle(Color.accentColor)
                     .frame(width: 48, height: 48)
-                    .background(Color.accentColor.opacity(0.12))
-                    .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
+                    .appRoundedBackground(AppColors.accentFill, radius: AppRadius.control)
 
                 VStack(alignment: .leading, spacing: 6) {
                     Text(viewModel.title)
@@ -39,13 +38,7 @@ struct PracticeCategoryCardView: View {
                     .fontWeight(.bold)
                     .foregroundStyle(.secondary)
             }
-            .padding(16)
-            .background(Color(.secondarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .stroke(Color.primary.opacity(0.06), lineWidth: 1)
-            )
+            .appCard(radius: AppRadius.largeCard)
         }
         .buttonStyle(.plain)
     }

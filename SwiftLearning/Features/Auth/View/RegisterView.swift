@@ -17,8 +17,8 @@ struct RegisterView: View {
             form
             Spacer()
         }
-        .padding(24)
-        .background(Color(.systemGroupedBackground))
+        .padding(AppSpacing.expandedScreen)
+        .background(AppColors.screenBackground)
         .navigationTitle(L10n.string("auth.register.navigationTitle"))
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -40,24 +40,18 @@ struct RegisterView: View {
         VStack(spacing: 16) {
             TextField(L10n.string("auth.field.name"), text: $viewModel.name)
                 .textContentType(.name)
-                .padding(14)
-                .background(Color(.secondarySystemGroupedBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .appInputField()
 
             TextField(L10n.string("auth.field.email"), text: $viewModel.email)
                 .textContentType(.emailAddress)
                 .keyboardType(.emailAddress)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
-                .padding(14)
-                .background(Color(.secondarySystemGroupedBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .appInputField()
 
             SecureField(L10n.string("auth.field.password"), text: $viewModel.password)
                 .textContentType(.newPassword)
-                .padding(14)
-                .background(Color(.secondarySystemGroupedBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .appInputField()
 
             if let errorMessage = viewModel.state.errorMessage {
                 Text(errorMessage)

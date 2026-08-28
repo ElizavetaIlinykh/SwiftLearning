@@ -44,12 +44,9 @@ struct EmptyStateView<Action: View>: View {
             action
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(20)
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+        .appCard(
+            radius: AppRadius.largeCard,
+            padding: AppSpacing.section
         )
     }
 }

@@ -20,9 +20,9 @@ struct LearnView: View {
 
                 content
             }
-            .padding(20)
+            .padding(AppSpacing.screen)
         }
-        .background(Color(.systemGroupedBackground))
+        .background(AppColors.screenBackground)
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await viewModel.fetchLessons()

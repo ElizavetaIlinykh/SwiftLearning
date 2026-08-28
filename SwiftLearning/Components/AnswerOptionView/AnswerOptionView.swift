@@ -20,13 +20,11 @@ struct AnswerOptionView: View {
                         .foregroundStyle(iconColor)
                 }
             }
-            .padding(16)
             .frame(minHeight: 58)
-            .background(backgroundColor)
-            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .stroke(borderColor, lineWidth: 1.5)
+            .appCard(
+                background: backgroundColor,
+                borderColor: borderColor,
+                lineWidth: 1.5
             )
         }
         .buttonStyle(.plain)
@@ -37,11 +35,11 @@ struct AnswerOptionView: View {
     private var backgroundColor: Color {
         switch viewModel.state {
         case .neutral:
-            Color(.secondarySystemGroupedBackground)
+            AppColors.cardBackground
         case .selectedCorrect, .correct:
-            Color.green.opacity(0.13)
+            Color.green.opacity(AppOpacity.selectedFill)
         case .selectedIncorrect:
-            Color.red.opacity(0.13)
+            Color.red.opacity(AppOpacity.selectedFill)
         }
     }
 

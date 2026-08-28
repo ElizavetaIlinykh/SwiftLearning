@@ -25,12 +25,9 @@ struct ProgressCardView: View {
 
             footer
         }
-        .padding(20)
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+        .appCard(
+            radius: AppRadius.largeCard,
+            padding: AppSpacing.section
         )
     }
 
@@ -51,8 +48,10 @@ struct ProgressCardView: View {
             }
             .frame(maxWidth: .infinity)
             .frame(height: 54)
-            .background(Color.green.opacity(0.12))
-            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .appRoundedBackground(
+                Color.green.opacity(AppOpacity.tintFill),
+                radius: AppRadius.card
+            )
 
         case .notStarted:
             PrimaryButtonView(title: L10n.string("learn.progress.startLearning")) {

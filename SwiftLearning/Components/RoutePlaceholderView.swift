@@ -10,7 +10,7 @@ struct RoutePlaceholderView: View {
             .font(.title2)
             .fontWeight(.semibold)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color(.systemGroupedBackground))
+            .background(AppColors.screenBackground)
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
     }

@@ -18,9 +18,9 @@ struct LessonQuizRouteView: View {
             VStack(alignment: .leading, spacing: 24) {
                 content
             }
-            .padding(20)
+            .padding(AppSpacing.screen)
         }
-        .background(Color(.systemGroupedBackground))
+        .background(AppColors.screenBackground)
         .navigationTitle(L10n.string("quiz.navigationTitle"))
         .navigationBarTitleDisplayMode(.inline)
         .task {

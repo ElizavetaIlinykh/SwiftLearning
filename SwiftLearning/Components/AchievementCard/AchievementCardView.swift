@@ -12,7 +12,7 @@ struct AchievementCardView: View {
                 .foregroundStyle(iconColor)
                 .frame(width: 48, height: 48)
                 .background(iconBackground)
-                .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: AppRadius.control, style: .continuous))
 
             VStack(alignment: .leading, spacing: 5) {
                 Text(viewModel.title)
@@ -31,12 +31,10 @@ struct AchievementCardView: View {
                 .font(.headline)
                 .foregroundStyle(viewModel.isUnlocked ? .green : .secondary)
         }
-        .padding(16)
-        .background(cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(borderColor, lineWidth: 1)
+        .appCard(
+            background: cardBackground,
+            borderColor: borderColor,
+            radius: AppRadius.largeCard
         )
         .opacity(viewModel.isUnlocked ? 1 : 0.68)
     }
@@ -48,7 +46,7 @@ struct AchievementCardView: View {
     }
 
     private var iconBackground: Color {
-        viewModel.isUnlocked ? Color.accentColor.opacity(0.12) : Color.secondary.opacity(0.10)
+        viewModel.isUnlocked ? AppColors.accentFill : AppColors.secondaryBorder
     }
 
     private var titleColor: Color {
@@ -56,11 +54,11 @@ struct AchievementCardView: View {
     }
 
     private var cardBackground: Color {
-        viewModel.isUnlocked ? Color(.secondarySystemGroupedBackground) : Color.secondary.opacity(0.08)
+        viewModel.isUnlocked ? AppColors.cardBackground : AppColors.secondaryFill
     }
 
     private var borderColor: Color {
-        viewModel.isUnlocked ? Color.primary.opacity(0.06) : Color.secondary.opacity(0.12)
+        viewModel.isUnlocked ? AppColors.hairlineBorder : AppColors.secondaryBorder
     }
 }
 

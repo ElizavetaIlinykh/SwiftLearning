@@ -20,9 +20,9 @@ struct PracticeView: View {
                 infoCard
                 content
             }
-            .padding(20)
+            .padding(AppSpacing.screen)
         }
-        .background(Color(.systemGroupedBackground))
+        .background(AppColors.screenBackground)
         .navigationTitle(L10n.string("practice.navigationTitle"))
         .navigationBarTitleDisplayMode(.inline)
         .task {
@@ -76,8 +76,7 @@ struct PracticeView: View {
                 .font(.system(size: 28, weight: .semibold))
                 .foregroundStyle(Color.accentColor)
                 .frame(width: 58, height: 58)
-                .background(Color.accentColor.opacity(0.12))
-                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .appRoundedBackground(AppColors.accentFill, radius: AppRadius.largeCard)
 
             VStack(alignment: .leading, spacing: 6) {
                 Text(L10n.string("practice.header.title"))
@@ -102,12 +101,9 @@ struct PracticeView: View {
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(18)
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+        .appCard(
+            radius: AppRadius.largeCard,
+            padding: AppSpacing.section
         )
     }
 

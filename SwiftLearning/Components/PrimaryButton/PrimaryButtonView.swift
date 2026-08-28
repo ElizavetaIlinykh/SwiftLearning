@@ -35,7 +35,7 @@ struct PrimaryButtonView: View {
                 .frame(maxWidth: .infinity)
                 .frame(height: 54)
                 .background(Color.accentColor)
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: AppRadius.card, style: .continuous))
         }
         .buttonStyle(.plain)
     }

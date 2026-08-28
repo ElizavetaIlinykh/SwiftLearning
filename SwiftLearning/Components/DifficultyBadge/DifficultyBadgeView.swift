@@ -45,7 +45,7 @@ struct DifficultyBadgeView: View {
     }
 
     private var backgroundColor: Color {
-        foregroundColor.opacity(0.13)
+        foregroundColor.opacity(AppOpacity.selectedFill)
     }
 }
 

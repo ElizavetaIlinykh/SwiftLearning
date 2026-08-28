@@ -60,12 +60,9 @@ struct PracticeResultView: View {
                     .foregroundStyle(Color.accentColor)
             }
             .frame(maxWidth: .infinity)
-            .padding(24)
-            .background(Color(.secondarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+            .appCard(
+                radius: AppRadius.largeCard,
+                padding: AppSpacing.expandedScreen
             )
 
             Spacer()
@@ -84,9 +81,9 @@ struct PracticeResultView: View {
                 .frame(height: 48)
             }
         }
-        .padding(24)
+        .padding(AppSpacing.expandedScreen)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(.systemGroupedBackground))
+        .background(AppColors.screenBackground)
         .navigationBarBackButtonHidden(true)
     }
 }

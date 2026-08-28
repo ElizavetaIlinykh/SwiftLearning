@@ -11,8 +11,7 @@ struct StatCardView: View {
                 .font(.headline)
                 .foregroundStyle(Color.accentColor)
                 .frame(width: 34, height: 34)
-                .background(Color.accentColor.opacity(0.12))
-                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .appRoundedBackground(AppColors.accentFill, radius: AppRadius.field)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(viewModel.title)
@@ -28,13 +27,7 @@ struct StatCardView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(16)
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(Color.primary.opacity(0.06), lineWidth: 1)
-        )
+        .appCard(radius: AppRadius.largeCard)
     }
 }
 

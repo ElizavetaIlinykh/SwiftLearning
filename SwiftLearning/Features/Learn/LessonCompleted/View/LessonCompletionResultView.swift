@@ -43,8 +43,10 @@ struct LessonCompletionResultView: View {
                 .foregroundStyle(.green)
                 .padding(.horizontal, 22)
                 .padding(.vertical, 12)
-                .background(Color.green.opacity(0.12))
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .appRoundedBackground(
+                    Color.green.opacity(AppOpacity.tintFill),
+                    radius: AppRadius.card
+                )
 
             Spacer()
 
@@ -52,9 +54,9 @@ struct LessonCompletionResultView: View {
                 viewModel.continueLearning()
             }
         }
-        .padding(24)
+        .padding(AppSpacing.expandedScreen)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(.systemGroupedBackground))
+        .background(AppColors.screenBackground)
         .navigationBarBackButtonHidden(true)
         .onAppear {
             isVisible = true

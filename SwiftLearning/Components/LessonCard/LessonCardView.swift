@@ -14,8 +14,7 @@ struct LessonCardView: View {
                     .fontWeight(.bold)
                     .foregroundStyle(numberColor)
                     .frame(width: 44, height: 44)
-                    .background(numberBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .appRoundedBackground(numberBackground, radius: AppRadius.control)
 
                 VStack(alignment: .leading, spacing: 6) {
                     Text(viewModel.title)
@@ -31,12 +30,11 @@ struct LessonCardView: View {
 
                 stateView
             }
-            .padding(16)
-            .background(cardBackground)
-            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .stroke(borderColor, lineWidth: viewModel.state == .current ? 1.5 : 1)
+            .appCard(
+                background: cardBackground,
+                borderColor: borderColor,
+                radius: AppRadius.largeCard,
+                lineWidth: viewModel.state == .current ? 1.5 : 1
             )
             .opacity(viewModel.state == .locked ? 0.62 : 1)
         }
@@ -73,11 +71,11 @@ struct LessonCardView: View {
     private var cardBackground: Color {
         switch viewModel.state {
         case .completed:
-            Color.green.opacity(0.08)
+            Color.green.opacity(AppOpacity.subtleFill)
         case .current:
-            Color.accentColor.opacity(0.10)
+            AppColors.accentFill
         case .locked:
-            Color.secondary.opacity(0.08)
+            AppColors.secondaryFill
         }
     }
 
@@ -86,9 +84,9 @@ struct LessonCardView: View {
         case .completed:
             Color.green.opacity(0.22)
         case .current:
-            Color.accentColor.opacity(0.55)
+            Color.accentColor.opacity(AppOpacity.activeBorder)
         case .locked:
-            Color.secondary.opacity(0.12)
+            AppColors.secondaryBorder
         }
     }
 
@@ -101,7 +99,7 @@ struct LessonCardView: View {
     }
 
     private var numberBackground: Color {
-        viewModel.state == .locked ? Color.secondary.opacity(0.10) : Color.accentColor.opacity(0.13)
+        viewModel.state == .locked ? AppColors.secondaryBorder : AppColors.accentSelectedFill
     }
 }
 

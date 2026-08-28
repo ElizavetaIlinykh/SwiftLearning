@@ -17,8 +17,8 @@ struct LoginView: View {
             form
             Spacer()
         }
-        .padding(24)
-        .background(Color(.systemGroupedBackground))
+        .padding(AppSpacing.expandedScreen)
+        .background(AppColors.screenBackground)
         .navigationTitle(L10n.string("auth.login.title"))
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -43,15 +43,11 @@ struct LoginView: View {
                 .keyboardType(.emailAddress)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
-                .padding(14)
-                .background(Color(.secondarySystemGroupedBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .appInputField()
 
             SecureField(L10n.string("auth.field.password"), text: $viewModel.password)
                 .textContentType(.password)
-                .padding(14)
-                .background(Color(.secondarySystemGroupedBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .appInputField()
 
             if let errorMessage = viewModel.state.errorMessage {
                 Text(errorMessage)
