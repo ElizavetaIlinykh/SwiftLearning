@@ -23,8 +23,6 @@ struct PracticeView: View {
             .padding(AppSpacing.screen)
         }
         .background(AppColors.screenBackground)
-        .navigationTitle(L10n.string("practice.navigationTitle"))
-        .navigationBarTitleDisplayMode(.inline)
         .task {
             await viewModel.loadTopics()
         }

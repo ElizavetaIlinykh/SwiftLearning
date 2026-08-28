@@ -27,8 +27,6 @@ struct ProfileView: View {
             .padding(AppSpacing.screen)
         }
         .background(AppColors.screenBackground)
-        .navigationTitle(L10n.string("profile.navigationTitle"))
-        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 NavigationLink(value: ProfileRouter.Route.settings) {
