@@ -67,10 +67,6 @@ struct PracticeSessionView: View {
             VStack(alignment: .leading, spacing: 14) {
                 DifficultyBadgeView(difficulty: task.difficulty)
 
-                if !task.tags.isEmpty {
-                    TagsView(tags: task.tags)
-                }
-
                 Text(task.question)
                     .font(.title2)
                     .fontWeight(.bold)

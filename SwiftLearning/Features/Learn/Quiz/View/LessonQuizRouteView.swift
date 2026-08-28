@@ -69,10 +69,6 @@ struct LessonQuizRouteView: View {
         VStack(alignment: .leading, spacing: 10) {
             DifficultyBadgeView(difficulty: question.difficulty)
 
-            if !question.tags.isEmpty {
-                TagsView(tags: question.tags)
-            }
-
             Text("Quick Check")
                 .font(.largeTitle)
                 .fontWeight(.bold)
