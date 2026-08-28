@@ -11,5 +11,8 @@ struct MainCoordinatorView: View {
 }
 
 #Preview {
-    MainCoordinatorView(dependencies: AppDependenciesAssembler.assemble())
+    let dependencies = AppDependenciesAssembler.assemble()
+
+    MainCoordinatorView(dependencies: dependencies)
+        .environment(dependencies.languageSettings)
 }

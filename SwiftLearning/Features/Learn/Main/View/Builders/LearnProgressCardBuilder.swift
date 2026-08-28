@@ -7,7 +7,7 @@ struct LearnProgressCardBuilder {
 
     // MARK: - Init -
 
-    init(courseTitle: String = "Swift Basics") {
+    init(courseTitle: String = L10n.string("app.course.swiftBasics")) {
         self.courseTitle = courseTitle
     }
 
@@ -52,7 +52,7 @@ struct LearnProgressCardBuilder {
         completedLessonsCount: Int,
         totalLessonsCount: Int
     ) -> String {
-        "\(completedLessonsCount) of \(totalLessonsCount) lessons completed"
+        L10n.format("learn.progress.completedLessons", completedLessonsCount, totalLessonsCount)
     }
 
     private func state(

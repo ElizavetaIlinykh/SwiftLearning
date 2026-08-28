@@ -29,13 +29,14 @@ struct ProfileCoordinatorView: View {
     private func destination(for route: ProfileRouter.Route) -> some View {
         switch route {
         case .statistics:
-            RoutePlaceholderView(title: "Statistics")
+            RoutePlaceholderView(title: L10n.string("profile.placeholder.statistics"))
         case .settings:
-            RoutePlaceholderView(title: "Settings")
+            ProfileSettingsView()
         }
     }
 }
 
 #Preview {
     ProfileCoordinatorView(dependencies: AppDependenciesAssembler.assemble())
+        .environment(LanguageSettings())
 }

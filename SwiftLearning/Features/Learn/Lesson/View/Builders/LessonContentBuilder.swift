@@ -6,10 +6,10 @@ struct LessonContentBuilder {
     func build(lesson: LessonDetails) -> LessonContentViewModel {
         LessonContentViewModel(
             lessonID: lesson.id,
-            theorySectionTitle: "THEORY",
+            theorySectionTitle: L10n.string("lesson.section.theory"),
             title: lesson.title,
             theory: lesson.theory ?? "",
-            codeSectionTitle: "CODE EXAMPLE",
+            codeSectionTitle: L10n.string("lesson.section.codeExample"),
             codeExample: lesson.codeExample ?? ""
         )
     }

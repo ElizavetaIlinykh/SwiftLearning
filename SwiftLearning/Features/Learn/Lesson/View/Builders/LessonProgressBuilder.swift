@@ -8,7 +8,7 @@ struct LessonProgressBuilder {
         totalLessonsCount: Int
     ) -> LessonProgressViewModel {
         LessonProgressViewModel(
-            title: "Lesson \(lesson.order) of \(totalLessonsCount)",
+            title: L10n.format("lesson.progress.title", lesson.order, totalLessonsCount),
             valueTitle: "\(lesson.order) / \(totalLessonsCount)",
             progress: progress(
                 lessonOrder: lesson.order,

@@ -19,17 +19,17 @@ struct LoginView: View {
         }
         .padding(24)
         .background(Color(.systemGroupedBackground))
-        .navigationTitle("Login")
+        .navigationTitle(L10n.string("auth.login.title"))
         .navigationBarTitleDisplayMode(.inline)
     }
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Swift Learning")
+            Text(L10n.string("app.name"))
                 .font(.largeTitle)
                 .fontWeight(.bold)
 
-            Text("Sign in to continue learning Swift.")
+            Text(L10n.string("auth.login.subtitle"))
                 .font(.headline)
                 .foregroundStyle(.secondary)
         }
@@ -38,7 +38,7 @@ struct LoginView: View {
 
     private var form: some View {
         VStack(spacing: 16) {
-            TextField("Email", text: $viewModel.email)
+            TextField(L10n.string("auth.field.email"), text: $viewModel.email)
                 .textContentType(.emailAddress)
                 .keyboardType(.emailAddress)
                 .textInputAutocapitalization(.never)
@@ -47,7 +47,7 @@ struct LoginView: View {
                 .background(Color(.secondarySystemGroupedBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
 
-            SecureField("Password", text: $viewModel.password)
+            SecureField(L10n.string("auth.field.password"), text: $viewModel.password)
                 .textContentType(.password)
                 .padding(14)
                 .background(Color(.secondarySystemGroupedBackground))
@@ -67,7 +67,7 @@ struct LoginView: View {
             }
             .disabled(viewModel.state.isLoading)
 
-            Button("Create an account") {
+            Button(L10n.string("auth.login.createAccount")) {
                 viewModel.openRegistration()
             }
             .font(.headline)

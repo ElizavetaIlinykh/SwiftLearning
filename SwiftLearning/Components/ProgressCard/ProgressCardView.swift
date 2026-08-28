@@ -44,7 +44,7 @@ struct ProgressCardView: View {
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundStyle(.green)
 
-                Text("Course Completed")
+                Text(L10n.string("learn.progress.courseCompleted"))
                     .font(.headline)
                     .fontWeight(.semibold)
                     .foregroundStyle(.green)
@@ -55,12 +55,12 @@ struct ProgressCardView: View {
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
 
         case .notStarted:
-            PrimaryButtonView(title: "Start Learning") {
+            PrimaryButtonView(title: L10n.string("learn.progress.startLearning")) {
                 onAction(.startLearning)
             }
 
         case .inProgress:
-            PrimaryButtonView(title: "Continue Learning") {
+            PrimaryButtonView(title: L10n.string("learn.progress.continueLearning")) {
                 onAction(.continueLearning)
             }
         }

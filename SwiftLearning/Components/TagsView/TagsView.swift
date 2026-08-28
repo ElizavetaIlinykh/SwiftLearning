@@ -20,7 +20,7 @@ struct TagsView: View {
             }
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Tags: \(tags.joined(separator: ", "))")
+        .accessibilityLabel(L10n.format("tags.accessibility", tags.joined(separator: ", ")))
     }
 }
 

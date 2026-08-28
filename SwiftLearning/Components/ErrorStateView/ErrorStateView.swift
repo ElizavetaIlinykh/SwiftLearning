@@ -11,7 +11,7 @@ struct ErrorStateView: View {
     init(
         title: String,
         message: String,
-        retryTitle: String = "Try Again",
+        retryTitle: String = L10n.string("common.tryAgain"),
         retryAction: @escaping () -> Void
     ) {
         self.init(

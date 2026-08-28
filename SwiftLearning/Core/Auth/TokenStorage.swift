@@ -102,9 +102,9 @@ enum TokenStorageError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidStoredToken:
-            "Stored access token is invalid."
+            L10n.string("error.token.invalidStoredToken")
         case let .keychainStatus(status):
-            "Keychain operation failed with status \(status)."
+            L10n.format("error.token.keychainStatus", status)
         }
     }
 }

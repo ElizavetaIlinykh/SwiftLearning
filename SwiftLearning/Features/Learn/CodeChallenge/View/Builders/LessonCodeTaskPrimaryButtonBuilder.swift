@@ -39,7 +39,7 @@ struct LessonCodeTaskPrimaryButtonBuilder {
 
     private func checkAnswerButton() -> LessonCodeTaskPrimaryButtonViewModel {
         LessonCodeTaskPrimaryButtonViewModel(
-            title: "Check Answer",
+            title: L10n.string("codeTask.checkAnswer"),
             isDisabled: false,
             action: .checkAnswer
         )
@@ -58,7 +58,7 @@ struct LessonCodeTaskPrimaryButtonBuilder {
     private func completionButtonTitle(
         completionState: LessonCompletionState
     ) -> String {
-        isCompleting(completionState: completionState) ? "Completing..." : "Finish Lesson"
+        isCompleting(completionState: completionState) ? L10n.string("codeTask.completing") : L10n.string("codeTask.finishLesson")
     }
 
     private func isCompleting(

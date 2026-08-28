@@ -19,17 +19,17 @@ struct RegisterView: View {
         }
         .padding(24)
         .background(Color(.systemGroupedBackground))
-        .navigationTitle("Register")
+        .navigationTitle(L10n.string("auth.register.navigationTitle"))
         .navigationBarTitleDisplayMode(.inline)
     }
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Create Account")
+            Text(L10n.string("auth.register.title"))
                 .font(.largeTitle)
                 .fontWeight(.bold)
 
-            Text("Register once and your progress will stay with your account.")
+            Text(L10n.string("auth.register.subtitle"))
                 .font(.headline)
                 .foregroundStyle(.secondary)
         }
@@ -38,13 +38,13 @@ struct RegisterView: View {
 
     private var form: some View {
         VStack(spacing: 16) {
-            TextField("Name", text: $viewModel.name)
+            TextField(L10n.string("auth.field.name"), text: $viewModel.name)
                 .textContentType(.name)
                 .padding(14)
                 .background(Color(.secondarySystemGroupedBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
 
-            TextField("Email", text: $viewModel.email)
+            TextField(L10n.string("auth.field.email"), text: $viewModel.email)
                 .textContentType(.emailAddress)
                 .keyboardType(.emailAddress)
                 .textInputAutocapitalization(.never)
@@ -53,7 +53,7 @@ struct RegisterView: View {
                 .background(Color(.secondarySystemGroupedBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
 
-            SecureField("Password", text: $viewModel.password)
+            SecureField(L10n.string("auth.field.password"), text: $viewModel.password)
                 .textContentType(.newPassword)
                 .padding(14)
                 .background(Color(.secondarySystemGroupedBackground))
@@ -73,7 +73,7 @@ struct RegisterView: View {
             }
             .disabled(viewModel.state.isLoading)
 
-            Button("Back to login") {
+            Button(L10n.string("auth.register.backToLogin")) {
                 viewModel.openLogin()
             }
             .font(.headline)

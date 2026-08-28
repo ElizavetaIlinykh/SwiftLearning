@@ -6,10 +6,10 @@ struct AnswerExplanationViewModel {
     let correctAnswer: String?
 
     var accessibilityLabel: String {
-        var parts = [isCorrect ? "Correct" : "Incorrect"]
+        var parts = [isCorrect ? L10n.string("answer.correct") : L10n.string("answer.incorrect")]
 
         if let correctAnswer {
-            parts.append("Correct answer: \(correctAnswer)")
+            parts.append(L10n.format("answer.correctAnswer", correctAnswer))
         }
 
         parts.append(explanation)

@@ -13,7 +13,7 @@ struct DifficultyBadgeView: View {
             .padding(.vertical, 6)
             .background(backgroundColor)
             .clipShape(Capsule())
-            .accessibilityLabel("Difficulty: \(title)")
+            .accessibilityLabel(L10n.format("difficulty.accessibility", title))
     }
 
     // MARK: - Private properties -
@@ -21,13 +21,13 @@ struct DifficultyBadgeView: View {
     private var title: String {
         switch difficulty {
         case .easy:
-            "Easy"
+            L10n.string("difficulty.easy")
         case .medium:
-            "Medium"
+            L10n.string("difficulty.medium")
         case .hard:
-            "Hard"
+            L10n.string("difficulty.hard")
         case .unknown:
-            "Unknown"
+            L10n.string("difficulty.unknown")
         }
     }
 

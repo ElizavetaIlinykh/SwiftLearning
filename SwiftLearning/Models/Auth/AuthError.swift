@@ -13,13 +13,13 @@ enum AuthError: LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .invalidCredentials:
-            "Incorrect email or password."
+            L10n.string("auth.error.invalidCredentials")
         case .emailAlreadyUsed:
-            "This email is already registered."
+            L10n.string("auth.error.emailAlreadyUsed")
         case .invalidInput:
-            "Please check the entered data."
+            L10n.string("auth.error.invalidInput")
         case .unauthorized, .missingSession:
-            "Please sign in to continue."
+            L10n.string("auth.error.unauthorized")
         case let .requestFailed(message):
             message
         }

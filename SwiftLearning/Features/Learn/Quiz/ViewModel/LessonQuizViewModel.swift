@@ -104,10 +104,10 @@ final class LessonQuizViewModel: ObservableObject {
         return .content(
             LessonQuizContentViewModel(
                 question: questionWithAnswerStates(currentQuestion),
-                progressTitle: "Question \(currentQuestionIndex + 1) of \(questions.count)",
+                progressTitle: L10n.format("quiz.progress.title", currentQuestionIndex + 1, questions.count),
                 progressValue: Double(currentQuestionIndex + 1) / Double(questions.count),
                 isAnswered: isAnswered,
-                primaryButtonTitle: isLastQuestion ? "Continue" : "Next Question",
+                primaryButtonTitle: isLastQuestion ? L10n.string("common.continue") : L10n.string("quiz.nextQuestion"),
                 answerExplanationViewModel: answerExplanationViewModel(for: currentQuestion)
             )
         )

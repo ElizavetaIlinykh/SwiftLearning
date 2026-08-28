@@ -27,11 +27,20 @@ struct ProfileView: View {
             .padding(20)
         }
         .background(Color(.systemGroupedBackground))
-        .navigationTitle("Profile")
+        .navigationTitle(L10n.string("profile.navigationTitle"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            Button("Logout") {
-                viewModel.logout()
+            ToolbarItem(placement: .topBarLeading) {
+                NavigationLink(value: ProfileRouter.Route.settings) {
+                    Image(systemName: "gearshape")
+                }
+                .accessibilityLabel(L10n.string("profile.settings"))
+            }
+
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(L10n.string("profile.logout")) {
+                    viewModel.logout()
+                }
             }
         }
         .task {
@@ -82,7 +91,7 @@ struct ProfileView: View {
 
     private func progressSection(viewModel: ProfileProgressViewModel) -> some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Your Progress")
+            Text(L10n.string("profile.yourProgress"))
                 .font(.title2)
                 .fontWeight(.bold)
 
@@ -123,11 +132,11 @@ struct ProfileView: View {
                 .foregroundStyle(.green)
 
             VStack(alignment: .leading, spacing: 3) {
-                Text("Course Completed")
+                Text(L10n.string("profile.courseCompleted.title"))
                     .font(.headline)
                     .foregroundStyle(.green)
 
-                Text("You finished Swift Basics!")
+                Text(L10n.string("profile.courseCompleted.message"))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -140,7 +149,7 @@ struct ProfileView: View {
 
     private func statisticsSection(statistics: [StatCardViewModel]) -> some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Statistics")
+            Text(L10n.string("profile.statistics"))
                 .font(.title2)
                 .fontWeight(.bold)
 
@@ -154,7 +163,7 @@ struct ProfileView: View {
 
     private func achievementsSection(achievements: [AchievementCardViewModel]) -> some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Achievements")
+            Text(L10n.string("profile.achievements"))
                 .font(.title2)
                 .fontWeight(.bold)
 
@@ -167,12 +176,12 @@ struct ProfileView: View {
     }
 
     private var loadingView: some View {
-        LoadingStateView(title: "Loading profile")
+        LoadingStateView(title: L10n.string("profile.loading"))
     }
 
     private func errorView(message: String) -> some View {
         ErrorStateView(
-            title: "Could not load profile",
+            title: L10n.string("profile.error.load"),
             message: message
         ) {
             Task {

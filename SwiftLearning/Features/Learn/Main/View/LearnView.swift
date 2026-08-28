@@ -40,11 +40,11 @@ struct LearnView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Swift Learning")
+            Text(L10n.string("learn.header.title"))
                 .font(.largeTitle)
                 .fontWeight(.bold)
 
-            Text("Continue learning Swift")
+            Text(L10n.string("learn.header.subtitle"))
                 .font(.headline)
                 .foregroundStyle(.secondary)
         }
@@ -77,7 +77,7 @@ struct LearnView: View {
             )
 
             VStack(alignment: .leading, spacing: 14) {
-                Text("Course")
+                Text(L10n.string("learn.course.section"))
                     .font(.title2)
                     .fontWeight(.bold)
 
@@ -114,12 +114,12 @@ struct LearnView: View {
     }
 
     private var loadingView: some View {
-        LoadingStateView(title: "Loading lessons")
+        LoadingStateView(title: L10n.string("learn.loadingLessons"))
     }
 
     private func errorView(message: String) -> some View {
         ErrorStateView(
-            title: "Could not load lessons",
+            title: L10n.string("learn.error.loadLessons"),
             message: message
         ) {
             Task {
@@ -130,8 +130,8 @@ struct LearnView: View {
 
     private var emptyView: some View {
         EmptyStateView(
-            title: "No lessons yet",
-            message: "Lessons will appear here when the server returns them."
+            title: L10n.string("learn.empty.title"),
+            message: L10n.string("learn.empty.message")
         )
     }
 }

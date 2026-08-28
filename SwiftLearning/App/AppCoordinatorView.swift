@@ -22,7 +22,7 @@ struct AppCoordinatorView: View {
         Group {
             switch session.status {
             case .unknown:
-                ProgressView("Checking session")
+                ProgressView(L10n.string("app.checkingSession"))
             case .authenticated:
                 MainCoordinatorView(dependencies: dependencies)
             case .unauthenticated:
@@ -36,5 +36,8 @@ struct AppCoordinatorView: View {
 }
 
 #Preview {
-    AppCoordinatorView(dependencies: AppDependenciesAssembler.assemble())
+    let dependencies = AppDependenciesAssembler.assemble()
+
+    AppCoordinatorView(dependencies: dependencies)
+        .environment(dependencies.languageSettings)
 }

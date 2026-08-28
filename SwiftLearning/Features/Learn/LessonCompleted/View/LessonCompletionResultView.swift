@@ -26,18 +26,18 @@ struct LessonCompletionResultView: View {
                 .animation(.spring(response: 0.45, dampingFraction: 0.72), value: isVisible)
 
             VStack(spacing: 10) {
-                Text("Lesson Complete!")
+                Text(L10n.string("lessonResult.title"))
                     .font(.largeTitle)
                     .fontWeight(.bold)
                     .multilineTextAlignment(.center)
 
-                Text("Your progress has been saved.")
+                Text(L10n.string("lessonResult.message"))
                     .font(.headline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             }
 
-            Text("+20 XP")
+            Text(L10n.string("lessonResult.xp"))
                 .font(.title2)
                 .fontWeight(.bold)
                 .foregroundStyle(.green)
@@ -48,7 +48,7 @@ struct LessonCompletionResultView: View {
 
             Spacer()
 
-            PrimaryButtonView(title: "Continue") {
+            PrimaryButtonView(title: L10n.string("common.continue")) {
                 viewModel.continueLearning()
             }
         }

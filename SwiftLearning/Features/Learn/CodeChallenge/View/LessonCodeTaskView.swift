@@ -21,7 +21,7 @@ struct LessonCodeTaskView: View {
             .padding(20)
         }
         .background(Color(.systemGroupedBackground))
-        .navigationTitle("Code Task")
+        .navigationTitle(L10n.string("codeTask.navigationTitle"))
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await viewModel.loadCodeTask()
@@ -63,7 +63,7 @@ struct LessonCodeTaskView: View {
 
     private func codeTaskHeader(_ contentViewModel: LessonCodeTaskContentViewModel) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Code Task")
+            Text(L10n.string("codeTask.title"))
                 .font(.largeTitle)
                 .fontWeight(.bold)
 
@@ -103,12 +103,12 @@ struct LessonCodeTaskView: View {
 
     private var answerSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("ANSWER")
+            Text(L10n.string("codeTask.answerSection"))
                 .font(.caption)
                 .fontWeight(.bold)
                 .foregroundStyle(.secondary)
 
-            TextField("Enter missing code", text: $viewModel.answer)
+            TextField(L10n.string("codeTask.answerPlaceholder"), text: $viewModel.answer)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .font(.body.monospaced())
@@ -125,20 +125,20 @@ struct LessonCodeTaskView: View {
 
     private var noCodeTaskView: some View {
         EmptyStateView(
-            title: "No code task",
-            message: "Continue to complete this lesson."
+            title: L10n.string("codeTask.noTask.title"),
+            message: L10n.string("codeTask.noTask.message")
         ) {
             primaryButton
         }
     }
 
     private var loadingView: some View {
-        LoadingStateView(title: "Loading code task")
+        LoadingStateView(title: L10n.string("codeTask.loading"))
     }
 
     private func errorView(message: String) -> some View {
         ErrorStateView(
-            title: "Could not load code task",
+            title: L10n.string("codeTask.error.load"),
             message: message
         ) {
             Task {
@@ -154,13 +154,13 @@ struct LessonCodeTaskView: View {
             EmptyView()
         case .correct:
             statusView(
-                title: "Great job!",
-                message: "You completed the task.",
+                title: L10n.string("codeTask.completed.title"),
+                message: L10n.string("codeTask.completed.message"),
                 systemImage: "checkmark.circle.fill",
                 color: .green
             )
         case .incorrect:
-            Text("Try again")
+            Text(L10n.string("codeTask.tryAgain"))
                 .font(.headline)
                 .foregroundStyle(.red)
                 .frame(maxWidth: .infinity, alignment: .leading)

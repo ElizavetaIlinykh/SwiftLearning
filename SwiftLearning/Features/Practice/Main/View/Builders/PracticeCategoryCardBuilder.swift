@@ -16,7 +16,7 @@ struct PracticeCategoryCardBuilder {
             id: category.id,
             title: category.title,
             description: category.description,
-            tasksCountTitle: "\(category.tasksCount) tasks",
+            tasksCountTitle: L10n.format("practice.tasksCount", category.tasksCount),
             systemImage: category.systemImage
         )
     }

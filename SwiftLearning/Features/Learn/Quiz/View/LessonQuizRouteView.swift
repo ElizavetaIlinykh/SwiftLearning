@@ -21,7 +21,7 @@ struct LessonQuizRouteView: View {
             .padding(20)
         }
         .background(Color(.systemGroupedBackground))
-        .navigationTitle("Quiz")
+        .navigationTitle(L10n.string("quiz.navigationTitle"))
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await viewModel.loadQuestions()
@@ -69,7 +69,7 @@ struct LessonQuizRouteView: View {
         VStack(alignment: .leading, spacing: 10) {
             DifficultyBadgeView(difficulty: question.difficulty)
 
-            Text("Quick Check")
+            Text(L10n.string("quiz.quickCheck"))
                 .font(.largeTitle)
                 .fontWeight(.bold)
 
@@ -115,12 +115,12 @@ struct LessonQuizRouteView: View {
     }
 
     private var loadingView: some View {
-        LoadingStateView(title: "Loading questions")
+        LoadingStateView(title: L10n.string("quiz.loadingQuestions"))
     }
 
     private func errorView(message: String) -> some View {
         ErrorStateView(
-            title: "Could not load questions",
+            title: L10n.string("quiz.error.loadQuestions"),
             message: message
         ) {
             Task {
@@ -131,10 +131,10 @@ struct LessonQuizRouteView: View {
 
     private var emptyView: some View {
         EmptyStateView(
-            title: "No questions yet",
-            message: "Continue to the code task."
+            title: L10n.string("quiz.empty.title"),
+            message: L10n.string("quiz.empty.message")
         ) {
-            PrimaryButtonView(title: "Continue") {
+            PrimaryButtonView(title: L10n.string("common.continue")) {
                 viewModel.openCodeTask()
             }
         }

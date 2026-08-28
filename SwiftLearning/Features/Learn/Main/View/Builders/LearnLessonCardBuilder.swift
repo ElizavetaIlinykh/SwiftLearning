@@ -32,6 +32,6 @@ struct LearnLessonCardBuilder {
     }
 
     private func actionTitle(for lesson: LessonSummary) -> String {
-        lesson.order == 1 ? "Start" : "Continue"
+        lesson.order == 1 ? L10n.string("learn.lesson.start") : L10n.string("learn.lesson.continue")
     }
 }

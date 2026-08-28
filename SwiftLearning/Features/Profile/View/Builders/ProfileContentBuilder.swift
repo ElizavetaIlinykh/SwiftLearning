@@ -19,7 +19,7 @@ struct ProfileContentBuilder {
 
     private func progressViewModel(statistics: UserStatistics) -> ProfileProgressViewModel {
         ProfileProgressViewModel(
-            title: "\(statistics.completedLessonsCount) of \(statistics.totalLessonsCount) lessons completed",
+            title: L10n.format("learn.progress.completedLessons", statistics.completedLessonsCount, statistics.totalLessonsCount),
             percentTitle: "\(statistics.progressPercent)%",
             progress: Double(statistics.progressPercent) / 100,
             isCourseCompleted: isCourseCompleted(statistics)
@@ -28,13 +28,13 @@ struct ProfileContentBuilder {
 
     private func statisticCards(statistics: UserStatistics) -> [StatCardViewModel] {
         [
-            StatCardViewModel(title: "Level", value: "\(statistics.currentLevel)", systemImage: "bolt.fill"),
+            StatCardViewModel(title: L10n.string("profile.stat.level"), value: "\(statistics.currentLevel)", systemImage: "bolt.fill"),
             StatCardViewModel(
-                title: "Lessons",
+                title: L10n.string("profile.stat.lessons"),
                 value: "\(statistics.completedLessonsCount) / \(statistics.totalLessonsCount)",
                 systemImage: "book.fill"
             ),
-            StatCardViewModel(title: "Progress", value: "\(statistics.progressPercent)%", systemImage: "target")
+            StatCardViewModel(title: L10n.string("profile.stat.progress"), value: "\(statistics.progressPercent)%", systemImage: "target")
         ]
     }
 
@@ -44,29 +44,29 @@ struct ProfileContentBuilder {
         return [
             AchievementCardViewModel(
                 id: "first-step",
-                title: "First Step",
-                description: "Complete your first lesson",
+                title: L10n.string("profile.achievement.firstStep.title"),
+                description: L10n.string("profile.achievement.firstStep.description"),
                 systemImage: "figure.walk",
                 isUnlocked: completedCount >= 1
             ),
             AchievementCardViewModel(
                 id: "swift-beginner",
-                title: "Swift Beginner",
-                description: "Complete 3 lessons",
+                title: L10n.string("profile.achievement.swiftBeginner.title"),
+                description: L10n.string("profile.achievement.swiftBeginner.description"),
                 systemImage: "chevron.left.forwardslash.chevron.right",
                 isUnlocked: completedCount >= 3
             ),
             AchievementCardViewModel(
                 id: "halfway-there",
-                title: "Halfway There",
-                description: "Complete 4 lessons",
+                title: L10n.string("profile.achievement.halfwayThere.title"),
+                description: L10n.string("profile.achievement.halfwayThere.description"),
                 systemImage: "flag.fill",
                 isUnlocked: completedCount >= 4
             ),
             AchievementCardViewModel(
                 id: "swift-explorer",
-                title: "Swift Explorer",
-                description: "Complete all lessons",
+                title: L10n.string("profile.achievement.swiftExplorer.title"),
+                description: L10n.string("profile.achievement.swiftExplorer.description"),
                 systemImage: "trophy.fill",
                 isUnlocked: isCourseCompleted(statistics)
             )

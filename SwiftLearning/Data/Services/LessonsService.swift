@@ -11,9 +11,9 @@ enum LessonCodeTaskError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .notFound:
-            "No code task is available for this lesson."
+            L10n.string("error.codeTask.notFound")
         case .missingProgress:
-            "Lesson completion did not return progress."
+            L10n.string("error.lesson.missingProgress")
         }
     }
 }

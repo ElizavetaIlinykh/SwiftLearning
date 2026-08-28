@@ -19,7 +19,7 @@ final class LessonViewModel: ObservableObject {
     @Published private(set) var state: LessonViewState = .loading
 
     var navigationTitle: String {
-        guard case let .content(_, contentViewModel) = state else { return "Lesson" }
+        guard case let .content(_, contentViewModel) = state else { return L10n.string("lesson.navigationTitle") }
         return contentViewModel.title
     }
 

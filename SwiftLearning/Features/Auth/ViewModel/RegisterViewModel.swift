@@ -16,7 +16,7 @@ final class RegisterViewModel: ObservableObject {
     @Published private(set) var state: AuthFormState = .idle
 
     var buttonTitle: String {
-        state.isLoading ? "Creating..." : "Register"
+        state.isLoading ? L10n.string("auth.register.creating") : L10n.string("auth.register.navigationTitle")
     }
 
     // MARK: - Init -

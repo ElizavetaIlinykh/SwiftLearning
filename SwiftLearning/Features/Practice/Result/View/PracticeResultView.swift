@@ -17,13 +17,13 @@ struct PracticeResultView: View {
     private var resultMessage: String {
         switch progress.scorePercent {
         case 100:
-            "Perfect!"
+            L10n.string("practice.result.perfect")
         case 80 ... 99:
-            "Great work!"
+            L10n.string("practice.result.great")
         case 60 ... 79:
-            "Good progress!"
+            L10n.string("practice.result.good")
         default:
-            "Keep practicing!"
+            L10n.string("practice.result.keepPracticing")
         }
     }
 
@@ -36,7 +36,7 @@ struct PracticeResultView: View {
                 .foregroundStyle(progress.scorePercent >= 60 ? .green : Color.accentColor)
 
             VStack(spacing: 10) {
-                Text("Practice Complete")
+                Text(L10n.string("practice.result.title"))
                     .font(.largeTitle)
                     .fontWeight(.bold)
                     .multilineTextAlignment(.center)
@@ -50,7 +50,7 @@ struct PracticeResultView: View {
                 Text("\(progress.correctAnswersCount) / \(progress.totalAnswersCount)")
                     .font(.system(size: 54, weight: .bold, design: .rounded))
 
-                Text("\(progress.scorePercent)% correct")
+                Text(L10n.format("practice.result.correctPercent", progress.scorePercent))
                     .font(.headline)
                     .foregroundStyle(.secondary)
 
@@ -71,11 +71,11 @@ struct PracticeResultView: View {
             Spacer()
 
             VStack(spacing: 12) {
-                PrimaryButtonView(title: "Practice Again") {
+                PrimaryButtonView(title: L10n.string("practice.result.practiceAgain")) {
                     onAction(.practiceAgain)
                 }
 
-                Button("Done") {
+                Button(L10n.string("common.done")) {
                     onAction(.done)
                 }
                 .font(.headline)

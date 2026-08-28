@@ -23,7 +23,7 @@ struct PracticeView: View {
             .padding(20)
         }
         .background(Color(.systemGroupedBackground))
-        .navigationTitle("Practice")
+        .navigationTitle(L10n.string("practice.navigationTitle"))
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await viewModel.loadTopics()
@@ -80,11 +80,11 @@ struct PracticeView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
 
             VStack(alignment: .leading, spacing: 6) {
-                Text("Practice Swift")
+                Text(L10n.string("practice.header.title"))
                     .font(.largeTitle)
                     .fontWeight(.bold)
 
-                Text("Improve your skills with quick challenges")
+                Text(L10n.string("practice.header.subtitle"))
                     .font(.headline)
                     .foregroundStyle(.secondary)
             }
@@ -94,10 +94,10 @@ struct PracticeView: View {
 
     private var infoCard: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Quick Practice")
+            Text(L10n.string("practice.info.title"))
                 .font(.headline)
 
-            Text("Answer questions and check your Swift knowledge.")
+            Text(L10n.string("practice.info.message"))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
@@ -112,7 +112,7 @@ struct PracticeView: View {
     }
 
     private var loadingView: some View {
-        LoadingStateView(title: "Loading practice topics")
+        LoadingStateView(title: L10n.string("practice.loadingTopics"))
     }
 
     // MARK: - Private methods -
@@ -133,7 +133,7 @@ struct PracticeView: View {
 
     private func errorView(message: String) -> some View {
         ErrorStateView(
-            title: "Could not load practice topics",
+            title: L10n.string("practice.error.loadTopics"),
             message: message
         ) {
             Task {
@@ -144,8 +144,8 @@ struct PracticeView: View {
 
     private var emptyView: some View {
         EmptyStateView(
-            title: "No practice topics yet",
-            message: "Topics will appear here when the server returns them."
+            title: L10n.string("practice.empty.title"),
+            message: L10n.string("practice.empty.message")
         )
     }
 }

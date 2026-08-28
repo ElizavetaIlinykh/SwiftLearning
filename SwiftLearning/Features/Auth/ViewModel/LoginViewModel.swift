@@ -15,7 +15,7 @@ final class LoginViewModel: ObservableObject {
     @Published private(set) var state: AuthFormState = .idle
 
     var buttonTitle: String {
-        state.isLoading ? "Signing In..." : "Login"
+        state.isLoading ? L10n.string("auth.login.signingIn") : L10n.string("auth.login.title")
     }
 
     // MARK: - Init -

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D75AFCEE3041D0BF003B950E /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D75AFCEA3041CC20003B950E /* Localizable.strings */; };
+		D75AFCEF3041D0C7003B950E /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D75AFCEC3041CC4F003B950E /* Localizable.strings */; };
 		D786B609303DDB5C00CBE45A /* PaginationManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D786B606303DDB5C00CBE45A /* PaginationManagerTests.swift */; };
 		D786B60A303DDB5C00CBE45A /* LearnViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D786B605303DDB5C00CBE45A /* LearnViewModelTests.swift */; };
 		D786B60B303DDB5C00CBE45A /* AuthSessionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D786B603303DDB5C00CBE45A /* AuthSessionTests.swift */; };
@@ -25,6 +27,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D75AFCEB3041CC20003B950E /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = Localizable.strings; sourceTree = "<group>"; };
+		D75AFCED3041CC4F003B950E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Localizable.strings; sourceTree = "<group>"; };
 		D786AFED30288D1000CBE45A /* SwiftLearning.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftLearning.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D786B5F2303DDAFC00CBE45A /* SwiftLearningTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftLearningTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D786B603303DDB5C00CBE45A /* AuthSessionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthSessionTests.swift; sourceTree = "<group>"; };
@@ -65,6 +69,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D75AFCE83041CBED003B950E /* ru.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				D75AFCEA3041CC20003B950E /* Localizable.strings */,
+			);
+			path = ru.lproj;
+			sourceTree = "<group>";
+		};
+		D75AFCE93041CBF0003B950E /* en.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				D75AFCEC3041CC4F003B950E /* Localizable.strings */,
+			);
+			path = en.lproj;
+			sourceTree = "<group>";
+		};
 		D786AFE430288D1000CBE45A = {
 			isa = PBXGroup;
 			children = (
@@ -72,6 +92,8 @@
 				D786B5F3303DDAFD00CBE45A /* SwiftLearningTests */,
 				D786AFEE30288D1000CBE45A /* Products */,
 				D786B608303DDB5C00CBE45A /* SwiftLearningTests */,
+				D75AFCE83041CBED003B950E /* ru.lproj */,
+				D75AFCE93041CBF0003B950E /* en.lproj */,
 			);
 			sourceTree = "<group>";
 		};
@@ -171,6 +193,7 @@
 			knownRegions = (
 				en,
 				Base,
+				ru,
 			);
 			mainGroup = D786AFE430288D1000CBE45A;
 			minimizedProjectReferenceProxies = 1;
@@ -193,6 +216,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D75AFCEF3041D0C7003B950E /* Localizable.strings in Resources */,
+				D75AFCEE3041D0BF003B950E /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -259,6 +284,25 @@
 			targetProxy = D786B5F6303DDAFD00CBE45A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		D75AFCEA3041CC20003B950E /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D75AFCEB3041CC20003B950E /* ru */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		D75AFCEC3041CC4F003B950E /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D75AFCED3041CC4F003B950E /* en */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		D786AFF630288D1200CBE45A /* Debug */ = {

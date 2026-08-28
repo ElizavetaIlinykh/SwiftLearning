@@ -11,13 +11,13 @@ struct AnswerExplanationView: View {
                 Image(systemName: viewModel.isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
                     .foregroundStyle(statusColor)
 
-                Text(viewModel.isCorrect ? "Correct" : "Incorrect")
+                Text(viewModel.isCorrect ? L10n.string("answer.correct") : L10n.string("answer.incorrect"))
                     .font(.headline)
                     .foregroundStyle(statusColor)
             }
 
             if let correctAnswer = viewModel.correctAnswer {
-                Text("Correct answer: \(correctAnswer)")
+                Text(L10n.format("answer.correctAnswer", correctAnswer))
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.primary)
             }

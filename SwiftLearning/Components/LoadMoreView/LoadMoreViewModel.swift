@@ -4,7 +4,7 @@ struct LoadMoreViewModel {
 
     init(
         state: LoadMoreView.State,
-        retryTitle: String = "Try Again"
+        retryTitle: String = L10n.string("common.tryAgain")
     ) {
         self.state = state
         self.retryTitle = retryTitle

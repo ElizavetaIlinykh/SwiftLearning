@@ -171,13 +171,13 @@ extension NetworkManager {
         var errorDescription: String? {
             switch self {
             case .invalidURL:
-                "Invalid URL."
+                L10n.string("error.network.invalidURL")
             case .invalidResponse:
-                "Invalid server response."
+                L10n.string("error.network.invalidResponse")
             case let .serverError(statusCode, _):
-                "Server returned status code \(statusCode)."
+                L10n.format("error.network.serverStatus", statusCode)
             case let .decodingFailed(error):
-                "Failed to decode response: \(error.localizedDescription)"
+                L10n.format("error.network.decode", error.localizedDescription)
             }
         }
     }

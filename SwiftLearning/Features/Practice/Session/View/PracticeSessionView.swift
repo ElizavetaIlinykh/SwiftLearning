@@ -114,7 +114,7 @@ struct PracticeSessionView: View {
     private func taskProgress(totalTasks: Int) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("Question \(currentTaskIndex + 1) of \(totalTasks)")
+                Text(L10n.format("practice.questionProgress", currentTaskIndex + 1, totalTasks))
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .foregroundStyle(.secondary)
@@ -169,12 +169,12 @@ struct PracticeSessionView: View {
     }
 
     private var loadingView: some View {
-        LoadingStateView(title: "Loading tasks")
+        LoadingStateView(title: L10n.string("practice.loadingTasks"))
     }
 
     private func errorView(message: String) -> some View {
         ErrorStateView(
-            title: "Could not load tasks",
+            title: L10n.string("practice.error.loadTasks"),
             message: message
         ) {
             Task {
@@ -185,10 +185,10 @@ struct PracticeSessionView: View {
 
     private var emptyView: some View {
         EmptyStateView(
-            title: "No tasks yet",
-            message: "Tasks will appear here when the server returns them."
+            title: L10n.string("practice.emptyTasks.title"),
+            message: L10n.string("practice.emptyTasks.message")
         ) {
-            Button("Done") {
+            Button(L10n.string("common.done")) {
                 viewModel.closePractice()
             }
             .font(.headline)
@@ -286,14 +286,14 @@ struct PracticeSessionView: View {
 
     private func actionButtonTitle(totalTasks: Int) -> String {
         if isSavingResult {
-            return "Saving..."
+            return L10n.string("common.saving")
         }
 
         if viewModel.isLoadingMoreTasks {
-            return "Loading..."
+            return L10n.string("common.loadingEllipsis")
         }
 
-        return isLastTask(totalTasks: totalTasks) && !viewModel.hasMoreTasks ? "See Results" : "Next Question"
+        return isLastTask(totalTasks: totalTasks) && !viewModel.hasMoreTasks ? L10n.string("practice.seeResults") : L10n.string("practice.nextQuestion")
     }
 
     private var isSavingResult: Bool {

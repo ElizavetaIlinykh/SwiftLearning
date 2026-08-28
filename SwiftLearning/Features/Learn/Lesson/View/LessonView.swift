@@ -83,7 +83,7 @@ struct LessonView: View {
                 )
             }
 
-            PrimaryButtonView(title: "Continue") {
+            PrimaryButtonView(title: L10n.string("common.continue")) {
                 viewModel.continueToQuiz(lessonID: contentViewModel.lessonID)
             }
         }
@@ -111,12 +111,12 @@ struct LessonView: View {
     }
 
     private var loadingView: some View {
-        LoadingStateView(title: "Loading lesson")
+        LoadingStateView(title: L10n.string("lesson.loading"))
     }
 
     private func errorView(message: String) -> some View {
         ErrorStateView(
-            title: "Could not load lesson",
+            title: L10n.string("lesson.error.load"),
             message: message
         ) {
             Task {

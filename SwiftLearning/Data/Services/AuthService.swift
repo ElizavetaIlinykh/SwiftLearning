@@ -80,13 +80,13 @@ final class AuthService: AuthServicing {
         if case let NetworkManager.NetworkError.serverError(statusCode, _) = error {
             switch statusCode {
             case 401:
-                return isRegister ? .requestFailed("Could not register this account.") : .invalidCredentials
+                return isRegister ? .requestFailed(L10n.string("auth.error.registerFailed")) : .invalidCredentials
             case 409:
                 return .emailAlreadyUsed
             case 422:
                 return .invalidInput
             default:
-                return .requestFailed("Request failed. Please try again.")
+                return .requestFailed(L10n.string("auth.error.requestFailed"))
             }
         }
 
