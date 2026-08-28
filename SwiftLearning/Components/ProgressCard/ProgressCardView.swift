@@ -4,7 +4,6 @@ struct ProgressCardView: View {
     // MARK: - Public properties -
 
     let viewModel: ProgressCardViewModel
-    let onAction: (ProgressCardAction) -> Void
 
     // MARK: - Public properties -
 
@@ -23,7 +22,9 @@ struct ProgressCardView: View {
             ProgressView(value: viewModel.progress)
                 .tint(.accentColor)
 
-            footer
+            if viewModel.state == .completed {
+                completedStateView
+            }
         }
         .appCard(
             radius: AppRadius.largeCard,
@@ -33,36 +34,22 @@ struct ProgressCardView: View {
 
     // MARK: - Private properties -
 
-    @ViewBuilder
-    private var footer: some View {
-        switch viewModel.state {
-        case .completed:
-            HStack(spacing: 10) {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
+    private var completedStateView: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "checkmark.circle.fill")
+                .foregroundStyle(.green)
 
-                Text(L10n.string("learn.progress.courseCompleted"))
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.green)
-            }
-            .frame(maxWidth: .infinity)
-            .frame(height: 54)
-            .appRoundedBackground(
-                Color.green.opacity(AppOpacity.tintFill),
-                radius: AppRadius.card
-            )
-
-        case .notStarted:
-            PrimaryButtonView(title: L10n.string("learn.progress.startLearning")) {
-                onAction(.startLearning)
-            }
-
-        case .inProgress:
-            PrimaryButtonView(title: L10n.string("learn.progress.continueLearning")) {
-                onAction(.continueLearning)
-            }
+            Text(L10n.string("learn.progress.courseCompleted"))
+                .font(.headline)
+                .fontWeight(.semibold)
+                .foregroundStyle(.green)
         }
+        .frame(maxWidth: .infinity)
+        .frame(height: 54)
+        .appRoundedBackground(
+            Color.green.opacity(AppOpacity.tintFill),
+            radius: AppRadius.card
+        )
     }
 }
 
@@ -75,8 +62,7 @@ struct ProgressCardView: View {
             totalLessonsCount: 8,
             progress: 0,
             state: .notStarted
-        ),
-        onAction: { _ in }
+        )
     )
     .padding()
     .background(Color(.systemGroupedBackground))

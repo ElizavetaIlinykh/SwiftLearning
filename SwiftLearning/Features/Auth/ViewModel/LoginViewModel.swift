@@ -43,6 +43,13 @@ final class LoginViewModel: ObservableObject {
         }
     }
 
+    func loginWithTemporaryCredentials() async {
+        // TODO: Remove temporary dev login credentials before release.
+        email = "lizik@example.com"
+        password = "lizik2903"
+        await login()
+    }
+
     func openRegistration() {
         output(.openRegistration)
     }

@@ -63,6 +63,17 @@ struct LoginView: View {
             }
             .disabled(viewModel.state.isLoading)
 
+            // TODO: Remove this temporary dev login button before release.
+            Button("Dev Login") {
+                Task {
+                    await viewModel.loginWithTemporaryCredentials()
+                }
+            }
+            .font(.headline)
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity)
+            .disabled(viewModel.state.isLoading)
+
             Button(L10n.string("auth.login.createAccount")) {
                 viewModel.openRegistration()
             }

@@ -36,7 +36,7 @@ struct LessonCardView: View {
                 radius: AppRadius.largeCard,
                 lineWidth: viewModel.state == .current ? 1.5 : 1
             )
-            .opacity(viewModel.state == .locked ? 0.62 : 1)
+            .opacity(viewModel.state == .locked ? 0.78 : 1)
         }
         .buttonStyle(.plain)
         .disabled(viewModel.state == .locked)
@@ -71,7 +71,7 @@ struct LessonCardView: View {
     private var cardBackground: Color {
         switch viewModel.state {
         case .completed:
-            Color.green.opacity(AppOpacity.subtleFill)
+            AppColors.cardBackground
         case .current:
             AppColors.accentFill
         case .locked:
@@ -82,7 +82,7 @@ struct LessonCardView: View {
     private var borderColor: Color {
         switch viewModel.state {
         case .completed:
-            Color.green.opacity(0.22)
+            AppColors.hairlineBorder
         case .current:
             Color.accentColor.opacity(AppOpacity.activeBorder)
         case .locked:
@@ -91,7 +91,14 @@ struct LessonCardView: View {
     }
 
     private var numberColor: Color {
-        viewModel.state == .locked ? .secondary : .accentColor
+        switch viewModel.state {
+        case .completed:
+            .green
+        case .current:
+            .accentColor
+        case .locked:
+            .secondary
+        }
     }
 
     private var titleColor: Color {
@@ -99,7 +106,14 @@ struct LessonCardView: View {
     }
 
     private var numberBackground: Color {
-        viewModel.state == .locked ? AppColors.secondaryBorder : AppColors.accentSelectedFill
+        switch viewModel.state {
+        case .completed:
+            Color.green.opacity(AppOpacity.tintFill)
+        case .current:
+            AppColors.accentSelectedFill
+        case .locked:
+            AppColors.secondaryBorder
+        }
     }
 }
 

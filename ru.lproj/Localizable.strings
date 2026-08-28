@@ -68,6 +68,8 @@
 "learn.header.title" = "Обучение Swift";
 "learn.header.subtitle" = "Продолжайте изучать Swift";
 "learn.course.section" = "Курс";
+"learn.currentLesson.section" = "Следующий урок";
+"learn.currentLesson.subtitle" = "Продолжите с урока, который доступен сейчас.";
 "learn.loadingLessons" = "Загружаем уроки";
 "learn.error.loadLessons" = "Не удалось загрузить уроки";
 "learn.empty.title" = "Уроков пока нет";

@@ -89,21 +89,10 @@ final class LearnViewModel: ObservableObject {
         openLesson(id: id)
     }
 
-    func handleProgressCardAction(_ action: ProgressCardAction) {
-        switch action {
-        case .startLearning, .continueLearning:
-            continueLearning()
-        }
-    }
-
     // MARK: - Private properties -
 
     private var sortedLessons: [LessonSummary] {
         lessons.sorted { $0.order < $1.order }
-    }
-
-    private var nextAvailableLesson: LessonSummary? {
-        sortedLessons.first { $0.status == .available }
     }
 
     private var loadMoreState: LoadMoreView.State {
@@ -145,14 +134,6 @@ final class LearnViewModel: ObservableObject {
         state = .content(
             makeContentViewModel(loadMoreState: loadMoreState)
         )
-    }
-
-    private func continueLearning() {
-        guard let lesson = nextAvailableLesson else {
-            return
-        }
-
-        openLesson(id: lesson.id)
     }
 
     private func openLesson(id: String) {

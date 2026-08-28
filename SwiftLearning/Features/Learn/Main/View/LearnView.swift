@@ -70,34 +70,114 @@ struct LearnView: View {
     }
 
     private func lessonsContent(_ contentViewModel: LearnContentViewModel) -> some View {
-        VStack(alignment: .leading, spacing: 20) {
-            ProgressCardView(
-                viewModel: contentViewModel.progressCard,
-                onAction: viewModel.handleProgressCardAction
-            )
+        let currentLesson = contentViewModel.lessonCards.first(where: isCurrentLesson)
+        let courseLessons = contentViewModel.lessonCards.filter { lesson in
+            lesson.id != currentLesson?.id
+        }
 
-            VStack(alignment: .leading, spacing: 14) {
-                Text(L10n.string("learn.course.section"))
+        return VStack(alignment: .leading, spacing: AppSpacing.section) {
+            ProgressCardView(viewModel: contentViewModel.progressCard)
+
+            if let currentLesson {
+                currentLessonSection(currentLesson)
+            }
+
+            courseSection(
+                lessons: courseLessons,
+                loadMoreState: contentViewModel.loadMoreState
+            )
+        }
+    }
+
+    private func currentLessonSection(_ lesson: LessonCardViewModel) -> some View {
+        VStack(alignment: .leading, spacing: AppSpacing.medium) {
+            VStack(alignment: .leading, spacing: AppSpacing.xSmall) {
+                Text(L10n.string("learn.currentLesson.section"))
                     .font(.title2)
                     .fontWeight(.bold)
 
-                LazyVStack(alignment: .leading, spacing: 14) {
-                    ForEach(contentViewModel.lessonCards) { lessonCard in
+                Text(L10n.string("learn.currentLesson.subtitle"))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
+            Button {
+                viewModel.selectLesson(id: lesson.id)
+            } label: {
+                HStack(alignment: .center, spacing: AppSpacing.card) {
+                    VStack(alignment: .leading, spacing: AppSpacing.xSmall) {
+                        Text(String(format: "%02d", lesson.order))
+                            .font(.caption)
+                            .fontWeight(.bold)
+                            .foregroundStyle(Color.accentColor)
+
+                        Text(lesson.title)
+                            .font(.title3)
+                            .fontWeight(.bold)
+                            .foregroundStyle(.primary)
+                            .multilineTextAlignment(.leading)
+
+                        if !lesson.description.isEmpty {
+                            Text(lesson.description)
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.leading)
+                        }
+                    }
+
+                    Spacer(minLength: AppSpacing.medium)
+
+                    Image(systemName: "play.circle.fill")
+                        .font(.system(size: 36, weight: .semibold))
+                        .foregroundStyle(Color.accentColor)
+                }
+                .appCard(
+                    background: AppColors.accentFill,
+                    borderColor: Color.accentColor.opacity(AppOpacity.activeBorder),
+                    radius: AppRadius.largeCard,
+                    padding: AppSpacing.section,
+                    lineWidth: 1.5
+                )
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private func courseSection(
+        lessons: [LessonCardViewModel],
+        loadMoreState: LoadMoreView.State
+    ) -> some View {
+        VStack(alignment: .leading, spacing: AppSpacing.large) {
+            Text(L10n.string("learn.course.section"))
+                .font(.title2)
+                .fontWeight(.bold)
+
+            if !lessons.isEmpty {
+                LazyVStack(alignment: .leading, spacing: AppSpacing.large) {
+                    ForEach(lessons) { lessonCard in
                         LessonCardView(viewModel: lessonCard) {
                             viewModel.selectLesson(id: lessonCard.id)
                         }
                     }
                 }
                 .scrollTargetLayout()
+            }
 
-                LoadMoreView(state: contentViewModel.loadMoreState) {
-                    await viewModel.retryLoadMoreLessons()
-                }
+            LoadMoreView(state: loadMoreState) {
+                await viewModel.retryLoadMoreLessons()
             }
         }
     }
 
     // MARK: - Private methods -
+
+    private func isCurrentLesson(_ lesson: LessonCardViewModel) -> Bool {
+        if case .current = lesson.state {
+            return true
+        }
+
+        return false
+    }
 
     private func loadMoreIfNeeded(visibleLessonIDs: [String]) {
         let preloadIDs = viewModel.lessonCards
