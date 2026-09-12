@@ -61,7 +61,7 @@ struct RegisterView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
 
-            PrimaryButtonView(title: viewModel.buttonTitle) {
+            PrimaryButtonView(title: primaryButtonTitle) {
                 Task {
                     await viewModel.register()
                 }
@@ -73,6 +73,10 @@ struct RegisterView: View {
             }
             .appSecondaryButton()
         }
+    }
+
+    private var primaryButtonTitle: String {
+        viewModel.state.isLoading ? L10n.string("auth.register.creating") : L10n.string("auth.register.navigationTitle")
     }
 }
 

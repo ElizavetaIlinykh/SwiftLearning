@@ -57,7 +57,7 @@ struct LoginView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
 
-            PrimaryButtonView(title: viewModel.buttonTitle) {
+            PrimaryButtonView(title: primaryButtonTitle) {
                 Task {
                     await viewModel.login()
                 }
@@ -79,6 +79,10 @@ struct LoginView: View {
             }
             .appSecondaryButton()
         }
+    }
+
+    private var primaryButtonTitle: String {
+        viewModel.state.isLoading ? L10n.string("auth.login.signingIn") : L10n.string("auth.login.title")
     }
 }
 
