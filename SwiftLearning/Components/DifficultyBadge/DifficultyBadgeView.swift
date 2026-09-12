@@ -34,13 +34,13 @@ struct DifficultyBadgeView: View {
     private var foregroundColor: Color {
         switch difficulty {
         case .easy:
-            .green
+            AppColors.success
         case .medium:
-            .orange
+            AppColors.warning
         case .hard:
-            .red
+            AppColors.error
         case .unknown:
-            .secondary
+            AppColors.textSecondary
         }
     }
 

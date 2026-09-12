@@ -38,7 +38,7 @@ struct EmptyStateView<Action: View>: View {
 
                 Text(viewModel.message)
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppColors.textSecondary)
             }
 
             action
@@ -73,5 +73,5 @@ extension EmptyStateView where Action == EmptyView {
         message: "Lessons will appear here when the server returns them."
     )
     .padding()
-    .background(Color(.systemGroupedBackground))
+    .background(AppColors.background)
 }

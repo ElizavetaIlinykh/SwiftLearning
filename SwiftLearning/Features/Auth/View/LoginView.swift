@@ -18,7 +18,7 @@ struct LoginView: View {
             Spacer()
         }
         .padding(AppSpacing.expandedScreen)
-        .background(AppColors.screenBackground)
+        .background(AppColors.background)
         .navigationTitle(L10n.string("auth.login.title"))
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -28,10 +28,11 @@ struct LoginView: View {
             Text(L10n.string("app.name"))
                 .font(.largeTitle)
                 .fontWeight(.bold)
+                .foregroundStyle(AppColors.textPrimary)
 
             Text(L10n.string("auth.login.subtitle"))
                 .font(.headline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppColors.textSecondary)
         }
         .padding(.top, 32)
     }
@@ -52,7 +53,7 @@ struct LoginView: View {
             if let errorMessage = viewModel.state.errorMessage {
                 Text(errorMessage)
                     .font(.subheadline)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(AppColors.error)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
 
@@ -70,15 +71,13 @@ struct LoginView: View {
                 }
             }
             .font(.headline)
-            .foregroundStyle(.secondary)
-            .frame(maxWidth: .infinity)
+            .appSecondaryButton()
             .disabled(viewModel.state.isLoading)
 
             Button(L10n.string("auth.login.createAccount")) {
                 viewModel.openRegistration()
             }
-            .font(.headline)
-            .frame(maxWidth: .infinity)
+            .appSecondaryButton()
         }
     }
 }

@@ -20,7 +20,7 @@ struct LessonView: View {
             }
             .padding(AppSpacing.screen)
         }
-        .background(AppColors.screenBackground)
+        .background(AppColors.background)
         .navigationTitle(viewModel.navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
         .task {
@@ -59,24 +59,25 @@ struct LessonView: View {
                 Text(contentViewModel.theorySectionTitle)
                     .font(.caption)
                     .fontWeight(.bold)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppColors.textSecondary)
 
                 Text(contentViewModel.title)
                     .font(.title)
                     .fontWeight(.bold)
+                    .foregroundStyle(AppColors.textPrimary)
 
                 Text(contentViewModel.theory)
                     .font(.body)
                     .lineSpacing(6)
                     .multilineTextAlignment(.leading)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(AppColors.textPrimary)
             }
 
             VStack(alignment: .leading, spacing: 10) {
                 Text(contentViewModel.codeSectionTitle)
                     .font(.caption)
                     .fontWeight(.bold)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppColors.textSecondary)
 
                 CodeBlockView(
                     viewModel: CodeBlockViewModel(code: contentViewModel.codeExample)
@@ -95,18 +96,17 @@ struct LessonView: View {
                 Text(progressViewModel.title)
                     .font(.subheadline)
                     .fontWeight(.semibold)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppColors.textSecondary)
 
                 Spacer()
 
                 Text(progressViewModel.valueTitle)
                     .font(.subheadline)
                     .fontWeight(.semibold)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppColors.textSecondary)
             }
 
-            ProgressView(value: progressViewModel.progress)
-                .tint(.accentColor)
+            AppProgressBarView(value: progressViewModel.progress)
         }
     }
 

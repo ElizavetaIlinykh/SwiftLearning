@@ -23,7 +23,7 @@ struct LessonCardView: View {
 
                     Text(viewModel.description)
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(AppColors.textSecondary)
                 }
 
                 Spacer(minLength: 12)
@@ -50,7 +50,7 @@ struct LessonCardView: View {
         case .completed:
             Image(systemName: "checkmark.circle.fill")
                 .font(.title3)
-                .foregroundStyle(.green)
+                .foregroundStyle(AppColors.lessonCompleted)
         case .current:
             HStack(spacing: 6) {
                 Text(viewModel.actionTitle)
@@ -60,59 +60,59 @@ struct LessonCardView: View {
                     .font(.caption)
                     .fontWeight(.bold)
             }
-            .foregroundStyle(Color.accentColor)
+            .foregroundStyle(AppColors.lessonCurrent)
         case .locked:
             Image(systemName: "lock.fill")
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppColors.lessonLocked)
         }
     }
 
     private var cardBackground: Color {
         switch viewModel.state {
         case .completed:
-            AppColors.cardBackground
+            AppColors.card
         case .current:
-            AppColors.accentFill
+            AppColors.primaryFill
         case .locked:
-            AppColors.secondaryFill
+            AppColors.subtleFill
         }
     }
 
     private var borderColor: Color {
         switch viewModel.state {
         case .completed:
-            AppColors.hairlineBorder
+            AppColors.border
         case .current:
-            Color.accentColor.opacity(AppOpacity.activeBorder)
+            AppColors.lessonCurrent.opacity(AppOpacity.activeBorder)
         case .locked:
-            AppColors.secondaryBorder
+            AppColors.border
         }
     }
 
     private var numberColor: Color {
         switch viewModel.state {
         case .completed:
-            .green
+            AppColors.lessonCompleted
         case .current:
-            .accentColor
+            AppColors.lessonCurrent
         case .locked:
-            .secondary
+            AppColors.lessonLocked
         }
     }
 
     private var titleColor: Color {
-        viewModel.state == .locked ? .secondary : .primary
+        viewModel.state == .locked ? AppColors.textSecondary : AppColors.textPrimary
     }
 
     private var numberBackground: Color {
         switch viewModel.state {
         case .completed:
-            Color.green.opacity(AppOpacity.tintFill)
+            AppColors.successFill
         case .current:
-            AppColors.accentSelectedFill
+            AppColors.primarySelectedFill
         case .locked:
-            AppColors.secondaryBorder
+            AppColors.disabledFill
         }
     }
 }

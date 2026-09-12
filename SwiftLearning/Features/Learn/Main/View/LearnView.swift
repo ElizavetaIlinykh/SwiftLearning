@@ -22,7 +22,7 @@ struct LearnView: View {
             }
             .padding(AppSpacing.screen)
         }
-        .background(AppColors.screenBackground)
+        .background(AppColors.background)
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await viewModel.fetchLessons()
@@ -43,10 +43,11 @@ struct LearnView: View {
             Text(L10n.string("learn.header.title"))
                 .font(.largeTitle)
                 .fontWeight(.bold)
+                .foregroundStyle(AppColors.textPrimary)
 
             Text(L10n.string("learn.header.subtitle"))
                 .font(.headline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppColors.textSecondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.top, 8)
@@ -95,10 +96,11 @@ struct LearnView: View {
                 Text(L10n.string("learn.currentLesson.section"))
                     .font(.title2)
                     .fontWeight(.bold)
+                    .foregroundStyle(AppColors.textPrimary)
 
                 Text(L10n.string("learn.currentLesson.subtitle"))
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppColors.textSecondary)
             }
 
             Button {
@@ -109,18 +111,18 @@ struct LearnView: View {
                         Text(String(format: "%02d", lesson.order))
                             .font(.caption)
                             .fontWeight(.bold)
-                            .foregroundStyle(Color.accentColor)
+                            .foregroundStyle(AppColors.lessonCurrent)
 
                         Text(lesson.title)
                             .font(.title3)
                             .fontWeight(.bold)
-                            .foregroundStyle(.primary)
+                            .foregroundStyle(AppColors.textPrimary)
                             .multilineTextAlignment(.leading)
 
                         if !lesson.description.isEmpty {
                             Text(lesson.description)
                                 .font(.subheadline)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(AppColors.textSecondary)
                                 .multilineTextAlignment(.leading)
                         }
                     }
@@ -129,11 +131,11 @@ struct LearnView: View {
 
                     Image(systemName: "play.circle.fill")
                         .font(.system(size: 36, weight: .semibold))
-                        .foregroundStyle(Color.accentColor)
+                        .foregroundStyle(AppColors.lessonCurrent)
                 }
                 .appCard(
-                    background: AppColors.accentFill,
-                    borderColor: Color.accentColor.opacity(AppOpacity.activeBorder),
+                    background: AppColors.primaryFill,
+                    borderColor: AppColors.lessonCurrent.opacity(AppOpacity.activeBorder),
                     radius: AppRadius.largeCard,
                     padding: AppSpacing.section,
                     lineWidth: 1.5
@@ -151,6 +153,7 @@ struct LearnView: View {
             Text(L10n.string("learn.course.section"))
                 .font(.title2)
                 .fontWeight(.bold)
+                .foregroundStyle(AppColors.textPrimary)
 
             if !lessons.isEmpty {
                 LazyVStack(alignment: .leading, spacing: AppSpacing.large) {

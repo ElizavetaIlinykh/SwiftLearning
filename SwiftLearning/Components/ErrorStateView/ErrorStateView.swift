@@ -41,7 +41,7 @@ struct ErrorStateView: View {
 
             Text(viewModel.message)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppColors.textSecondary)
 
             PrimaryButtonView(title: viewModel.retryTitle, action: retryAction)
         }
@@ -59,5 +59,5 @@ struct ErrorStateView: View {
         message: "Something went wrong."
     ) {}
         .padding()
-        .background(Color(.systemGroupedBackground))
+        .background(AppColors.background)
 }

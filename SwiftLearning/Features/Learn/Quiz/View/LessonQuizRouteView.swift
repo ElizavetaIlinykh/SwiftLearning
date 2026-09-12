@@ -20,7 +20,7 @@ struct LessonQuizRouteView: View {
             }
             .padding(AppSpacing.screen)
         }
-        .background(AppColors.screenBackground)
+        .background(AppColors.background)
         .navigationTitle(L10n.string("quiz.navigationTitle"))
         .navigationBarTitleDisplayMode(.inline)
         .task {
@@ -72,11 +72,12 @@ struct LessonQuizRouteView: View {
             Text(L10n.string("quiz.quickCheck"))
                 .font(.largeTitle)
                 .fontWeight(.bold)
+                .foregroundStyle(AppColors.textPrimary)
 
             Text(question.text)
                 .font(.title3)
                 .fontWeight(.semibold)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppColors.textSecondary)
         }
     }
 
@@ -104,13 +105,12 @@ struct LessonQuizRouteView: View {
                 Text(contentViewModel.progressTitle)
                     .font(.subheadline)
                     .fontWeight(.semibold)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppColors.textSecondary)
 
                 Spacer()
             }
 
-            ProgressView(value: contentViewModel.progressValue)
-                .tint(.accentColor)
+            AppProgressBarView(value: contentViewModel.progressValue)
         }
     }
 

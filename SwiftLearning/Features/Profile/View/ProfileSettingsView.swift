@@ -24,6 +24,9 @@ struct ProfileSettingsView: View {
                 .pickerStyle(.inline)
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(AppColors.background)
+        .tint(AppColors.primary)
         .navigationTitle(L10n.string("profile.settings"))
         .navigationBarTitleDisplayMode(.inline)
     }

@@ -9,20 +9,20 @@ struct StatCardView: View {
         VStack(alignment: .leading, spacing: 12) {
             Image(systemName: viewModel.systemImage)
                 .font(.headline)
-                .foregroundStyle(Color.accentColor)
+                .foregroundStyle(AppColors.primary)
                 .frame(width: 34, height: 34)
-                .appRoundedBackground(AppColors.accentFill, radius: AppRadius.field)
+                .appRoundedBackground(AppColors.primaryFill, radius: AppRadius.field)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(viewModel.title)
                     .font(.caption)
                     .fontWeight(.semibold)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppColors.textSecondary)
 
                 Text(viewModel.value)
                     .font(.title3)
                     .fontWeight(.bold)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(AppColors.textPrimary)
                     .minimumScaleFactor(0.8)
             }
         }
@@ -40,5 +40,5 @@ struct StatCardView: View {
         )
     )
     .padding()
-    .background(Color(.systemGroupedBackground))
+    .background(AppColors.background)
 }

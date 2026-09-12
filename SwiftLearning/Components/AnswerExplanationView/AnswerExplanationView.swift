@@ -19,12 +19,12 @@ struct AnswerExplanationView: View {
             if let correctAnswer = viewModel.correctAnswer {
                 Text(L10n.format("answer.correctAnswer", correctAnswer))
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(AppColors.textPrimary)
             }
 
             Text(viewModel.explanation)
                 .font(.body)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppColors.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -39,7 +39,7 @@ struct AnswerExplanationView: View {
     // MARK: - Private properties -
 
     private var statusColor: Color {
-        viewModel.isCorrect ? .green : .red
+        viewModel.isCorrect ? AppColors.success : AppColors.error
     }
 }
 
@@ -62,5 +62,5 @@ struct AnswerExplanationView: View {
         )
     }
     .padding()
-    .background(Color(.systemGroupedBackground))
+    .background(AppColors.background)
 }

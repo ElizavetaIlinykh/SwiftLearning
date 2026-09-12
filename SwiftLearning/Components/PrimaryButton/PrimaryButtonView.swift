@@ -6,6 +6,8 @@ struct PrimaryButtonView: View {
     let viewModel: PrimaryButtonViewModel
     let action: () -> Void
 
+    @Environment(\.isEnabled) private var isEnabled
+
     // MARK: - Init -
 
     init(
@@ -31,10 +33,10 @@ struct PrimaryButtonView: View {
             Text(viewModel.title)
                 .font(.headline)
                 .fontWeight(.semibold)
-                .foregroundStyle(.white)
+                .foregroundStyle(AppColors.onPrimary)
                 .frame(maxWidth: .infinity)
                 .frame(height: 54)
-                .background(Color.accentColor)
+                .background(isEnabled ? AppColors.buttonPrimary : AppColors.buttonDisabled)
                 .clipShape(RoundedRectangle(cornerRadius: AppRadius.card, style: .continuous))
         }
         .buttonStyle(.plain)

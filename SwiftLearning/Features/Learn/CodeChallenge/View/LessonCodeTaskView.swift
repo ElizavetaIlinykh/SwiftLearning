@@ -20,7 +20,7 @@ struct LessonCodeTaskView: View {
             }
             .padding(AppSpacing.screen)
         }
-        .background(AppColors.screenBackground)
+        .background(AppColors.background)
         .navigationTitle(L10n.string("codeTask.navigationTitle"))
         .navigationBarTitleDisplayMode(.inline)
         .task {
@@ -66,14 +66,16 @@ struct LessonCodeTaskView: View {
             Text(L10n.string("codeTask.title"))
                 .font(.largeTitle)
                 .fontWeight(.bold)
+                .foregroundStyle(AppColors.textPrimary)
 
             Text(contentViewModel.title)
                 .font(.title3)
                 .fontWeight(.semibold)
+                .foregroundStyle(AppColors.textPrimary)
 
             Text(contentViewModel.description)
                 .font(.body)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppColors.textSecondary)
         }
     }
 
@@ -82,7 +84,7 @@ struct LessonCodeTaskView: View {
             Text(contentViewModel.codeSectionTitle)
                 .font(.caption)
                 .fontWeight(.bold)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppColors.textSecondary)
 
             CodeBlockView(
                 viewModel: CodeBlockViewModel(code: contentViewModel.code)
@@ -106,7 +108,7 @@ struct LessonCodeTaskView: View {
             Text(L10n.string("codeTask.answerSection"))
                 .font(.caption)
                 .fontWeight(.bold)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppColors.textSecondary)
 
             TextField(L10n.string("codeTask.answerPlaceholder"), text: $viewModel.answer)
                 .textInputAutocapitalization(.never)
@@ -154,19 +156,19 @@ struct LessonCodeTaskView: View {
                 title: L10n.string("codeTask.completed.title"),
                 message: L10n.string("codeTask.completed.message"),
                 systemImage: "checkmark.circle.fill",
-                color: .green
+                color: AppColors.success
             )
         case .incorrect:
             Text(L10n.string("codeTask.tryAgain"))
                 .font(.headline)
-                .foregroundStyle(.red)
+                .foregroundStyle(AppColors.error)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
 
         if case let .failed(message) = viewModel.completionState {
             Text(message)
                 .font(.subheadline)
-                .foregroundStyle(.red)
+                .foregroundStyle(AppColors.error)
         }
     }
 
@@ -188,7 +190,7 @@ struct LessonCodeTaskView: View {
 
             Text(message)
                 .font(.body)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppColors.textSecondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .appCard(
@@ -200,11 +202,11 @@ struct LessonCodeTaskView: View {
     private var answerBorderColor: Color {
         switch viewModel.answerState {
         case .idle:
-            Color.primary.opacity(0.08)
+            AppColors.border
         case .correct:
-            Color.green.opacity(0.55)
+            AppColors.success.opacity(AppOpacity.activeBorder)
         case .incorrect:
-            Color.red.opacity(0.55)
+            AppColors.error.opacity(AppOpacity.activeBorder)
         }
     }
 }

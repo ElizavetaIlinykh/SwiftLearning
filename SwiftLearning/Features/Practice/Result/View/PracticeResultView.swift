@@ -33,31 +33,33 @@ struct PracticeResultView: View {
 
             Image(systemName: progress.scorePercent >= 60 ? "checkmark.circle.fill" : "arrow.clockwise.circle.fill")
                 .font(.system(size: 74, weight: .semibold))
-                .foregroundStyle(progress.scorePercent >= 60 ? .green : Color.accentColor)
+                .foregroundStyle(progress.scorePercent >= 60 ? AppColors.success : AppColors.primary)
 
             VStack(spacing: 10) {
                 Text(L10n.string("practice.result.title"))
                     .font(.largeTitle)
                     .fontWeight(.bold)
+                    .foregroundStyle(AppColors.textPrimary)
                     .multilineTextAlignment(.center)
 
                 Text(topicTitle)
                     .font(.headline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppColors.textSecondary)
             }
 
             VStack(spacing: 8) {
                 Text("\(progress.correctAnswersCount) / \(progress.totalAnswersCount)")
                     .font(.system(size: 54, weight: .bold, design: .rounded))
+                    .foregroundStyle(AppColors.textPrimary)
 
                 Text(L10n.format("practice.result.correctPercent", progress.scorePercent))
                     .font(.headline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppColors.textSecondary)
 
                 Text(resultMessage)
                     .font(.title3)
                     .fontWeight(.semibold)
-                    .foregroundStyle(Color.accentColor)
+                    .foregroundStyle(AppColors.primary)
             }
             .frame(maxWidth: .infinity)
             .appCard(
@@ -75,15 +77,12 @@ struct PracticeResultView: View {
                 Button(L10n.string("common.done")) {
                     onAction(.done)
                 }
-                .font(.headline)
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity)
-                .frame(height: 48)
+                .appSecondaryButton()
             }
         }
         .padding(AppSpacing.expandedScreen)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(AppColors.screenBackground)
+        .background(AppColors.background)
         .navigationBarBackButtonHidden(true)
     }
 }

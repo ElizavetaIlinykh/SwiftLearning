@@ -13,14 +13,14 @@ struct ProgressCardView: View {
                 Text(viewModel.courseTitle)
                     .font(.title3)
                     .fontWeight(.bold)
+                    .foregroundStyle(AppColors.textPrimary)
 
                 Text(viewModel.completedLessonsTitle)
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppColors.textSecondary)
             }
 
-            ProgressView(value: viewModel.progress)
-                .tint(.accentColor)
+            AppProgressBarView(value: viewModel.progress)
 
             if viewModel.state == .completed {
                 completedStateView
@@ -37,17 +37,17 @@ struct ProgressCardView: View {
     private var completedStateView: some View {
         HStack(spacing: 10) {
             Image(systemName: "checkmark.circle.fill")
-                .foregroundStyle(.green)
+                .foregroundStyle(AppColors.success)
 
             Text(L10n.string("learn.progress.courseCompleted"))
                 .font(.headline)
                 .fontWeight(.semibold)
-                .foregroundStyle(.green)
+                .foregroundStyle(AppColors.success)
         }
         .frame(maxWidth: .infinity)
         .frame(height: 54)
         .appRoundedBackground(
-            Color.green.opacity(AppOpacity.tintFill),
+            AppColors.successFill,
             radius: AppRadius.card
         )
     }
@@ -65,5 +65,5 @@ struct ProgressCardView: View {
         )
     )
     .padding()
-    .background(Color(.systemGroupedBackground))
+    .background(AppColors.background)
 }

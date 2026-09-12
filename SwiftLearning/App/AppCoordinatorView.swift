@@ -23,6 +23,10 @@ struct AppCoordinatorView: View {
             switch session.status {
             case .unknown:
                 ProgressView(L10n.string("app.checkingSession"))
+                    .foregroundStyle(AppColors.textSecondary)
+                    .tint(AppColors.primary)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(AppColors.background)
             case .authenticated:
                 MainCoordinatorView(dependencies: dependencies)
             case .unauthenticated:

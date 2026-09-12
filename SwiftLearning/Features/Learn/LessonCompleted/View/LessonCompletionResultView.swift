@@ -20,7 +20,7 @@ struct LessonCompletionResultView: View {
 
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 88, weight: .semibold))
-                .foregroundStyle(.green)
+                .foregroundStyle(AppColors.success)
                 .scaleEffect(isVisible ? 1.0 : 0.7)
                 .opacity(isVisible ? 1 : 0)
                 .animation(.spring(response: 0.45, dampingFraction: 0.72), value: isVisible)
@@ -29,22 +29,23 @@ struct LessonCompletionResultView: View {
                 Text(L10n.string("lessonResult.title"))
                     .font(.largeTitle)
                     .fontWeight(.bold)
+                    .foregroundStyle(AppColors.textPrimary)
                     .multilineTextAlignment(.center)
 
                 Text(L10n.string("lessonResult.message"))
                     .font(.headline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppColors.textSecondary)
                     .multilineTextAlignment(.center)
             }
 
             Text(L10n.string("lessonResult.xp"))
                 .font(.title2)
                 .fontWeight(.bold)
-                .foregroundStyle(.green)
+                .foregroundStyle(AppColors.success)
                 .padding(.horizontal, 22)
                 .padding(.vertical, 12)
                 .appRoundedBackground(
-                    Color.green.opacity(AppOpacity.tintFill),
+                    AppColors.successFill,
                     radius: AppRadius.card
                 )
 
@@ -56,7 +57,7 @@ struct LessonCompletionResultView: View {
         }
         .padding(AppSpacing.expandedScreen)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(AppColors.screenBackground)
+        .background(AppColors.background)
         .navigationBarBackButtonHidden(true)
         .onAppear {
             isVisible = true

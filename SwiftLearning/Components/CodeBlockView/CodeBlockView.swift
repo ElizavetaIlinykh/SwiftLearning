@@ -9,12 +9,12 @@ struct CodeBlockView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             Text(viewModel.code)
                 .font(.system(.body, design: .monospaced))
-                .foregroundStyle(Color.white.opacity(0.94))
+                .foregroundStyle(AppColors.surface.opacity(0.94))
                 .multilineTextAlignment(.leading)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(AppSpacing.section)
         }
-        .background(Color(red: 0.10, green: 0.11, blue: 0.13))
+        .background(AppColors.codeBackground)
         .clipShape(RoundedRectangle(cornerRadius: AppRadius.card, style: .continuous))
     }
 }

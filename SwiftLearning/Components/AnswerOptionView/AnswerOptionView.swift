@@ -35,44 +35,44 @@ struct AnswerOptionView: View {
     private var backgroundColor: Color {
         switch viewModel.state {
         case .neutral:
-            AppColors.cardBackground
+            AppColors.card
         case .selectedCorrect, .correct:
-            Color.green.opacity(AppOpacity.selectedFill)
+            AppColors.successFill
         case .selectedIncorrect:
-            Color.red.opacity(AppOpacity.selectedFill)
+            AppColors.errorFill
         }
     }
 
     private var borderColor: Color {
         switch viewModel.state {
         case .neutral:
-            Color.primary.opacity(0.08)
+            AppColors.border
         case .selectedCorrect, .correct:
-            Color.green.opacity(0.55)
+            AppColors.success.opacity(AppOpacity.activeBorder)
         case .selectedIncorrect:
-            Color.red.opacity(0.55)
+            AppColors.error.opacity(AppOpacity.activeBorder)
         }
     }
 
     private var textColor: Color {
         switch viewModel.state {
         case .neutral:
-            .primary
+            AppColors.textPrimary
         case .selectedCorrect, .correct:
-            .green
+            AppColors.success
         case .selectedIncorrect:
-            .red
+            AppColors.error
         }
     }
 
     private var iconColor: Color {
         switch viewModel.state {
         case .selectedCorrect, .correct:
-            .green
+            AppColors.success
         case .selectedIncorrect:
-            .red
+            AppColors.error
         case .neutral:
-            .secondary
+            AppColors.textSecondary
         }
     }
 
@@ -110,5 +110,5 @@ struct AnswerOptionView: View {
         ) {}
     }
     .padding()
-    .background(Color(.systemGroupedBackground))
+    .background(AppColors.background)
 }

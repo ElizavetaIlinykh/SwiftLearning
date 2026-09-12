@@ -22,7 +22,7 @@ struct PracticeView: View {
             }
             .padding(AppSpacing.screen)
         }
-        .background(AppColors.screenBackground)
+        .background(AppColors.background)
         .task {
             await viewModel.loadTopics()
         }
@@ -72,18 +72,19 @@ struct PracticeView: View {
         HStack(alignment: .top, spacing: 16) {
             Image(systemName: "chevron.left.forwardslash.chevron.right")
                 .font(.system(size: 28, weight: .semibold))
-                .foregroundStyle(Color.accentColor)
+                .foregroundStyle(AppColors.primary)
                 .frame(width: 58, height: 58)
-                .appRoundedBackground(AppColors.accentFill, radius: AppRadius.largeCard)
+                .appRoundedBackground(AppColors.primaryFill, radius: AppRadius.largeCard)
 
             VStack(alignment: .leading, spacing: 6) {
                 Text(L10n.string("practice.header.title"))
                     .font(.largeTitle)
                     .fontWeight(.bold)
+                    .foregroundStyle(AppColors.textPrimary)
 
                 Text(L10n.string("practice.header.subtitle"))
                     .font(.headline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppColors.textSecondary)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -93,10 +94,11 @@ struct PracticeView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(L10n.string("practice.info.title"))
                 .font(.headline)
+                .foregroundStyle(AppColors.textPrimary)
 
             Text(L10n.string("practice.info.message"))
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppColors.textSecondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .appCard(

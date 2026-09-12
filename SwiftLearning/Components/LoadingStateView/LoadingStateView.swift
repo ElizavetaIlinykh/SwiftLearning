@@ -17,7 +17,7 @@ struct LoadingStateView: View {
 
             Text(viewModel.title)
                 .font(.headline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppColors.textSecondary)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 48)
@@ -27,5 +27,5 @@ struct LoadingStateView: View {
 #Preview {
     LoadingStateView(title: "Loading")
         .padding(20)
-        .background(Color(.systemGroupedBackground))
+        .background(AppColors.background)
 }

@@ -50,7 +50,7 @@ struct LoadMoreView: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text(message)
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppColors.textSecondary)
 
                 Button(viewModel.retryTitle) {
                     Task {
@@ -58,6 +58,7 @@ struct LoadMoreView: View {
                     }
                 }
                 .font(.headline)
+                .foregroundStyle(AppColors.primary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 8)

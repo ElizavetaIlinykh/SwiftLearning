@@ -11,24 +11,24 @@ struct PracticeCategoryCardView: View {
             HStack(spacing: 16) {
                 Image(systemName: viewModel.systemImage)
                     .font(.system(size: 22, weight: .semibold))
-                    .foregroundStyle(Color.accentColor)
+                    .foregroundStyle(AppColors.primary)
                     .frame(width: 48, height: 48)
-                    .appRoundedBackground(AppColors.accentFill, radius: AppRadius.control)
+                    .appRoundedBackground(AppColors.primaryFill, radius: AppRadius.control)
 
                 VStack(alignment: .leading, spacing: 6) {
                     Text(viewModel.title)
                         .font(.headline)
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(AppColors.textPrimary)
 
                     Text(viewModel.description)
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(AppColors.textSecondary)
                         .multilineTextAlignment(.leading)
 
                     Text(viewModel.tasksCountTitle)
                         .font(.caption)
                         .fontWeight(.semibold)
-                        .foregroundStyle(Color.accentColor)
+                        .foregroundStyle(AppColors.primary)
                 }
 
                 Spacer(minLength: 12)
@@ -36,7 +36,7 @@ struct PracticeCategoryCardView: View {
                 Image(systemName: "chevron.right")
                     .font(.subheadline)
                     .fontWeight(.bold)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppColors.textSecondary)
             }
             .appCard(radius: AppRadius.largeCard)
         }
@@ -55,5 +55,5 @@ struct PracticeCategoryCardView: View {
         )
     ) {}
         .padding()
-        .background(Color(.systemGroupedBackground))
+        .background(AppColors.background)
 }

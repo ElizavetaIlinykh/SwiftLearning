@@ -26,7 +26,7 @@ struct ProfileView: View {
             }
             .padding(AppSpacing.screen)
         }
-        .background(AppColors.screenBackground)
+        .background(AppColors.background)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 NavigationLink(value: ProfileRouter.Route.settings) {
@@ -39,6 +39,7 @@ struct ProfileView: View {
                 Button(L10n.string("profile.logout")) {
                     viewModel.logout()
                 }
+                .foregroundStyle(AppColors.primary)
             }
         }
         .task {
@@ -70,16 +71,17 @@ struct ProfileView: View {
         VStack(spacing: 12) {
             Image(systemName: "person.crop.circle.fill")
                 .font(.system(size: 92, weight: .regular))
-                .foregroundStyle(Color.accentColor)
+                .foregroundStyle(AppColors.primary)
 
             VStack(spacing: 5) {
                 Text(viewModel.name)
                     .font(.title2)
                     .fontWeight(.bold)
+                    .foregroundStyle(AppColors.textPrimary)
 
                 Text(viewModel.email)
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppColors.textSecondary)
                     .multilineTextAlignment(.center)
             }
         }
@@ -92,22 +94,23 @@ struct ProfileView: View {
             Text(L10n.string("profile.yourProgress"))
                 .font(.title2)
                 .fontWeight(.bold)
+                .foregroundStyle(AppColors.textPrimary)
 
             VStack(alignment: .leading, spacing: 14) {
                 HStack(alignment: .firstTextBaseline) {
                     Text(viewModel.title)
                         .font(.headline)
+                        .foregroundStyle(AppColors.textPrimary)
 
                     Spacer()
 
                     Text(viewModel.percentTitle)
                         .font(.headline)
                         .fontWeight(.bold)
-                        .foregroundStyle(Color.accentColor)
+                        .foregroundStyle(AppColors.primary)
                 }
 
-                ProgressView(value: viewModel.progress)
-                    .tint(.accentColor)
+                AppProgressBarView(value: viewModel.progress)
 
                 if viewModel.isCourseCompleted {
                     courseCompletedCard
@@ -124,22 +127,22 @@ struct ProfileView: View {
         HStack(spacing: 12) {
             Image(systemName: "checkmark.seal.fill")
                 .font(.title3)
-                .foregroundStyle(.green)
+                .foregroundStyle(AppColors.success)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(L10n.string("profile.courseCompleted.title"))
                     .font(.headline)
-                    .foregroundStyle(.green)
+                    .foregroundStyle(AppColors.success)
 
                 Text(L10n.string("profile.courseCompleted.message"))
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppColors.textSecondary)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(AppSpacing.large)
         .appRoundedBackground(
-            Color.green.opacity(AppOpacity.tintFill),
+            AppColors.successFill,
             radius: AppRadius.card
         )
     }
@@ -149,6 +152,7 @@ struct ProfileView: View {
             Text(L10n.string("profile.statistics"))
                 .font(.title2)
                 .fontWeight(.bold)
+                .foregroundStyle(AppColors.textPrimary)
 
             LazyVGrid(columns: statisticColumns, spacing: 12) {
                 ForEach(statistics) { statistic in
@@ -163,6 +167,7 @@ struct ProfileView: View {
             Text(L10n.string("profile.achievements"))
                 .font(.title2)
                 .fontWeight(.bold)
+                .foregroundStyle(AppColors.textPrimary)
 
             VStack(spacing: 12) {
                 ForEach(achievements) { achievement in

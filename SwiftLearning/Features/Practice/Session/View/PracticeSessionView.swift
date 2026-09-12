@@ -25,7 +25,7 @@ struct PracticeSessionView: View {
             }
             .padding(AppSpacing.screen)
         }
-        .background(AppColors.screenBackground)
+        .background(AppColors.background)
         .navigationTitle(viewModel.topicTitle)
         .navigationBarTitleDisplayMode(.inline)
         .animation(.easeInOut(duration: 0.2), value: currentTaskIndex)
@@ -70,6 +70,7 @@ struct PracticeSessionView: View {
                 Text(task.question)
                     .font(.title2)
                     .fontWeight(.bold)
+                    .foregroundStyle(AppColors.textPrimary)
                     .multilineTextAlignment(.leading)
 
                 if let code = task.code {
@@ -117,18 +118,17 @@ struct PracticeSessionView: View {
                 Text(L10n.format("practice.questionProgress", currentTaskIndex + 1, totalTasks))
                     .font(.subheadline)
                     .fontWeight(.semibold)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppColors.textSecondary)
 
                 Spacer()
 
                 Text(viewModel.topicTitle)
                     .font(.subheadline)
                     .fontWeight(.semibold)
-                    .foregroundStyle(Color.accentColor)
+                    .foregroundStyle(AppColors.primary)
             }
 
-            ProgressView(value: Double(currentTaskIndex + 1) / Double(totalTasks))
-                .tint(.accentColor)
+            AppProgressBarView(value: Double(currentTaskIndex + 1) / Double(totalTasks))
         }
     }
 
@@ -149,7 +149,7 @@ struct PracticeSessionView: View {
         if case let .failed(message) = viewModel.completionState {
             Text(message)
                 .font(.subheadline)
-                .foregroundStyle(.red)
+                .foregroundStyle(AppColors.error)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
@@ -163,7 +163,7 @@ struct PracticeSessionView: View {
         } else if let message = viewModel.loadMoreTasksError {
             Text(message)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppColors.textSecondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
@@ -191,10 +191,7 @@ struct PracticeSessionView: View {
             Button(L10n.string("common.done")) {
                 viewModel.closePractice()
             }
-            .font(.headline)
-            .foregroundStyle(.secondary)
-            .frame(maxWidth: .infinity)
-            .frame(height: 48)
+            .appSecondaryButton()
         }
     }
 

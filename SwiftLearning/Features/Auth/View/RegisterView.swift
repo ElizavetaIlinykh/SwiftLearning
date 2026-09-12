@@ -18,7 +18,7 @@ struct RegisterView: View {
             Spacer()
         }
         .padding(AppSpacing.expandedScreen)
-        .background(AppColors.screenBackground)
+        .background(AppColors.background)
         .navigationTitle(L10n.string("auth.register.navigationTitle"))
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -28,10 +28,11 @@ struct RegisterView: View {
             Text(L10n.string("auth.register.title"))
                 .font(.largeTitle)
                 .fontWeight(.bold)
+                .foregroundStyle(AppColors.textPrimary)
 
             Text(L10n.string("auth.register.subtitle"))
                 .font(.headline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppColors.textSecondary)
         }
         .padding(.top, 32)
     }
@@ -56,7 +57,7 @@ struct RegisterView: View {
             if let errorMessage = viewModel.state.errorMessage {
                 Text(errorMessage)
                     .font(.subheadline)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(AppColors.error)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
 
@@ -70,8 +71,7 @@ struct RegisterView: View {
             Button(L10n.string("auth.register.backToLogin")) {
                 viewModel.openLogin()
             }
-            .font(.headline)
-            .frame(maxWidth: .infinity)
+            .appSecondaryButton()
         }
     }
 }

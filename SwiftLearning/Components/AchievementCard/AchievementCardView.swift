@@ -21,7 +21,7 @@ struct AchievementCardView: View {
 
                 Text(viewModel.description)
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppColors.textSecondary)
                     .multilineTextAlignment(.leading)
             }
 
@@ -29,7 +29,7 @@ struct AchievementCardView: View {
 
             Image(systemName: viewModel.isUnlocked ? "checkmark.circle.fill" : "lock.fill")
                 .font(.headline)
-                .foregroundStyle(viewModel.isUnlocked ? .green : .secondary)
+                .foregroundStyle(viewModel.isUnlocked ? AppColors.success : AppColors.textSecondary)
         }
         .appCard(
             background: cardBackground,
@@ -42,23 +42,23 @@ struct AchievementCardView: View {
     // MARK: - Private properties -
 
     private var iconColor: Color {
-        viewModel.isUnlocked ? Color.accentColor : .secondary
+        viewModel.isUnlocked ? AppColors.primary : AppColors.textSecondary
     }
 
     private var iconBackground: Color {
-        viewModel.isUnlocked ? AppColors.accentFill : AppColors.secondaryBorder
+        viewModel.isUnlocked ? AppColors.primaryFill : AppColors.disabledFill
     }
 
     private var titleColor: Color {
-        viewModel.isUnlocked ? .primary : .secondary
+        viewModel.isUnlocked ? AppColors.textPrimary : AppColors.textSecondary
     }
 
     private var cardBackground: Color {
-        viewModel.isUnlocked ? AppColors.cardBackground : AppColors.secondaryFill
+        viewModel.isUnlocked ? AppColors.card : AppColors.subtleFill
     }
 
     private var borderColor: Color {
-        viewModel.isUnlocked ? AppColors.hairlineBorder : AppColors.secondaryBorder
+        AppColors.border
     }
 }
 
@@ -84,5 +84,5 @@ struct AchievementCardView: View {
         )
     }
     .padding()
-    .background(Color(.systemGroupedBackground))
+    .background(AppColors.background)
 }

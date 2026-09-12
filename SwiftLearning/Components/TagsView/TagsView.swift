@@ -10,12 +10,12 @@ struct TagsView: View {
             ForEach(tags, id: \.self) { tag in
                 Text(tag)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppColors.textSecondary)
                     .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.horizontal, 9)
                     .padding(.vertical, 5)
-                    .background(Color.primary.opacity(0.05))
+                    .background(AppColors.subtleFill)
                     .clipShape(Capsule())
             }
         }

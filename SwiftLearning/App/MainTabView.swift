@@ -43,6 +43,7 @@ struct MainTabView: View {
                 }
                 .tag(MainTab.profile)
         }
+        .tint(AppColors.primary)
     }
 }
 
