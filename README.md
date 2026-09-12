@@ -6,7 +6,8 @@ The app includes authentication, course progress tracking, profile statistics, a
 
 ## Demo
 
-<video src="Docs/demo.mov" controls width="320"></video>
+https://github.com/user-attachments/assets/ec937e74-14fb-4bcd-afd7-0d5c3a519f53
+
 
 ## Features
 
