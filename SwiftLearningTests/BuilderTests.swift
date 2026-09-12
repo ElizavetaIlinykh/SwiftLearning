@@ -5,23 +5,25 @@ import Testing
 struct BuilderTests {
     @Test
     func lessonCardBuilderMapsLessonsToCardViewModels() {
+        L10n.setLanguage(.english)
+
         let lessons = [
             LessonSummary(
-                id: "completed",
+                id: "lesson-1",
                 title: "Completed",
                 description: "Done",
                 order: 1,
                 status: .completed
             ),
             LessonSummary(
-                id: "available",
+                id: "lesson-2",
                 title: "Available",
                 description: "Current",
                 order: 2,
                 status: .available
             ),
             LessonSummary(
-                id: "locked",
+                id: "lesson-3",
                 title: "Locked",
                 description: "Later",
                 order: 3,
@@ -31,23 +33,25 @@ struct BuilderTests {
 
         let cards = LearnLessonCardBuilder().build(lessons: lessons)
 
-        #expect(cards.map(\.id) == ["completed", "available", "locked"])
+        #expect(cards.map(\.id) == ["lesson-1", "lesson-2", "lesson-3"])
         #expect(cards.map(\.state) == [.completed, .current, .locked])
         #expect(cards.map(\.actionTitle) == ["Start", "Continue", "Continue"])
     }
 
     @Test
     func progressCardBuilderCalculatesProgressState() {
+        L10n.setLanguage(.english)
+
         let lessons = [
             LessonSummary(
-                id: "one",
+                id: "lesson-1",
                 title: "One",
                 description: "First",
                 order: 1,
                 status: .completed
             ),
             LessonSummary(
-                id: "two",
+                id: "lesson-2",
                 title: "Two",
                 description: "Second",
                 order: 2,
