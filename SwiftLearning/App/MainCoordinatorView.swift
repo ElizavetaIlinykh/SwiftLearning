@@ -15,4 +15,5 @@ struct MainCoordinatorView: View {
 
     MainCoordinatorView(dependencies: dependencies)
         .environment(dependencies.languageSettings)
+        .environment(dependencies.themeSettings)
 }

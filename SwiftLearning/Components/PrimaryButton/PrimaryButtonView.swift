@@ -33,7 +33,7 @@ struct PrimaryButtonView: View {
             Text(viewModel.title)
                 .font(.headline)
                 .fontWeight(.semibold)
-                .foregroundStyle(AppColors.onPrimary)
+                .foregroundStyle(isEnabled ? AppColors.onPrimary : AppColors.textSecondary)
                 .frame(maxWidth: .infinity)
                 .frame(height: 54)
                 .background(isEnabled ? AppColors.buttonPrimary : AppColors.buttonDisabled)

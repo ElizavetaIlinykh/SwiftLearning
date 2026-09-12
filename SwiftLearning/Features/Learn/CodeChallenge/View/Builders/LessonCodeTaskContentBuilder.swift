@@ -22,6 +22,8 @@ struct LessonCodeTaskContentBuilder {
     // MARK: - Private methods -
 
     private func codeSectionTitle(answerState: AnswerState) -> String {
-        answerState == .correct ? L10n.string("codeTask.section.completedCode") : L10n.string("codeTask.section.completeCode")
+        answerState == .correct
+            ? L10n.string("codeTask.section.completedCode")
+            : L10n.string("codeTask.section.completeCode")
     }
 }

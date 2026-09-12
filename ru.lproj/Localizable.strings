@@ -161,6 +161,10 @@
 "profile.language.section" = "Язык";
 "profile.language.russian" = "Русский";
 "profile.language.english" = "English";
+"profile.theme.section" = "Тема";
+"profile.theme.system" = "Системная";
+"profile.theme.light" = "Светлая";
+"profile.theme.dark" = "Темная";
 "profile.achievement.firstStep.title" = "Первый шаг";
 "profile.achievement.firstStep.description" = "Завершите первый урок";
 "profile.achievement.swiftBeginner.title" = "Новичок в Swift";

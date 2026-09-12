@@ -7,6 +7,7 @@ struct AppCoordinatorView: View {
 
     // MARK: - Private properties -
 
+    @Environment(ThemeSettings.self) private var themeSettings
     @ObservedObject private var session: SessionState
 
     // MARK: - Init -
@@ -33,6 +34,7 @@ struct AppCoordinatorView: View {
                 AuthCoordinatorView(dependencies: dependencies)
             }
         }
+        .preferredColorScheme(themeSettings.selectedTheme.colorScheme)
         .task {
             await session.restoreSession()
         }
@@ -44,4 +46,5 @@ struct AppCoordinatorView: View {
 
     AppCoordinatorView(dependencies: dependencies)
         .environment(dependencies.languageSettings)
+        .environment(dependencies.themeSettings)
 }

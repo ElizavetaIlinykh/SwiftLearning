@@ -21,6 +21,7 @@ struct AuthCoordinatorView: View {
                 }
         }
         .environment(router)
+        .appNavigationContainer()
     }
 
     private var loginView: some View {

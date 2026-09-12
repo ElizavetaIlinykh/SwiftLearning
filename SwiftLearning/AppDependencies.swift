@@ -4,17 +4,20 @@ final class AppDependencies {
     let services: AppServices
     let session: SessionState
     let languageSettings: LanguageSettings
+    let themeSettings: ThemeSettings
 
     // MARK: - Init -
 
     init(
         services: AppServices,
         session: SessionState,
-        languageSettings: LanguageSettings
+        languageSettings: LanguageSettings,
+        themeSettings: ThemeSettings
     ) {
         self.services = services
         self.session = session
         self.languageSettings = languageSettings
+        self.themeSettings = themeSettings
     }
 }
 

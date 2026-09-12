@@ -35,6 +35,33 @@ struct AppSecondaryButtonStyle: ViewModifier {
     }
 }
 
+struct AppNavigationContainerStyle: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .toolbarBackground(AppColors.background, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .tint(AppColors.primary)
+    }
+}
+
+struct AppTabContainerStyle: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .toolbarBackground(AppColors.surface, for: .tabBar)
+            .toolbarBackground(.visible, for: .tabBar)
+            .tint(AppColors.primary)
+    }
+}
+
+struct AppSettingsFormStyle: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .scrollContentBackground(.hidden)
+            .background(AppColors.background)
+            .tint(AppColors.primary)
+    }
+}
+
 extension View {
     func appCard(
         background: Color = AppColors.card,
@@ -67,6 +94,8 @@ extension View {
         lineWidth: CGFloat = 1
     ) -> some View {
         padding(AppSpacing.large)
+            .foregroundStyle(AppColors.textPrimary)
+            .tint(AppColors.primary)
             .background(AppColors.surface)
             .clipShape(RoundedRectangle(cornerRadius: AppRadius.field, style: .continuous))
             .overlay(
@@ -77,5 +106,17 @@ extension View {
 
     func appSecondaryButton() -> some View {
         modifier(AppSecondaryButtonStyle())
+    }
+
+    func appNavigationContainer() -> some View {
+        modifier(AppNavigationContainerStyle())
+    }
+
+    func appTabContainer() -> some View {
+        modifier(AppTabContainerStyle())
+    }
+
+    func appSettingsForm() -> some View {
+        modifier(AppSettingsFormStyle())
     }
 }

@@ -29,6 +29,7 @@ struct LearnCoordinatorView: View {
             }
         }
         .environment(router)
+        .appNavigationContainer()
     }
 
     // MARK: - Private methods -

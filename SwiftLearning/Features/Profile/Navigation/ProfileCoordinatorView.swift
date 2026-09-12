@@ -21,6 +21,7 @@ struct ProfileCoordinatorView: View {
                 }
         }
         .environment(router)
+        .appNavigationContainer()
     }
 
     // MARK: - Private methods -
@@ -32,6 +33,10 @@ struct ProfileCoordinatorView: View {
             RoutePlaceholderView(title: L10n.string("profile.placeholder.statistics"))
         case .settings:
             ProfileSettingsView()
+        case .languageSettings:
+            ProfileLanguageSettingsView()
+        case .themeSettings:
+            ProfileThemeSettingsView()
         }
     }
 }
@@ -39,4 +44,5 @@ struct ProfileCoordinatorView: View {
 #Preview {
     ProfileCoordinatorView(dependencies: AppDependenciesAssembler.assemble())
         .environment(LanguageSettings())
+        .environment(ThemeSettings())
 }

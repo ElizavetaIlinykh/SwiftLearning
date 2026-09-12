@@ -6,6 +6,8 @@ final class ProfileRouter {
     enum Route: Hashable {
         case statistics
         case settings
+        case languageSettings
+        case themeSettings
     }
 
     // MARK: - Public properties -

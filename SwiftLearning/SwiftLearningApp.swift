@@ -12,6 +12,7 @@ struct SwiftLearningApp: App {
         WindowGroup {
             AppCoordinatorView(dependencies: dependencies)
                 .environment(dependencies.languageSettings)
+                .environment(dependencies.themeSettings)
                 .environment(\.locale, Locale(identifier: dependencies.languageSettings.selectedLanguage.rawValue))
         }
     }

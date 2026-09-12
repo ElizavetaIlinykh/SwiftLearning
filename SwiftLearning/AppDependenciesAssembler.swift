@@ -5,6 +5,7 @@ enum AppDependenciesAssembler {
     static func assemble() -> AppDependencies {
         let configuration = AppConfiguration.load()
         let languageSettings = LanguageSettings()
+        let themeSettings = ThemeSettings()
         let tokenStorage = KeychainTokenStorage()
         let networkManager = NetworkManager(
             baseURL: configuration.baseURL,
@@ -30,7 +31,8 @@ enum AppDependenciesAssembler {
         return AppDependencies(
             services: services,
             session: session,
-            languageSettings: languageSettings
+            languageSettings: languageSettings,
+            themeSettings: themeSettings
         )
     }
 }

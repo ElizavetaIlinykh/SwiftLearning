@@ -9,7 +9,7 @@ struct CodeBlockView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             Text(viewModel.code)
                 .font(.system(.body, design: .monospaced))
-                .foregroundStyle(AppColors.surface.opacity(0.94))
+                .foregroundStyle(AppColors.codeText)
                 .multilineTextAlignment(.leading)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(AppSpacing.section)

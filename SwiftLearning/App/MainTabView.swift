@@ -43,11 +43,12 @@ struct MainTabView: View {
                 }
                 .tag(MainTab.profile)
         }
-        .tint(AppColors.primary)
+        .appTabContainer()
     }
 }
 
 #Preview {
     MainTabView(dependencies: AppDependenciesAssembler.assemble())
         .environment(LanguageSettings())
+        .environment(ThemeSettings())
 }

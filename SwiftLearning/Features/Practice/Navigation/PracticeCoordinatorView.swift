@@ -35,6 +35,7 @@ struct PracticeCoordinatorView: View {
             }
         }
         .environment(router)
+        .appNavigationContainer()
     }
 
     // MARK: - Private methods -
