@@ -122,10 +122,22 @@ final class LessonQuizViewModel: ObservableObject {
             explanation: question.explanation,
             difficulty: question.difficulty,
             tags: question.tags,
-            answers: question.answers.indices.map { index in
+            answers: visibleAnswerIndices(in: question.answers).map { index in
                 answerWithState(question.answers[index], at: index, in: question.answers)
             }
         )
+    }
+
+    private func visibleAnswerIndices(
+        in answers: [LessonQuizAnswerViewModel]
+    ) -> [Int] {
+        guard let selectedAnswerIndex else {
+            return Array(answers.indices)
+        }
+
+        return answers.indices.filter { index in
+            index == selectedAnswerIndex || answers[index].isCorrect
+        }
     }
 
     private func answerWithState(
