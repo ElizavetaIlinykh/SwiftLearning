@@ -17,7 +17,6 @@ struct PracticeView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 header
-                infoCard
                 content
             }
             .padding(AppSpacing.screen)
@@ -88,23 +87,6 @@ struct PracticeView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    private var infoCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(L10n.string("practice.info.title"))
-                .font(.headline)
-                .foregroundStyle(AppColors.textPrimary)
-
-            Text(L10n.string("practice.info.message"))
-                .font(.subheadline)
-                .foregroundStyle(AppColors.textSecondary)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .appCard(
-            radius: AppRadius.largeCard,
-            padding: AppSpacing.section
-        )
     }
 
     private var loadingView: some View {
