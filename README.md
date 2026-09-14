@@ -66,7 +66,7 @@ Views should use semantic colors from `AppColors` instead of hardcoded colors. T
 By default, the app uses:
 
 ```text
-http://127.0.0.1:8000
+https://swift-learning-backend.onrender.com
 ```
 
 You can override it with `API_BASE_URL` through an environment variable or the app Info.plist.
@@ -77,7 +77,7 @@ You can override it with `API_BASE_URL` through an environment variable or the a
 
 1. `API_BASE_URL` from the process environment.
 2. `API_BASE_URL` from the app bundle Info.plist.
-3. Default value: `http://127.0.0.1:8000`.
+3. Default value: `https://swift-learning-backend.onrender.com`.
 
 ## Localization
 

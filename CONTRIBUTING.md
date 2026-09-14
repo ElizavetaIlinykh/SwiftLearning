@@ -138,6 +138,6 @@ Builders should:
 
 App-wide configuration lives in `Core/Configuration`.
 
-`AppConfiguration` owns the API base URL. It reads `API_BASE_URL` from the process environment first, then from Info.plist, and falls back to the local development server URL.
+`AppConfiguration` owns the API base URL. It reads `API_BASE_URL` from the process environment first, then from Info.plist, and falls back to the Render backend URL.
 
 `NetworkManager` should receive its `baseURL` from `AppDependenciesAssembler`; do not add feature-specific base URLs or hardcoded backend hosts in services.
