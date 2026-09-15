@@ -6,6 +6,7 @@ enum AppDependenciesAssembler {
         let configuration = AppConfiguration.load()
         let languageSettings = LanguageSettings()
         let themeSettings = ThemeSettings()
+        let lessonProgressNotifier = LessonProgressNotifier()
         let tokenStorage = KeychainTokenStorage()
         let networkManager = NetworkManager(
             baseURL: configuration.baseURL,
@@ -32,7 +33,8 @@ enum AppDependenciesAssembler {
             services: services,
             session: session,
             languageSettings: languageSettings,
-            themeSettings: themeSettings
+            themeSettings: themeSettings,
+            lessonProgressNotifier: lessonProgressNotifier
         )
     }
 }

@@ -11,6 +11,7 @@ final class LessonCodeTaskViewModel: ObservableObject {
 
     private let codeTaskManager: LessonCodeTaskManager
     private let builders: LessonCodeTaskBuilders
+    private let lessonProgressNotifier: LessonProgressNotifier
     private let output: (LessonCodeTaskOutput) -> Void
     private var codeTask: LessonCodeTask?
 
@@ -32,11 +33,13 @@ final class LessonCodeTaskViewModel: ObservableObject {
         lessonID: String,
         codeTaskManager: LessonCodeTaskManager,
         builders: LessonCodeTaskBuilders,
+        lessonProgressNotifier: LessonProgressNotifier,
         output: @escaping (LessonCodeTaskOutput) -> Void
     ) {
         self.lessonID = lessonID
         self.codeTaskManager = codeTaskManager
         self.builders = builders
+        self.lessonProgressNotifier = lessonProgressNotifier
         self.output = output
     }
 
@@ -102,16 +105,13 @@ final class LessonCodeTaskViewModel: ObservableObject {
         do {
             let progress = try await codeTaskManager.completeLesson()
             completionState = .completed(progress)
-            openResult()
+            lessonProgressNotifier.lessonDidComplete(id: lessonID)
+            output(.openResult(lessonID: lessonID))
         } catch is CancellationError {
             return
         } catch {
             completionState = .failed(UserFacingErrorMessage.message(for: error))
         }
-    }
-
-    private func openResult() {
-        output(.openResult(lessonID: lessonID))
     }
 
     private func resetAnswer() {

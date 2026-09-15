@@ -21,6 +21,7 @@ enum LessonCodeTaskAssembler {
             lessonID: lessonID,
             codeTaskManager: codeTaskManager,
             builders: builders,
+            lessonProgressNotifier: dependencies.lessonProgressNotifier,
             output: output
         )
 

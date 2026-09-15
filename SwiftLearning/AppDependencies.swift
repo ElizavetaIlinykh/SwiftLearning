@@ -5,6 +5,7 @@ final class AppDependencies {
     let session: SessionState
     let languageSettings: LanguageSettings
     let themeSettings: ThemeSettings
+    let lessonProgressNotifier: LessonProgressNotifier
 
     // MARK: - Init -
 
@@ -12,12 +13,14 @@ final class AppDependencies {
         services: AppServices,
         session: SessionState,
         languageSettings: LanguageSettings,
-        themeSettings: ThemeSettings
+        themeSettings: ThemeSettings,
+        lessonProgressNotifier: LessonProgressNotifier
     ) {
         self.services = services
         self.session = session
         self.languageSettings = languageSettings
         self.themeSettings = themeSettings
+        self.lessonProgressNotifier = lessonProgressNotifier
     }
 }
 

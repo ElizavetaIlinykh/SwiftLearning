@@ -17,6 +17,7 @@ final class LearnViewModel: ObservableObject {
     private let progressCardBuilder: LearnProgressCardBuilder
     private let output: (LearnOutput) -> Void
     private var lessons: [LessonSummary] = []
+    private var lessonCompletionObservation: LessonProgressNotifier.Observation?
 
     // MARK: - Public properties -
 
@@ -32,12 +33,18 @@ final class LearnViewModel: ObservableObject {
         lessonsManager: LessonsManager,
         lessonCardBuilder: LearnLessonCardBuilder,
         progressCardBuilder: LearnProgressCardBuilder,
+        lessonProgressNotifier: LessonProgressNotifier,
         output: @escaping (LearnOutput) -> Void
     ) {
         self.lessonsManager = lessonsManager
         self.lessonCardBuilder = lessonCardBuilder
         self.progressCardBuilder = progressCardBuilder
         self.output = output
+        lessonCompletionObservation = lessonProgressNotifier.observeLessonCompletion { [weak self] _ in
+            Task { @MainActor in
+                await self?.refreshLessons()
+            }
+        }
     }
 
     // MARK: - Public methods -
