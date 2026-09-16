@@ -15,15 +15,20 @@ enum PracticeLessonOutput {
     case openResult(progress: PracticeProgress)
 }
 
+enum PracticeCompletionState: Equatable {
+    case idle
+    case saving
+    case failed(String)
+}
+
 @MainActor
 final class PracticeLessonViewModel: ObservableObject {
     // MARK: - Private properties -
 
     private let tasksManager: PracticeTasksManager
-    private let taskBuilder: PracticeTaskBuilder
     private let contentBuilder: PracticeLessonContentBuilder
     private let output: (PracticeLessonOutput) -> Void
-    private var session = PracticeSessionState()
+    private var lessonState = PracticeLessonState()
 
     // MARK: - Public properties -
 
@@ -35,13 +40,11 @@ final class PracticeLessonViewModel: ObservableObject {
     init(
         topicTitle: String,
         tasksManager: PracticeTasksManager,
-        taskBuilder: PracticeTaskBuilder,
         contentBuilder: PracticeLessonContentBuilder,
         output: @escaping (PracticeLessonOutput) -> Void
     ) {
         self.topicTitle = topicTitle
         self.tasksManager = tasksManager
-        self.taskBuilder = taskBuilder
         self.contentBuilder = contentBuilder
         self.output = output
     }
@@ -67,12 +70,13 @@ final class PracticeLessonViewModel: ObservableObject {
 
     private func loadTasks() async {
         state = .loading
-        resetProgress()
+        lessonState.reset()
 
         do {
-            let page = try await tasksManager.loadTasks()
-            setLoadedPage(page)
-            await loadMoreTasksIfNeededForCurrentTask()
+            let snapshot = try await tasksManager.loadTasks()
+            lessonState.apply(snapshot)
+            updateViewState()
+            await prefetchTasksIfNeeded()
         } catch is CancellationError {
             return
         } catch {
@@ -81,20 +85,32 @@ final class PracticeLessonViewModel: ObservableObject {
     }
 
     private func refreshTasks() async {
-        await loadTasks()
+        do {
+            let snapshot = try await tasksManager.loadTasks()
+            lessonState.apply(snapshot)
+            updateViewState()
+            await prefetchTasksIfNeeded()
+        } catch is CancellationError {
+            return
+        } catch where !lessonState.session.hasTasks {
+            state = .error(UserFacingErrorMessage.message(for: error))
+        } catch {
+            lessonState.failPagination(message: UserFacingErrorMessage.message(for: error))
+            updateViewState()
+        }
     }
 
     private func selectAnswer(answerID: String) {
-        session.selectAnswer(id: answerID)
-        updateStateFromTasks()
+        lessonState.selectAnswer(id: answerID)
+        updateViewState()
     }
 
     private func advance() async {
-        guard session.hasTasks else { return }
+        guard lessonState.session.hasTasks else { return }
 
-        if session.isLastTask {
-            if session.pagination.hasMore {
-                await loadNextPageAndAdvanceIfPossible()
+        if lessonState.session.isLastTask {
+            if lessonState.pagination.hasMore {
+                await loadNextPageForAdvance()
             } else {
                 await saveResult()
             }
@@ -102,28 +118,16 @@ final class PracticeLessonViewModel: ObservableObject {
         }
 
         moveToNextTask()
-        await loadMoreTasksIfNeededForCurrentTask()
+        await prefetchTasksIfNeeded()
     }
 
     private func closePractice() {
         output(.closePractice)
     }
 
-    private func resetProgress() {
-        session = PracticeSessionState()
-    }
-
-    private func setLoadedPage(_ page: PracticeTasksPage) {
-        session.setTasks(
-            taskBuilder.build(tasks: page.tasks),
-            hasMore: page.hasMore
-        )
-        updateStateFromTasks()
-    }
-
-    private func updateStateFromTasks() {
+    private func updateViewState() {
         guard let content = contentBuilder.build(
-            session: session,
+            state: lessonState,
             topicTitle: topicTitle
         ) else {
             state = .empty
@@ -133,71 +137,74 @@ final class PracticeLessonViewModel: ObservableObject {
         state = .content(content)
     }
 
-    private func loadMoreTasksIfNeededForCurrentTask() async {
-        guard let currentTask = session.currentTask else { return }
+    private func prefetchTasksIfNeeded() async {
+        guard let currentTask = lessonState.session.currentTask else { return }
+        guard lessonState.canLoadMore else { return }
 
-        await loadMoreTasks { [tasksManager] in
-            try await tasksManager.loadMoreTasksIfNeeded(currentTaskID: currentTask.id)
-        }
-    }
-
-    private func loadNextPageAndAdvanceIfPossible() async {
-        let previousTaskCount = session.taskCount
-        await loadMoreTasks { [tasksManager] in
-            try await tasksManager.loadMoreTasks()
-        }
-
-        if session.taskCount > previousTaskCount {
-            moveToNextTask()
-            await loadMoreTasksIfNeededForCurrentTask()
-        } else if !session.pagination.hasMore {
-            await saveResult()
-        }
-    }
-
-    private func loadMoreTasks(
-        _ load: () async throws -> PracticeTasksPage
-    ) async {
-        guard session.canLoadMore else {
-            return
-        }
-
-        session.startLoadingMore()
-        updateStateFromTasks()
+        lessonState.startPagination()
+        updateViewState()
 
         do {
-            let page = try await load()
-            setLoadedPage(page)
+            let snapshot = try await tasksManager.loadMoreTasksIfNeeded(currentTaskID: currentTask.id)
+            lessonState.apply(snapshot)
+            updateViewState()
         } catch is CancellationError {
-            session.cancelLoadingMore()
-            updateStateFromTasks()
+            lessonState.cancelPagination()
+            updateViewState()
         } catch {
-            session.failLoadingMore(message: UserFacingErrorMessage.message(for: error))
-            updateStateFromTasks()
+            lessonState.failPagination(message: UserFacingErrorMessage.message(for: error))
+            updateViewState()
+        }
+    }
+
+    private func loadNextPageForAdvance() async {
+        let previousTaskCount = lessonState.session.taskCount
+        guard lessonState.canLoadMore else { return }
+
+        lessonState.startPagination()
+        updateViewState()
+
+        do {
+            let snapshot = try await tasksManager.loadMoreTasks()
+            lessonState.apply(snapshot)
+            updateViewState()
+
+            if lessonState.session.taskCount > previousTaskCount {
+                moveToNextTask()
+                await prefetchTasksIfNeeded()
+            } else if !lessonState.pagination.hasMore {
+                await saveResult()
+            }
+        } catch is CancellationError {
+            lessonState.cancelPagination()
+            updateViewState()
+        } catch {
+            lessonState.failPagination(message: UserFacingErrorMessage.message(for: error))
+            updateViewState()
         }
     }
 
     private func moveToNextTask() {
-        session.moveToNextTask()
-        updateStateFromTasks()
+        lessonState.moveToNextTask()
+        updateViewState()
     }
 
     private func saveResult() async {
-        guard session.canSaveResult else { return }
+        guard lessonState.canSaveResult else { return }
 
-        session.startSaving()
-        updateStateFromTasks()
+        lessonState.startSaving()
+        updateViewState()
 
         do {
             let progress = try await tasksManager.completeTopic(
-                correctAnswersCount: session.correctAnswersCount,
-                totalAnswersCount: session.totalAnswersCount
+                correctAnswersCount: lessonState.session.correctAnswersCount,
+                totalAnswersCount: lessonState.session.totalAnswersCount
             )
-            session.finishSaving()
+            lessonState.finishSaving()
             output(.openResult(progress: progress))
         } catch {
-            session.failSaving(message: UserFacingErrorMessage.message(for: error))
-            updateStateFromTasks()
+            lessonState.failSaving(message: UserFacingErrorMessage.message(for: error))
+            updateViewState()
         }
     }
 }

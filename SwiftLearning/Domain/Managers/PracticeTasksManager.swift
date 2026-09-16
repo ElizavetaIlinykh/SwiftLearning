@@ -1,6 +1,6 @@
 import Foundation
 
-struct PracticeTasksPage: Equatable {
+struct PracticeTasksSnapshot: Equatable {
     // MARK: - Public properties -
 
     let tasks: [PracticeTask]
@@ -28,7 +28,7 @@ final class PracticeTasksManager {
 
     private var loadedTasks: [PracticeTask] = []
     private var hasMoreTasks = false
-    private var currentTask: Task<PracticeTasksPage, Error>?
+    private var currentTask: Task<PracticeTasksSnapshot, Error>?
 
     // MARK: - Init -
 
@@ -65,7 +65,7 @@ final class PracticeTasksManager {
     /// Loads the first task page and resets pagination.
     ///
     /// - Returns: A snapshot containing loaded tasks and next-page availability.
-    func loadTasks() async throws -> PracticeTasksPage {
+    func loadTasks() async throws -> PracticeTasksSnapshot {
         guard currentTask == nil else {
             return currentPage
         }
@@ -77,7 +77,7 @@ final class PracticeTasksManager {
     ///
     /// - Parameter currentTaskID: Task currently visible to the user.
     /// - Returns: The current page snapshot after the operation completes.
-    func loadMoreTasksIfNeeded(currentTaskID: String) async throws -> PracticeTasksPage {
+    func loadMoreTasksIfNeeded(currentTaskID: String) async throws -> PracticeTasksSnapshot {
         guard shouldLoadMore(currentTaskID: currentTaskID) else {
             return currentPage
         }
@@ -88,7 +88,7 @@ final class PracticeTasksManager {
     /// Loads and appends the next task page when available.
     ///
     /// - Returns: The current page snapshot after the operation completes.
-    func loadMoreTasks() async throws -> PracticeTasksPage {
+    func loadMoreTasks() async throws -> PracticeTasksSnapshot {
         guard hasMoreTasks else {
             return currentPage
         }
@@ -119,8 +119,8 @@ final class PracticeTasksManager {
 
     // MARK: - Private properties -
 
-    private var currentPage: PracticeTasksPage {
-        PracticeTasksPage(
+    private var currentPage: PracticeTasksSnapshot {
+        PracticeTasksSnapshot(
             tasks: loadedTasks,
             hasMore: hasMoreTasks
         )
@@ -128,7 +128,7 @@ final class PracticeTasksManager {
 
     // MARK: - Private methods -
 
-    private func performInitialFetch() async throws -> PracticeTasksPage {
+    private func performInitialFetch() async throws -> PracticeTasksSnapshot {
         let task = Task { @MainActor in
             let response = try await pageLoader.fetch()
 
@@ -149,7 +149,7 @@ final class PracticeTasksManager {
         return try await task.value
     }
 
-    private func performLoadMore() async throws -> PracticeTasksPage {
+    private func performLoadMore() async throws -> PracticeTasksSnapshot {
         let task = Task { @MainActor in
             let response = try await pageLoader.loadNext()
 

@@ -4,9 +4,10 @@ struct PracticeLessonContentBuilder {
     // MARK: - Public methods -
 
     func build(
-        session: PracticeSessionState,
+        state: PracticeLessonState,
         topicTitle: String
     ) -> PracticeLessonContentViewModel? {
+        let session = state.session
         guard let currentTask = session.currentTask else { return nil }
 
         return PracticeLessonContentViewModel(
@@ -22,37 +23,39 @@ struct PracticeLessonContentBuilder {
             ),
             progressValue: Double(session.currentQuestionNumber) / Double(session.taskCount),
             isAnswered: session.isAnswered,
-            actionButtonTitle: actionButtonTitle(for: session),
-            isActionButtonDisabled: session.isSavingResult || session.isWaitingForRequiredTasks,
+            actionButtonTitle: actionButtonTitle(for: state),
+            isActionButtonDisabled: state.isSavingResult || state.isWaitingForRequiredTasks,
             answerExplanationViewModel: buildAnswerExplanation(
                 for: currentTask,
                 selectedAnswerIndex: session.selectedAnswerIndex
             ),
-            paginationErrorMessage: session.blockingPaginationErrorMessage
+            paginationErrorMessage: state.blockingPaginationErrorMessage
         )
     }
 
     // MARK: - Private methods -
 
-    private func actionButtonTitle(for session: PracticeSessionState) -> String {
-        if session.isSavingResult {
+    private func actionButtonTitle(for state: PracticeLessonState) -> String {
+        if state.isSavingResult {
             return L10n.string("common.saving")
         }
 
-        if session.isWaitingForRequiredTasks {
+        if state.isWaitingForRequiredTasks {
             return L10n.string("common.loadingEllipsis")
         }
 
-        return session.isLastTask && !session.pagination.hasMore
+        return state.session.isLastTask && !state.pagination.hasMore
             ? L10n.string("practice.seeResults")
             : L10n.string("practice.nextQuestion")
     }
 
     private func buildTask(
-        from task: PracticeTaskViewModel,
+        from task: PracticeTask,
         selectedAnswerIndex: Int?
     ) -> PracticeTaskViewModel {
-        PracticeTaskViewModel(
+        let answers = task.answers.sorted { $0.order < $1.order }
+
+        return PracticeTaskViewModel(
             id: task.id,
             question: task.question,
             code: task.code,
@@ -60,13 +63,13 @@ struct PracticeLessonContentBuilder {
             difficulty: task.difficulty,
             tags: task.tags,
             answers: visibleAnswerIndices(
-                in: task.answers,
+                in: answers,
                 selectedAnswerIndex: selectedAnswerIndex
             ).map { index in
                 buildAnswer(
-                    from: task.answers[index],
+                    from: answers[index],
                     at: index,
-                    in: task.answers,
+                    in: answers,
                     selectedAnswerIndex: selectedAnswerIndex
                 )
             }
@@ -74,7 +77,7 @@ struct PracticeLessonContentBuilder {
     }
 
     private func visibleAnswerIndices(
-        in answers: [PracticeAnswerViewModel],
+        in answers: [PracticeAnswer],
         selectedAnswerIndex: Int?
     ) -> [Int] {
         guard let selectedAnswerIndex else {
@@ -87,9 +90,9 @@ struct PracticeLessonContentBuilder {
     }
 
     private func buildAnswer(
-        from answer: PracticeAnswerViewModel,
+        from answer: PracticeAnswer,
         at index: Int,
-        in answers: [PracticeAnswerViewModel],
+        in answers: [PracticeAnswer],
         selectedAnswerIndex: Int?
     ) -> PracticeAnswerViewModel {
         PracticeAnswerViewModel(
@@ -106,7 +109,7 @@ struct PracticeLessonContentBuilder {
 
     private func optionState(
         for index: Int,
-        in answers: [PracticeAnswerViewModel],
+        in answers: [PracticeAnswer],
         selectedAnswerIndex: Int?
     ) -> AnswerOptionState {
         guard let selectedAnswerIndex else { return .neutral }
@@ -127,20 +130,21 @@ struct PracticeLessonContentBuilder {
     }
 
     private func buildAnswerExplanation(
-        for task: PracticeTaskViewModel,
+        for task: PracticeTask,
         selectedAnswerIndex: Int?
     ) -> AnswerExplanationViewModel? {
         guard let selectedAnswerIndex else { return nil }
 
-        let isCorrect = task.answers[selectedAnswerIndex].isCorrect
+        let answers = task.answers.sorted { $0.order < $1.order }
+        let isCorrect = answers[selectedAnswerIndex].isCorrect
         return AnswerExplanationViewModel(
             isCorrect: isCorrect,
             explanation: task.explanation,
-            correctAnswer: isCorrect ? nil : correctAnswerText(in: task.answers)
+            correctAnswer: isCorrect ? nil : correctAnswerText(in: answers)
         )
     }
 
-    private func correctAnswerText(in answers: [PracticeAnswerViewModel]) -> String? {
+    private func correctAnswerText(in answers: [PracticeAnswer]) -> String? {
         answers.first { $0.isCorrect }?.text
     }
 }

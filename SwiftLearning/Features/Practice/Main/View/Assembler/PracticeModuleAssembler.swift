@@ -31,7 +31,6 @@ enum PracticeModuleAssembler {
         let viewModel = PracticeLessonViewModel(
             topicTitle: topicTitle,
             tasksManager: tasksManager,
-            taskBuilder: PracticeTaskBuilder(),
             contentBuilder: PracticeLessonContentBuilder(),
             output: output
         )
