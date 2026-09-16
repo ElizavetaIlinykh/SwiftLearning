@@ -44,7 +44,7 @@ struct PracticeCoordinatorView: View {
     private func destination(for route: PracticeRouter.Route) -> some View {
         switch route {
         case let .exercise(id, title, _):
-            PracticeModuleAssembler.assembleSession(
+            PracticeModuleAssembler.assembleLesson(
                 topicID: id,
                 topicTitle: title,
                 dependencies: dependencies,

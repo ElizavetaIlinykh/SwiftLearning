@@ -12,7 +12,7 @@ typealias PracticeTasksLoadingState = LoadingState<[PracticeTask]>
 /// Coordinates practice task loading and pagination for one topic.
 ///
 /// The manager owns page accumulation, duplicate filtering, and next-page checks.
-/// UI state is handled by `PracticeSessionViewModel`.
+/// UI state is handled by `PracticeLessonViewModel`.
 @MainActor
 final class PracticeTasksManager {
     // MARK: - Private properties -

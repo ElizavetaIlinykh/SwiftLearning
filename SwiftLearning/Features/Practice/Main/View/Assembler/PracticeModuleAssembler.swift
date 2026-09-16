@@ -18,23 +18,24 @@ enum PracticeModuleAssembler {
         return PracticeView(viewModel: viewModel)
     }
 
-    static func assembleSession(
+    static func assembleLesson(
         topicID: String,
         topicTitle: String,
         dependencies: AppDependencies,
-        output: @escaping (PracticeSessionOutput) -> Void
-    ) -> PracticeSessionView {
+        output: @escaping (PracticeLessonOutput) -> Void
+    ) -> PracticeLessonView {
         let tasksManager = PracticeTasksManager(
             topicID: topicID,
             practiceService: dependencies.services.practiceService
         )
-        let viewModel = PracticeSessionViewModel(
+        let viewModel = PracticeLessonViewModel(
             tasksManager: tasksManager,
             taskBuilder: PracticeTaskBuilder(),
+            contentBuilder: PracticeLessonContentBuilder(),
             output: output
         )
 
-        return PracticeSessionView(
+        return PracticeLessonView(
             topicTitle: topicTitle,
             viewModel: viewModel
         )

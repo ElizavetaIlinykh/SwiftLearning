@@ -1,6 +1,6 @@
 import Foundation
 
-struct PracticeSessionContentViewModel {
+struct PracticeLessonContentViewModel {
     let task: PracticeTaskViewModel
     let progressTitle: String
     let progressValue: Double
@@ -29,9 +29,9 @@ struct PracticeAnswerViewModel: Identifiable {
     let state: AnswerOptionState
 }
 
-enum PracticeSessionViewState {
+enum PracticeLessonViewState {
     case loading
-    case content(PracticeSessionContentViewModel)
+    case content(PracticeLessonContentViewModel)
     case empty
     case error(String)
 }

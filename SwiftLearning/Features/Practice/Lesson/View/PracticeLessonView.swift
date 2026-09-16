@@ -1,16 +1,16 @@
 import SwiftUI
 
-struct PracticeSessionView: View {
+struct PracticeLessonView: View {
     // MARK: - Private properties -
 
     private let topicTitle: String
-    @StateObject private var viewModel: PracticeSessionViewModel
+    @StateObject private var viewModel: PracticeLessonViewModel
 
     // MARK: - Init -
 
     init(
         topicTitle: String,
-        viewModel: PracticeSessionViewModel
+        viewModel: PracticeLessonViewModel
     ) {
         self.topicTitle = topicTitle
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -52,7 +52,7 @@ struct PracticeSessionView: View {
 
     // MARK: - Private methods -
 
-    private func taskContent(_ contentViewModel: PracticeSessionContentViewModel) -> some View {
+    private func taskContent(_ contentViewModel: PracticeLessonContentViewModel) -> some View {
         VStack(alignment: .leading, spacing: 22) {
             taskProgress(contentViewModel)
                 .task {
@@ -98,7 +98,7 @@ struct PracticeSessionView: View {
         }
     }
 
-    private func answersView(_ contentViewModel: PracticeSessionContentViewModel) -> some View {
+    private func answersView(_ contentViewModel: PracticeLessonContentViewModel) -> some View {
         VStack(spacing: 12) {
             ForEach(contentViewModel.task.answers) { answer in
                 AnswerOptionView(
@@ -114,7 +114,7 @@ struct PracticeSessionView: View {
         }
     }
 
-    private func taskProgress(_ contentViewModel: PracticeSessionContentViewModel) -> some View {
+    private func taskProgress(_ contentViewModel: PracticeLessonContentViewModel) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text(contentViewModel.progressTitle)
@@ -162,14 +162,14 @@ struct PracticeSessionView: View {
     }
 
     @ViewBuilder
-    private func feedbackView(_ contentViewModel: PracticeSessionContentViewModel) -> some View {
+    private func feedbackView(_ contentViewModel: PracticeLessonContentViewModel) -> some View {
         if let answerExplanationViewModel = contentViewModel.answerExplanationViewModel {
             AnswerExplanationView(viewModel: answerExplanationViewModel)
         }
     }
 
     @ViewBuilder
-    private func loadMoreTasksView(_ contentViewModel: PracticeSessionContentViewModel) -> some View {
+    private func loadMoreTasksView(_ contentViewModel: PracticeLessonContentViewModel) -> some View {
         if contentViewModel.isLoadingMoreTasks {
             ProgressView()
                 .frame(maxWidth: .infinity)
@@ -185,7 +185,7 @@ struct PracticeSessionView: View {
 
 #Preview {
     NavigationStack {
-        PracticeModuleAssembler.assembleSession(
+        PracticeModuleAssembler.assembleLesson(
             topicID: "topic-uuid",
             topicTitle: "Variables and Constants",
             dependencies: AppDependenciesAssembler.assemble(),
