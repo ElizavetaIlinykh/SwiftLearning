@@ -6,8 +6,8 @@ struct LessonProgressBuilder {
     func build(
         lesson: LessonDetails,
         totalLessonsCount: Int
-    ) -> LessonProgressViewModel {
-        LessonProgressViewModel(
+    ) -> LessonProgressViewData {
+        LessonProgressViewData(
             title: L10n.format("lesson.progress.title", lesson.order, totalLessonsCount),
             valueTitle: "\(lesson.order) / \(totalLessonsCount)",
             progress: progress(

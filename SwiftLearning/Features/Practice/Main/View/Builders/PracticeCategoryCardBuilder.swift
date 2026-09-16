@@ -3,7 +3,7 @@ import Foundation
 struct PracticeCategoryCardBuilder {
     // MARK: - Public methods -
 
-    func build(categories: [PracticeCategory]) -> [PracticeCategoryCardViewModel] {
+    func build(categories: [PracticeCategory]) -> [PracticeCategoryCardViewData] {
         categories
             .sorted { $0.order < $1.order }
             .map(build(category:))
@@ -11,8 +11,8 @@ struct PracticeCategoryCardBuilder {
 
     // MARK: - Private methods -
 
-    private func build(category: PracticeCategory) -> PracticeCategoryCardViewModel {
-        PracticeCategoryCardViewModel(
+    private func build(category: PracticeCategory) -> PracticeCategoryCardViewData {
+        PracticeCategoryCardViewData(
             id: category.id,
             title: category.title,
             description: category.description,

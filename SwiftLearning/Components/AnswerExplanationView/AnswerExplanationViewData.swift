@@ -1,4 +1,4 @@
-struct AnswerExplanationViewModel {
+struct AnswerExplanationViewData {
     // MARK: - Public properties -
 
     let isCorrect: Bool

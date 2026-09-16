@@ -23,7 +23,7 @@ final class LessonCodeTaskViewModel: ObservableObject {
     @Published private(set) var completionState: LessonCompletionState = .idle
     @Published private(set) var answerState: AnswerState = .idle
 
-    var primaryButtonViewModel: LessonCodeTaskPrimaryButtonViewModel {
+    var primaryButtonViewData: LessonCodeTaskPrimaryButtonViewData {
         builders.primaryButtonBuilder.build(context: primaryButtonContext)
     }
 

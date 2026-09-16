@@ -9,7 +9,7 @@ struct LoadMoreView: View {
 
     // MARK: - Public properties -
 
-    let viewModel: LoadMoreViewModel
+    let viewData: LoadMoreViewData
     let retryAction: () async -> Void
 
     // MARK: - Init -
@@ -20,7 +20,7 @@ struct LoadMoreView: View {
         retryAction: @escaping () async -> Void
     ) {
         self.init(
-            viewModel: LoadMoreViewModel(
+            viewData: LoadMoreViewData(
                 state: state,
                 retryTitle: retryTitle
             ),
@@ -29,15 +29,15 @@ struct LoadMoreView: View {
     }
 
     init(
-        viewModel: LoadMoreViewModel,
+        viewData: LoadMoreViewData,
         retryAction: @escaping () async -> Void
     ) {
-        self.viewModel = viewModel
+        self.viewData = viewData
         self.retryAction = retryAction
     }
 
     var body: some View {
-        switch viewModel.state {
+        switch viewData.state {
         case .idle:
             EmptyView()
 
@@ -52,7 +52,7 @@ struct LoadMoreView: View {
                     .font(.subheadline)
                     .foregroundStyle(AppColors.textSecondary)
 
-                Button(viewModel.retryTitle) {
+                Button(viewData.retryTitle) {
                     Task {
                         await retryAction()
                     }

@@ -3,14 +3,14 @@ import SwiftUI
 struct EmptyStateView<Action: View>: View {
     // MARK: - Public properties -
 
-    let viewModel: EmptyStateViewModel
+    let viewData: EmptyStateViewData
     @ViewBuilder let action: Action
 
     init(
-        viewModel: EmptyStateViewModel,
+        viewData: EmptyStateViewData,
         @ViewBuilder action: () -> Action
     ) {
-        self.viewModel = viewModel
+        self.viewData = viewData
         self.action = action()
     }
 
@@ -20,7 +20,7 @@ struct EmptyStateView<Action: View>: View {
         @ViewBuilder action: () -> Action
     ) {
         self.init(
-            viewModel: EmptyStateViewModel(
+            viewData: EmptyStateViewData(
                 title: title,
                 message: message
             ),
@@ -33,10 +33,10 @@ struct EmptyStateView<Action: View>: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             VStack(alignment: .leading, spacing: 8) {
-                Text(viewModel.title)
+                Text(viewData.title)
                     .font(.headline)
 
-                Text(viewModel.message)
+                Text(viewData.message)
                     .font(.subheadline)
                     .foregroundStyle(AppColors.textSecondary)
             }
@@ -57,7 +57,7 @@ extension EmptyStateView where Action == EmptyView {
         message: String
     ) {
         self.init(
-            viewModel: EmptyStateViewModel(
+            viewData: EmptyStateViewData(
                 title: title,
                 message: message
             )

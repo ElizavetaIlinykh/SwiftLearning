@@ -3,14 +3,14 @@ import Foundation
 struct LearnLessonCardBuilder {
     // MARK: - Public methods -
 
-    func build(lessons: [LessonSummary]) -> [LessonCardViewModel] {
+    func build(lessons: [LessonSummary]) -> [LessonCardViewData] {
         lessons.map(build(lesson:))
     }
 
     // MARK: - Private methods -
 
-    private func build(lesson: LessonSummary) -> LessonCardViewModel {
-        LessonCardViewModel(
+    private func build(lesson: LessonSummary) -> LessonCardViewData {
+        LessonCardViewData(
             id: lesson.id,
             title: lesson.title,
             description: lesson.description ?? "",

@@ -36,8 +36,8 @@ struct LessonCodeTaskView: View {
         switch viewModel.state {
         case .loading:
             loadingView
-        case let .content(contentViewModel):
-            codeTaskContent(contentViewModel)
+        case let .content(contentViewData):
+            codeTaskContent(contentViewData)
         case .notAvailable:
             noCodeTaskView
         case let .error(message):
@@ -47,11 +47,11 @@ struct LessonCodeTaskView: View {
 
     // MARK: - Private methods -
 
-    private func codeTaskContent(_ contentViewModel: LessonCodeTaskContentViewModel) -> some View {
+    private func codeTaskContent(_ contentViewData: LessonCodeTaskContentViewData) -> some View {
         VStack(alignment: .leading, spacing: 24) {
-            codeTaskHeader(contentViewModel)
+            codeTaskHeader(contentViewData)
 
-            codeBlockSection(contentViewModel)
+            codeBlockSection(contentViewData)
 
             answerSection
 
@@ -61,46 +61,46 @@ struct LessonCodeTaskView: View {
         }
     }
 
-    private func codeTaskHeader(_ contentViewModel: LessonCodeTaskContentViewModel) -> some View {
+    private func codeTaskHeader(_ contentViewData: LessonCodeTaskContentViewData) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(L10n.string("codeTask.title"))
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .foregroundStyle(AppColors.textPrimary)
 
-            Text(contentViewModel.title)
+            Text(contentViewData.title)
                 .font(.title3)
                 .fontWeight(.semibold)
                 .foregroundStyle(AppColors.textPrimary)
 
-            Text(contentViewModel.description)
+            Text(contentViewData.description)
                 .font(.body)
                 .foregroundStyle(AppColors.textSecondary)
         }
     }
 
-    private func codeBlockSection(_ contentViewModel: LessonCodeTaskContentViewModel) -> some View {
+    private func codeBlockSection(_ contentViewData: LessonCodeTaskContentViewData) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(contentViewModel.codeSectionTitle)
+            Text(contentViewData.codeSectionTitle)
                 .font(.caption)
                 .fontWeight(.bold)
                 .foregroundStyle(AppColors.textSecondary)
 
             CodeBlockView(
-                viewModel: CodeBlockViewModel(code: contentViewModel.code)
+                viewData: CodeBlockViewData(code: contentViewData.code)
             )
         }
     }
 
     private var primaryButton: some View {
-        let buttonViewModel = viewModel.primaryButtonViewModel
+        let buttonViewData = viewModel.primaryButtonViewData
 
-        return PrimaryButtonView(title: buttonViewModel.title) {
+        return PrimaryButtonView(title: buttonViewData.title) {
             Task {
-                await viewModel.performPrimaryAction(buttonViewModel.action)
+                await viewModel.performPrimaryAction(buttonViewData.action)
             }
         }
-        .disabled(buttonViewModel.isDisabled)
+        .disabled(buttonViewData.isDisabled)
     }
 
     private var answerSection: some View {

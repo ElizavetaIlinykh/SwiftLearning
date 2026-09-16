@@ -2,7 +2,7 @@ import Foundation
 
 enum LessonCodeTaskViewState {
     case loading
-    case content(LessonCodeTaskContentViewModel)
+    case content(LessonCodeTaskContentViewData)
     case notAvailable
     case error(String)
 }

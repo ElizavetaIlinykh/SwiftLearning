@@ -1,4 +1,4 @@
-struct LoadMoreViewModel {
+struct LoadMoreViewData {
     let state: LoadMoreView.State
     let retryTitle: String
 

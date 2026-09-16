@@ -1,28 +1,28 @@
 import Foundation
 
-struct PracticeLessonContentViewModel {
+struct PracticeLessonContentViewData {
     let topicTitle: String
-    let task: PracticeTaskViewModel
+    let task: PracticeTaskViewData
     let progressTitle: String
     let progressValue: Double
     let isAnswered: Bool
     let actionButtonTitle: String
     let isActionButtonDisabled: Bool
-    let answerExplanationViewModel: AnswerExplanationViewModel?
+    let answerExplanationViewData: AnswerExplanationViewData?
     let paginationErrorMessage: String?
 }
 
-struct PracticeTaskViewModel: Identifiable {
+struct PracticeTaskViewData: Identifiable {
     let id: String
     let question: String
     let code: String?
     let explanation: String
     let difficulty: Difficulty
     let tags: [String]
-    let answers: [PracticeAnswerViewModel]
+    let answers: [PracticeAnswerViewData]
 }
 
-struct PracticeAnswerViewModel: Identifiable {
+struct PracticeAnswerViewData: Identifiable {
     let id: String
     let text: String
     let isCorrect: Bool
@@ -31,7 +31,7 @@ struct PracticeAnswerViewModel: Identifiable {
 
 enum PracticeLessonViewState {
     case loading
-    case content(PracticeLessonContentViewModel)
+    case content(PracticeLessonContentViewData)
     case empty
     case error(String)
 }

@@ -3,26 +3,26 @@ import SwiftUI
 struct AnswerExplanationView: View {
     // MARK: - Public properties -
 
-    let viewModel: AnswerExplanationViewModel
+    let viewData: AnswerExplanationViewData
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 8) {
-                Image(systemName: viewModel.isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
+                Image(systemName: viewData.isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
                     .foregroundStyle(statusColor)
 
-                Text(viewModel.isCorrect ? L10n.string("answer.correct") : L10n.string("answer.incorrect"))
+                Text(viewData.isCorrect ? L10n.string("answer.correct") : L10n.string("answer.incorrect"))
                     .font(.headline)
                     .foregroundStyle(statusColor)
             }
 
-            if let correctAnswer = viewModel.correctAnswer {
+            if let correctAnswer = viewData.correctAnswer {
                 Text(L10n.format("answer.correctAnswer", correctAnswer))
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(AppColors.textPrimary)
             }
 
-            Text(viewModel.explanation)
+            Text(viewData.explanation)
                 .font(.body)
                 .foregroundStyle(AppColors.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -33,20 +33,20 @@ struct AnswerExplanationView: View {
             padding: AppSpacing.section
         )
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(viewModel.accessibilityLabel)
+        .accessibilityLabel(viewData.accessibilityLabel)
     }
 
     // MARK: - Private properties -
 
     private var statusColor: Color {
-        viewModel.isCorrect ? AppColors.success : AppColors.error
+        viewData.isCorrect ? AppColors.success : AppColors.error
     }
 }
 
 #Preview {
     VStack(spacing: 12) {
         AnswerExplanationView(
-            viewModel: AnswerExplanationViewModel(
+            viewData: AnswerExplanationViewData(
                 isCorrect: true,
                 explanation: "Constants in Swift are declared with let.",
                 correctAnswer: nil
@@ -54,7 +54,7 @@ struct AnswerExplanationView: View {
         )
 
         AnswerExplanationView(
-            viewModel: AnswerExplanationViewModel(
+            viewData: AnswerExplanationViewData(
                 isCorrect: false,
                 explanation: "Constants in Swift are declared with let.",
                 correctAnswer: "let"

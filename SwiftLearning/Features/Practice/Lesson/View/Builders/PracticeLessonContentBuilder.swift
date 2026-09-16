@@ -6,11 +6,11 @@ struct PracticeLessonContentBuilder {
     func build(
         state: PracticeLessonState,
         topicTitle: String
-    ) -> PracticeLessonContentViewModel? {
+    ) -> PracticeLessonContentViewData? {
         let session = state.session
         guard let currentTask = session.currentTask else { return nil }
 
-        return PracticeLessonContentViewModel(
+        return PracticeLessonContentViewData(
             topicTitle: topicTitle,
             task: buildTask(
                 from: currentTask,
@@ -25,7 +25,7 @@ struct PracticeLessonContentBuilder {
             isAnswered: session.isAnswered,
             actionButtonTitle: actionButtonTitle(for: state),
             isActionButtonDisabled: state.isSavingResult || state.isWaitingForRequiredTasks,
-            answerExplanationViewModel: buildAnswerExplanation(
+            answerExplanationViewData: buildAnswerExplanation(
                 for: currentTask,
                 selectedAnswerIndex: session.selectedAnswerIndex
             ),
@@ -52,10 +52,10 @@ struct PracticeLessonContentBuilder {
     private func buildTask(
         from task: PracticeTask,
         selectedAnswerIndex: Int?
-    ) -> PracticeTaskViewModel {
+    ) -> PracticeTaskViewData {
         let answers = task.answers.sorted { $0.order < $1.order }
 
-        return PracticeTaskViewModel(
+        return PracticeTaskViewData(
             id: task.id,
             question: task.question,
             code: task.code,
@@ -94,8 +94,8 @@ struct PracticeLessonContentBuilder {
         at index: Int,
         in answers: [PracticeAnswer],
         selectedAnswerIndex: Int?
-    ) -> PracticeAnswerViewModel {
-        PracticeAnswerViewModel(
+    ) -> PracticeAnswerViewData {
+        PracticeAnswerViewData(
             id: answer.id,
             text: answer.text,
             isCorrect: answer.isCorrect,
@@ -132,12 +132,12 @@ struct PracticeLessonContentBuilder {
     private func buildAnswerExplanation(
         for task: PracticeTask,
         selectedAnswerIndex: Int?
-    ) -> AnswerExplanationViewModel? {
+    ) -> AnswerExplanationViewData? {
         guard let selectedAnswerIndex else { return nil }
 
         let answers = task.answers.sorted { $0.order < $1.order }
         let isCorrect = answers[selectedAnswerIndex].isCorrect
-        return AnswerExplanationViewModel(
+        return AnswerExplanationViewData(
             isCorrect: isCorrect,
             explanation: task.explanation,
             correctAnswer: isCorrect ? nil : correctAnswerText(in: answers)

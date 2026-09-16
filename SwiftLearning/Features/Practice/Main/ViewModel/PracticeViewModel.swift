@@ -21,7 +21,7 @@ final class PracticeViewModel: ObservableObject {
 
     @Published private(set) var state: PracticeViewState = .loading
 
-    var topicCards: [PracticeCategoryCardViewModel] {
+    var topicCards: [PracticeCategoryCardViewData] {
         categoryCardBuilder.build(categories: topics)
     }
 
@@ -123,14 +123,14 @@ final class PracticeViewModel: ObservableObject {
         if topics.isEmpty {
             state = .empty
         } else {
-            state = .content(makeContentViewModel())
+            state = .content(makeContentViewData())
         }
     }
 
-    private func makeContentViewModel(
+    private func makeContentViewData(
         loadMoreState: LoadMoreView.State? = nil
-    ) -> PracticeContentViewModel {
-        PracticeContentViewModel(
+    ) -> PracticeContentViewData {
+        PracticeContentViewData(
             topics: topicCards,
             loadMoreState: loadMoreState ?? self.loadMoreState
         )
@@ -142,7 +142,7 @@ final class PracticeViewModel: ObservableObject {
         }
 
         state = .content(
-            makeContentViewModel(loadMoreState: loadMoreState)
+            makeContentViewData(loadMoreState: loadMoreState)
         )
     }
 }

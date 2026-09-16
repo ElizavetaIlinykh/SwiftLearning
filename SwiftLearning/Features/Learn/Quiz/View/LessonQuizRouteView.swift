@@ -40,25 +40,25 @@ struct LessonQuizRouteView: View {
             errorView(message: message)
         case .empty:
             emptyView
-        case let .content(contentViewModel):
-            questionView(contentViewModel)
+        case let .content(contentViewData):
+            questionView(contentViewData)
         }
     }
 
     // MARK: - Private methods -
 
-    private func questionView(_ contentViewModel: LessonQuizContentViewModel) -> some View {
+    private func questionView(_ contentViewData: LessonQuizContentViewData) -> some View {
         VStack(alignment: .leading, spacing: 24) {
-            questionProgress(contentViewModel)
+            questionProgress(contentViewData)
 
-            questionHeader(contentViewModel.question)
+            questionHeader(contentViewData.question)
 
-            answersView(contentViewModel)
+            answersView(contentViewData)
 
-            if contentViewModel.isAnswered {
-                feedbackView(contentViewModel)
+            if contentViewData.isAnswered {
+                feedbackView(contentViewData)
 
-                PrimaryButtonView(title: contentViewModel.primaryButtonTitle) {
+                PrimaryButtonView(title: contentViewData.primaryButtonTitle) {
                     Task {
                         await viewModel.handle(.advance)
                     }
@@ -67,7 +67,7 @@ struct LessonQuizRouteView: View {
         }
     }
 
-    private func questionHeader(_ question: LessonQuizQuestionViewModel) -> some View {
+    private func questionHeader(_ question: LessonQuizQuestionViewData) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             DifficultyBadgeView(difficulty: question.difficulty)
 
@@ -83,13 +83,13 @@ struct LessonQuizRouteView: View {
         }
     }
 
-    private func answersView(_ contentViewModel: LessonQuizContentViewModel) -> some View {
+    private func answersView(_ contentViewData: LessonQuizContentViewData) -> some View {
         VStack(spacing: 12) {
-            ForEach(contentViewModel.question.answers.indices, id: \.self) { index in
-                let answer = contentViewModel.question.answers[index]
+            ForEach(contentViewData.question.answers.indices, id: \.self) { index in
+                let answer = contentViewData.question.answers[index]
 
                 AnswerOptionView(
-                    viewModel: AnswerOptionViewModel(
+                    viewData: AnswerOptionViewData(
                         title: answer.text,
                         state: answer.state
                     )
@@ -98,15 +98,15 @@ struct LessonQuizRouteView: View {
                         await viewModel.handle(.selectAnswer(index))
                     }
                 }
-                .disabled(contentViewModel.isAnswered)
+                .disabled(contentViewData.isAnswered)
             }
         }
     }
 
-    private func questionProgress(_ contentViewModel: LessonQuizContentViewModel) -> some View {
+    private func questionProgress(_ contentViewData: LessonQuizContentViewData) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text(contentViewModel.progressTitle)
+                Text(contentViewData.progressTitle)
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .foregroundStyle(AppColors.textSecondary)
@@ -114,7 +114,7 @@ struct LessonQuizRouteView: View {
                 Spacer()
             }
 
-            AppProgressBarView(value: contentViewModel.progressValue)
+            AppProgressBarView(value: contentViewData.progressValue)
         }
     }
 
@@ -147,9 +147,9 @@ struct LessonQuizRouteView: View {
     }
 
     @ViewBuilder
-    private func feedbackView(_ contentViewModel: LessonQuizContentViewModel) -> some View {
-        if let answerExplanationViewModel = contentViewModel.answerExplanationViewModel {
-            AnswerExplanationView(viewModel: answerExplanationViewModel)
+    private func feedbackView(_ contentViewData: LessonQuizContentViewData) -> some View {
+        if let answerExplanationViewData = contentViewData.answerExplanationViewData {
+            AnswerExplanationView(viewData: answerExplanationViewData)
         }
     }
 }

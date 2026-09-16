@@ -3,10 +3,10 @@ import Foundation
 struct LessonQuizContentBuilder {
     // MARK: - Public methods -
 
-    func build(progress: LessonQuizProgressState) -> LessonQuizContentViewModel? {
+    func build(progress: LessonQuizProgressState) -> LessonQuizContentViewData? {
         guard let currentQuestion = progress.currentQuestion else { return nil }
 
-        return LessonQuizContentViewModel(
+        return LessonQuizContentViewData(
             question: buildQuestion(
                 currentQuestion,
                 selectedAnswerIndex: progress.selectedAnswerIndex
@@ -21,7 +21,7 @@ struct LessonQuizContentBuilder {
             primaryButtonTitle: progress.isLastQuestion
                 ? L10n.string("common.continue")
                 : L10n.string("quiz.nextQuestion"),
-            answerExplanationViewModel: buildAnswerExplanation(
+            answerExplanationViewData: buildAnswerExplanation(
                 for: currentQuestion,
                 selectedAnswerIndex: progress.selectedAnswerIndex
             )
@@ -33,10 +33,10 @@ struct LessonQuizContentBuilder {
     private func buildQuestion(
         _ question: LessonQuizQuestion,
         selectedAnswerIndex: Int?
-    ) -> LessonQuizQuestionViewModel {
+    ) -> LessonQuizQuestionViewData {
         let answers = question.answers.sorted { $0.order < $1.order }
 
-        return LessonQuizQuestionViewModel(
+        return LessonQuizQuestionViewData(
             id: question.id,
             text: question.text,
             explanation: question.explanation,
@@ -74,8 +74,8 @@ struct LessonQuizContentBuilder {
         at index: Int,
         in answers: [LessonQuizAnswer],
         selectedAnswerIndex: Int?
-    ) -> LessonQuizAnswerViewModel {
-        LessonQuizAnswerViewModel(
+    ) -> LessonQuizAnswerViewData {
+        LessonQuizAnswerViewData(
             id: answer.id,
             text: answer.text,
             isCorrect: answer.isCorrect,
@@ -112,12 +112,12 @@ struct LessonQuizContentBuilder {
     private func buildAnswerExplanation(
         for question: LessonQuizQuestion,
         selectedAnswerIndex: Int?
-    ) -> AnswerExplanationViewModel? {
+    ) -> AnswerExplanationViewData? {
         guard let selectedAnswerIndex else { return nil }
 
         let answers = question.answers.sorted { $0.order < $1.order }
         let isCorrect = answers[selectedAnswerIndex].isCorrect
-        return AnswerExplanationViewModel(
+        return AnswerExplanationViewData(
             isCorrect: isCorrect,
             explanation: question.explanation,
             correctAnswer: isCorrect ? nil : correctAnswerText(in: answers)

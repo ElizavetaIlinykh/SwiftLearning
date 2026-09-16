@@ -57,17 +57,17 @@ struct ProfileView: View {
             loadingView
         case let .error(message):
             errorView(message: message)
-        case let .content(contentViewModel):
-            profileHeader(viewModel: contentViewModel.header)
-            progressSection(viewModel: contentViewModel.progress)
-            statisticsSection(statistics: contentViewModel.statistics)
-            achievementsSection(achievements: contentViewModel.achievements)
+        case let .content(contentViewData):
+            profileHeader(viewModel: contentViewData.header)
+            progressSection(viewModel: contentViewData.progress)
+            statisticsSection(statistics: contentViewData.statistics)
+            achievementsSection(achievements: contentViewData.achievements)
         }
     }
 
     // MARK: - Private methods -
 
-    private func profileHeader(viewModel: ProfileHeaderViewModel) -> some View {
+    private func profileHeader(viewModel: ProfileHeaderViewData) -> some View {
         VStack(spacing: 12) {
             Image(systemName: "person.crop.circle.fill")
                 .font(.system(size: 92, weight: .regular))
@@ -89,7 +89,7 @@ struct ProfileView: View {
         .padding(.top, 8)
     }
 
-    private func progressSection(viewModel: ProfileProgressViewModel) -> some View {
+    private func progressSection(viewModel: ProfileProgressViewData) -> some View {
         VStack(alignment: .leading, spacing: 16) {
             Text(L10n.string("profile.yourProgress"))
                 .font(.title2)
@@ -147,7 +147,7 @@ struct ProfileView: View {
         )
     }
 
-    private func statisticsSection(statistics: [StatCardViewModel]) -> some View {
+    private func statisticsSection(statistics: [StatCardViewData]) -> some View {
         VStack(alignment: .leading, spacing: 14) {
             Text(L10n.string("profile.statistics"))
                 .font(.title2)
@@ -156,13 +156,13 @@ struct ProfileView: View {
 
             LazyVGrid(columns: statisticColumns, spacing: 12) {
                 ForEach(statistics) { statistic in
-                    StatCardView(viewModel: statistic)
+                    StatCardView(viewData: statistic)
                 }
             }
         }
     }
 
-    private func achievementsSection(achievements: [AchievementCardViewModel]) -> some View {
+    private func achievementsSection(achievements: [AchievementCardViewData]) -> some View {
         VStack(alignment: .leading, spacing: 14) {
             Text(L10n.string("profile.achievements"))
                 .font(.title2)
@@ -171,7 +171,7 @@ struct ProfileView: View {
 
             VStack(spacing: 12) {
                 ForEach(achievements) { achievement in
-                    AchievementCardView(viewModel: achievement)
+                    AchievementCardView(viewData: achievement)
                 }
             }
         }

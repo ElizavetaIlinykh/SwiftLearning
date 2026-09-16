@@ -3,7 +3,7 @@ import SwiftUI
 struct ErrorStateView: View {
     // MARK: - Public properties -
 
-    let viewModel: ErrorStateViewModel
+    let viewData: ErrorStateViewData
     let retryAction: () -> Void
 
     // MARK: - Init -
@@ -15,7 +15,7 @@ struct ErrorStateView: View {
         retryAction: @escaping () -> Void
     ) {
         self.init(
-            viewModel: ErrorStateViewModel(
+            viewData: ErrorStateViewData(
                 title: title,
                 message: message,
                 retryTitle: retryTitle
@@ -25,10 +25,10 @@ struct ErrorStateView: View {
     }
 
     init(
-        viewModel: ErrorStateViewModel,
+        viewData: ErrorStateViewData,
         retryAction: @escaping () -> Void
     ) {
-        self.viewModel = viewModel
+        self.viewData = viewData
         self.retryAction = retryAction
     }
 
@@ -36,14 +36,14 @@ struct ErrorStateView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text(viewModel.title)
+            Text(viewData.title)
                 .font(.headline)
 
-            Text(viewModel.message)
+            Text(viewData.message)
                 .font(.subheadline)
                 .foregroundStyle(AppColors.textSecondary)
 
-            PrimaryButtonView(title: viewModel.retryTitle, action: retryAction)
+            PrimaryButtonView(title: viewData.retryTitle, action: retryAction)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .appCard(

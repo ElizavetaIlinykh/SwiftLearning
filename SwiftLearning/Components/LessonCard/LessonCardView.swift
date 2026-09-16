@@ -3,13 +3,13 @@ import SwiftUI
 struct LessonCardView: View {
     // MARK: - Public properties -
 
-    let viewModel: LessonCardViewModel
+    let viewData: LessonCardViewData
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             HStack(spacing: 16) {
-                Text(String(format: "%02d", viewModel.order))
+                Text(String(format: "%02d", viewData.order))
                     .font(.headline)
                     .fontWeight(.bold)
                     .foregroundStyle(numberColor)
@@ -17,11 +17,11 @@ struct LessonCardView: View {
                     .appRoundedBackground(numberBackground, radius: AppRadius.control)
 
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(viewModel.title)
+                    Text(viewData.title)
                         .font(.headline)
                         .foregroundStyle(titleColor)
 
-                    Text(viewModel.description)
+                    Text(viewData.description)
                         .font(.subheadline)
                         .foregroundStyle(AppColors.textSecondary)
                 }
@@ -34,26 +34,26 @@ struct LessonCardView: View {
                 background: cardBackground,
                 borderColor: borderColor,
                 radius: AppRadius.largeCard,
-                lineWidth: viewModel.state == .current ? 1.5 : 1
+                lineWidth: viewData.state == .current ? 1.5 : 1
             )
-            .opacity(viewModel.state == .locked ? 0.78 : 1)
+            .opacity(viewData.state == .locked ? 0.78 : 1)
         }
         .buttonStyle(.plain)
-        .disabled(viewModel.state == .locked)
+        .disabled(viewData.state == .locked)
     }
 
     // MARK: - Private properties -
 
     @ViewBuilder
     private var stateView: some View {
-        switch viewModel.state {
+        switch viewData.state {
         case .completed:
             Image(systemName: "checkmark.circle.fill")
                 .font(.title3)
                 .foregroundStyle(AppColors.lessonCompleted)
         case .current:
             HStack(spacing: 6) {
-                Text(viewModel.actionTitle)
+                Text(viewData.actionTitle)
                     .font(.caption)
                     .fontWeight(.semibold)
                 Image(systemName: "chevron.right")
@@ -69,7 +69,7 @@ struct LessonCardView: View {
     }
 
     private var cardBackground: Color {
-        switch viewModel.state {
+        switch viewData.state {
         case .completed:
             AppColors.card
         case .current:
@@ -80,7 +80,7 @@ struct LessonCardView: View {
     }
 
     private var borderColor: Color {
-        switch viewModel.state {
+        switch viewData.state {
         case .completed:
             AppColors.border
         case .current:
@@ -91,7 +91,7 @@ struct LessonCardView: View {
     }
 
     private var numberColor: Color {
-        switch viewModel.state {
+        switch viewData.state {
         case .completed:
             AppColors.lessonCompleted
         case .current:
@@ -102,11 +102,11 @@ struct LessonCardView: View {
     }
 
     private var titleColor: Color {
-        viewModel.state == .locked ? AppColors.textSecondary : AppColors.textPrimary
+        viewData.state == .locked ? AppColors.textSecondary : AppColors.textPrimary
     }
 
     private var numberBackground: Color {
-        switch viewModel.state {
+        switch viewData.state {
         case .completed:
             AppColors.successFill
         case .current:
@@ -120,7 +120,7 @@ struct LessonCardView: View {
 #Preview {
     VStack(spacing: 12) {
         LessonCardView(
-            viewModel: LessonCardViewModel(
+            viewData: LessonCardViewData(
                 id: "1",
                 title: "Variables",
                 description: "Basics",
@@ -130,7 +130,7 @@ struct LessonCardView: View {
             )
         ) {}
         LessonCardView(
-            viewModel: LessonCardViewModel(
+            viewData: LessonCardViewData(
                 id: "2",
                 title: "Conditions",
                 description: "Control flow",
@@ -140,7 +140,7 @@ struct LessonCardView: View {
             )
         ) {}
         LessonCardView(
-            viewModel: LessonCardViewModel(
+            viewData: LessonCardViewData(
                 id: "3",
                 title: "Functions",
                 description: "Reusable code",

@@ -3,13 +3,13 @@ import SwiftUI
 struct AnswerOptionView: View {
     // MARK: - Public properties -
 
-    let viewModel: AnswerOptionViewModel
+    let viewData: AnswerOptionViewData
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             HStack(spacing: 12) {
-                Text(viewModel.title)
+                Text(viewData.title)
                     .font(.headline)
                     .foregroundStyle(textColor)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -33,7 +33,7 @@ struct AnswerOptionView: View {
     // MARK: - Private properties -
 
     private var backgroundColor: Color {
-        switch viewModel.state {
+        switch viewData.state {
         case .neutral:
             AppColors.card
         case .selectedCorrect, .correct:
@@ -44,7 +44,7 @@ struct AnswerOptionView: View {
     }
 
     private var borderColor: Color {
-        switch viewModel.state {
+        switch viewData.state {
         case .neutral:
             AppColors.border
         case .selectedCorrect, .correct:
@@ -55,7 +55,7 @@ struct AnswerOptionView: View {
     }
 
     private var textColor: Color {
-        switch viewModel.state {
+        switch viewData.state {
         case .neutral:
             AppColors.textPrimary
         case .selectedCorrect, .correct:
@@ -66,7 +66,7 @@ struct AnswerOptionView: View {
     }
 
     private var iconColor: Color {
-        switch viewModel.state {
+        switch viewData.state {
         case .selectedCorrect, .correct:
             AppColors.success
         case .selectedIncorrect:
@@ -77,7 +77,7 @@ struct AnswerOptionView: View {
     }
 
     private var systemImageName: String? {
-        switch viewModel.state {
+        switch viewData.state {
         case .selectedCorrect, .correct:
             "checkmark.circle.fill"
         case .selectedIncorrect:
@@ -91,19 +91,19 @@ struct AnswerOptionView: View {
 #Preview {
     VStack(spacing: 12) {
         AnswerOptionView(
-            viewModel: AnswerOptionViewModel(
+            viewData: AnswerOptionViewData(
                 title: "print()",
                 state: .neutral
             )
         ) {}
         AnswerOptionView(
-            viewModel: AnswerOptionViewModel(
+            viewData: AnswerOptionViewData(
                 title: "print()",
                 state: .selectedCorrect
             )
         ) {}
         AnswerOptionView(
-            viewModel: AnswerOptionViewModel(
+            viewData: AnswerOptionViewData(
                 title: "show()",
                 state: .selectedIncorrect
             )

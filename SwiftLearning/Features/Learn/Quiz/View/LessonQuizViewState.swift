@@ -1,24 +1,24 @@
 import Foundation
 
-struct LessonQuizContentViewModel {
-    let question: LessonQuizQuestionViewModel
+struct LessonQuizContentViewData {
+    let question: LessonQuizQuestionViewData
     let progressTitle: String
     let progressValue: Double
     let isAnswered: Bool
     let primaryButtonTitle: String
-    let answerExplanationViewModel: AnswerExplanationViewModel?
+    let answerExplanationViewData: AnswerExplanationViewData?
 }
 
-struct LessonQuizQuestionViewModel: Identifiable {
+struct LessonQuizQuestionViewData: Identifiable {
     let id: UUID
     let text: String
     let explanation: String
     let difficulty: Difficulty
     let tags: [String]
-    let answers: [LessonQuizAnswerViewModel]
+    let answers: [LessonQuizAnswerViewData]
 }
 
-struct LessonQuizAnswerViewModel: Identifiable {
+struct LessonQuizAnswerViewData: Identifiable {
     let id: UUID
     let text: String
     let isCorrect: Bool
@@ -27,7 +27,7 @@ struct LessonQuizAnswerViewModel: Identifiable {
 
 enum LessonQuizViewState {
     case loading
-    case content(LessonQuizContentViewModel)
+    case content(LessonQuizContentViewData)
     case empty
     case error(String)
 }

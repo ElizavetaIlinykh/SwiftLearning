@@ -3,11 +3,11 @@ import SwiftUI
 struct CodeBlockView: View {
     // MARK: - Public properties -
 
-    let viewModel: CodeBlockViewModel
+    let viewData: CodeBlockViewData
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            Text(viewModel.code)
+            Text(viewData.code)
                 .font(.system(.body, design: .monospaced))
                 .foregroundStyle(AppColors.codeText)
                 .multilineTextAlignment(.leading)
@@ -21,7 +21,7 @@ struct CodeBlockView: View {
 
 #Preview {
     CodeBlockView(
-        viewModel: CodeBlockViewModel(code: "print(\"Hello, Swift!\")")
+        viewData: CodeBlockViewData(code: "print(\"Hello, Swift!\")")
     )
     .padding()
 }

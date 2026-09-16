@@ -3,26 +3,26 @@ import SwiftUI
 struct ProgressCardView: View {
     // MARK: - Public properties -
 
-    let viewModel: ProgressCardViewModel
+    let viewData: ProgressCardViewData
 
     // MARK: - Public properties -
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             VStack(alignment: .leading, spacing: 8) {
-                Text(viewModel.courseTitle)
+                Text(viewData.courseTitle)
                     .font(.title3)
                     .fontWeight(.bold)
                     .foregroundStyle(AppColors.textPrimary)
 
-                Text(viewModel.completedLessonsTitle)
+                Text(viewData.completedLessonsTitle)
                     .font(.subheadline)
                     .foregroundStyle(AppColors.textSecondary)
             }
 
-            AppProgressBarView(value: viewModel.progress)
+            AppProgressBarView(value: viewData.progress)
 
-            if viewModel.state == .completed {
+            if viewData.state == .completed {
                 completedStateView
             }
         }
@@ -55,7 +55,7 @@ struct ProgressCardView: View {
 
 #Preview {
     ProgressCardView(
-        viewModel: ProgressCardViewModel(
+        viewData: ProgressCardViewData(
             courseTitle: "Swift Basics",
             completedLessonsTitle: "0 of 8 lessons completed",
             completedLessonsCount: 0,

@@ -19,8 +19,8 @@ final class LessonViewModel: ObservableObject {
     @Published private(set) var state: LessonViewState = .loading
 
     var navigationTitle: String {
-        guard case let .content(_, contentViewModel) = state else { return L10n.string("lesson.navigationTitle") }
-        return contentViewModel.title
+        guard case let .content(_, contentViewData) = state else { return L10n.string("lesson.navigationTitle") }
+        return contentViewData.title
     }
 
     // MARK: - Init -
@@ -60,11 +60,11 @@ final class LessonViewModel: ObservableObject {
 
     private func makeContentState(lesson: LessonDetails) -> LessonViewState {
         .content(
-            progressViewModel: builders.progressBuilder.build(
+            progressViewData: builders.progressBuilder.build(
                 lesson: lesson,
                 totalLessonsCount: totalLessonsCount
             ),
-            contentViewModel: builders.contentBuilder.build(lesson: lesson)
+            contentViewData: builders.contentBuilder.build(lesson: lesson)
         )
     }
 }

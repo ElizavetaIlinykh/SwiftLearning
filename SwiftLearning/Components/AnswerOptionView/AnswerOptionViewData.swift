@@ -5,7 +5,7 @@ enum AnswerOptionState {
     case correct
 }
 
-struct AnswerOptionViewModel {
+struct AnswerOptionViewData {
     // MARK: - Public properties -
 
     let title: String

@@ -40,39 +40,39 @@ struct PracticeLessonView: View {
             errorView(message: message)
         case .empty:
             emptyView
-        case let .content(contentViewModel):
-            taskContent(contentViewModel)
+        case let .content(contentViewData):
+            taskContent(contentViewData)
         }
     }
 
     // MARK: - Private methods -
 
-    private func taskContent(_ contentViewModel: PracticeLessonContentViewModel) -> some View {
+    private func taskContent(_ contentViewData: PracticeLessonContentViewData) -> some View {
         VStack(alignment: .leading, spacing: 22) {
-            taskProgress(contentViewModel)
+            taskProgress(contentViewData)
 
-            taskHeader(contentViewModel.task)
+            taskHeader(contentViewData.task)
 
-            answersView(contentViewModel)
+            answersView(contentViewData)
 
-            if contentViewModel.isAnswered {
-                feedbackView(contentViewModel)
-                paginationErrorView(contentViewModel)
+            if contentViewData.isAnswered {
+                feedbackView(contentViewData)
+                paginationErrorView(contentViewData)
 
                 PrimaryButtonView(
-                    title: contentViewModel.actionButtonTitle,
+                    title: contentViewData.actionButtonTitle,
                     action: {
                         Task {
                             await viewModel.handle(.advance)
                         }
                     }
                 )
-                .disabled(contentViewModel.isActionButtonDisabled)
+                .disabled(contentViewData.isActionButtonDisabled)
             }
         }
     }
 
-    private func taskHeader(_ task: PracticeTaskViewModel) -> some View {
+    private func taskHeader(_ task: PracticeTaskViewData) -> some View {
         VStack(alignment: .leading, spacing: 14) {
             DifficultyBadgeView(difficulty: task.difficulty)
 
@@ -84,17 +84,17 @@ struct PracticeLessonView: View {
 
             if let code = task.code {
                 CodeBlockView(
-                    viewModel: CodeBlockViewModel(code: code)
+                    viewData: CodeBlockViewData(code: code)
                 )
             }
         }
     }
 
-    private func answersView(_ contentViewModel: PracticeLessonContentViewModel) -> some View {
+    private func answersView(_ contentViewData: PracticeLessonContentViewData) -> some View {
         VStack(spacing: 12) {
-            ForEach(contentViewModel.task.answers) { answer in
+            ForEach(contentViewData.task.answers) { answer in
                 AnswerOptionView(
-                    viewModel: AnswerOptionViewModel(
+                    viewData: AnswerOptionViewData(
                         title: answer.text,
                         state: answer.state
                     )
@@ -103,28 +103,28 @@ struct PracticeLessonView: View {
                         await viewModel.handle(.selectAnswer(answer.id))
                     }
                 }
-                .disabled(contentViewModel.isAnswered)
+                .disabled(contentViewData.isAnswered)
             }
         }
     }
 
-    private func taskProgress(_ contentViewModel: PracticeLessonContentViewModel) -> some View {
+    private func taskProgress(_ contentViewData: PracticeLessonContentViewData) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text(contentViewModel.progressTitle)
+                Text(contentViewData.progressTitle)
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .foregroundStyle(AppColors.textSecondary)
 
                 Spacer()
 
-                Text(contentViewModel.topicTitle)
+                Text(contentViewData.topicTitle)
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .foregroundStyle(AppColors.primary)
             }
 
-            AppProgressBarView(value: contentViewModel.progressValue)
+            AppProgressBarView(value: contentViewData.progressValue)
         }
     }
 
@@ -158,15 +158,15 @@ struct PracticeLessonView: View {
     }
 
     @ViewBuilder
-    private func feedbackView(_ contentViewModel: PracticeLessonContentViewModel) -> some View {
-        if let answerExplanationViewModel = contentViewModel.answerExplanationViewModel {
-            AnswerExplanationView(viewModel: answerExplanationViewModel)
+    private func feedbackView(_ contentViewData: PracticeLessonContentViewData) -> some View {
+        if let answerExplanationViewData = contentViewData.answerExplanationViewData {
+            AnswerExplanationView(viewData: answerExplanationViewData)
         }
     }
 
     @ViewBuilder
-    private func paginationErrorView(_ contentViewModel: PracticeLessonContentViewModel) -> some View {
-        if let message = contentViewModel.paginationErrorMessage {
+    private func paginationErrorView(_ contentViewData: PracticeLessonContentViewData) -> some View {
+        if let message = contentViewData.paginationErrorMessage {
             Text(message)
                 .font(.subheadline)
                 .foregroundStyle(AppColors.textSecondary)

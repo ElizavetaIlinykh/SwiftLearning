@@ -3,23 +3,23 @@ import SwiftUI
 struct StatCardView: View {
     // MARK: - Public properties -
 
-    let viewModel: StatCardViewModel
+    let viewData: StatCardViewData
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Image(systemName: viewModel.systemImage)
+            Image(systemName: viewData.systemImage)
                 .font(.headline)
                 .foregroundStyle(AppColors.primary)
                 .frame(width: 34, height: 34)
                 .appRoundedBackground(AppColors.primaryFill, radius: AppRadius.field)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(viewModel.title)
+                Text(viewData.title)
                     .font(.caption)
                     .fontWeight(.semibold)
                     .foregroundStyle(AppColors.textSecondary)
 
-                Text(viewModel.value)
+                Text(viewData.value)
                     .font(.title3)
                     .fontWeight(.bold)
                     .foregroundStyle(AppColors.textPrimary)
@@ -33,7 +33,7 @@ struct StatCardView: View {
 
 #Preview {
     StatCardView(
-        viewModel: StatCardViewModel(
+        viewData: StatCardViewData(
             title: "XP",
             value: "80",
             systemImage: "bolt.fill"

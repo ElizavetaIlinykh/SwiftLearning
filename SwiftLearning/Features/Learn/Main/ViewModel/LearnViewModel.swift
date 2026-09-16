@@ -23,7 +23,7 @@ final class LearnViewModel: ObservableObject {
 
     @Published private(set) var state: LearnViewState = .loading
 
-    var lessonCards: [LessonCardViewModel] {
+    var lessonCards: [LessonCardViewData] {
         lessonCardBuilder.build(lessons: sortedLessons)
     }
 
@@ -119,14 +119,14 @@ final class LearnViewModel: ObservableObject {
         if lessons.isEmpty {
             state = .empty
         } else {
-            state = .content(makeContentViewModel())
+            state = .content(makeContentViewData())
         }
     }
 
-    private func makeContentViewModel(
+    private func makeContentViewData(
         loadMoreState: LoadMoreView.State? = nil
-    ) -> LearnContentViewModel {
-        LearnContentViewModel(
+    ) -> LearnContentViewData {
+        LearnContentViewData(
             progressCard: progressCardBuilder.build(lessons: sortedLessons),
             lessonCards: lessonCards,
             loadMoreState: loadMoreState ?? self.loadMoreState
@@ -139,7 +139,7 @@ final class LearnViewModel: ObservableObject {
         }
 
         state = .content(
-            makeContentViewModel(loadMoreState: loadMoreState)
+            makeContentViewData(loadMoreState: loadMoreState)
         )
     }
 

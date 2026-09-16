@@ -11,7 +11,7 @@ struct LessonCodeTaskPrimaryButtonContext {
     let completionState: LessonCompletionState
 }
 
-struct LessonCodeTaskPrimaryButtonViewModel {
+struct LessonCodeTaskPrimaryButtonViewData {
     let title: String
     let isDisabled: Bool
     let action: LessonCodeTaskPrimaryAction
@@ -22,7 +22,7 @@ struct LessonCodeTaskPrimaryButtonBuilder {
 
     func build(
         context: LessonCodeTaskPrimaryButtonContext
-    ) -> LessonCodeTaskPrimaryButtonViewModel {
+    ) -> LessonCodeTaskPrimaryButtonViewData {
         switch context.viewState {
         case .notAvailable:
             finishLessonButton(completionState: context.completionState)
@@ -37,8 +37,8 @@ struct LessonCodeTaskPrimaryButtonBuilder {
 
     // MARK: - Private methods -
 
-    private func checkAnswerButton() -> LessonCodeTaskPrimaryButtonViewModel {
-        LessonCodeTaskPrimaryButtonViewModel(
+    private func checkAnswerButton() -> LessonCodeTaskPrimaryButtonViewData {
+        LessonCodeTaskPrimaryButtonViewData(
             title: L10n.string("codeTask.checkAnswer"),
             isDisabled: false,
             action: .checkAnswer
@@ -47,8 +47,8 @@ struct LessonCodeTaskPrimaryButtonBuilder {
 
     private func finishLessonButton(
         completionState: LessonCompletionState
-    ) -> LessonCodeTaskPrimaryButtonViewModel {
-        LessonCodeTaskPrimaryButtonViewModel(
+    ) -> LessonCodeTaskPrimaryButtonViewData {
+        LessonCodeTaskPrimaryButtonViewData(
             title: completionButtonTitle(completionState: completionState),
             isDisabled: isCompleting(completionState: completionState),
             action: .finishLesson

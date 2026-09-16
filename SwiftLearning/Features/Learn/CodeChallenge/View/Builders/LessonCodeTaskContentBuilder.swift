@@ -10,8 +10,8 @@ struct LessonCodeTaskContentBuilder {
 
     func build(
         context: LessonCodeTaskContentContext
-    ) -> LessonCodeTaskContentViewModel {
-        LessonCodeTaskContentViewModel(
+    ) -> LessonCodeTaskContentViewData {
+        LessonCodeTaskContentViewData(
             title: context.codeTask.title,
             description: context.codeTask.description,
             codeSectionTitle: codeSectionTitle(answerState: context.answerState),

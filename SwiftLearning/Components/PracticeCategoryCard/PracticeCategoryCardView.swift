@@ -3,29 +3,29 @@ import SwiftUI
 struct PracticeCategoryCardView: View {
     // MARK: - Public properties -
 
-    let viewModel: PracticeCategoryCardViewModel
+    let viewData: PracticeCategoryCardViewData
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             HStack(spacing: 16) {
-                Image(systemName: viewModel.systemImage)
+                Image(systemName: viewData.systemImage)
                     .font(.system(size: 22, weight: .semibold))
                     .foregroundStyle(AppColors.primary)
                     .frame(width: 48, height: 48)
                     .appRoundedBackground(AppColors.primaryFill, radius: AppRadius.control)
 
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(viewModel.title)
+                    Text(viewData.title)
                         .font(.headline)
                         .foregroundStyle(AppColors.textPrimary)
 
-                    Text(viewModel.description)
+                    Text(viewData.description)
                         .font(.subheadline)
                         .foregroundStyle(AppColors.textSecondary)
                         .multilineTextAlignment(.leading)
 
-                    Text(viewModel.tasksCountTitle)
+                    Text(viewData.tasksCountTitle)
                         .font(.caption)
                         .fontWeight(.semibold)
                         .foregroundStyle(AppColors.primary)
@@ -46,7 +46,7 @@ struct PracticeCategoryCardView: View {
 
 #Preview {
     PracticeCategoryCardView(
-        viewModel: PracticeCategoryCardViewModel(
+        viewData: PracticeCategoryCardViewData(
             id: "topic-uuid",
             title: "Variables and Constants",
             description: "Practice variables and constants",

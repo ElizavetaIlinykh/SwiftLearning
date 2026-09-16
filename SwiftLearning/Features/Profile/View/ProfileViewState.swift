@@ -1,18 +1,18 @@
 import Foundation
 
-struct ProfileContentViewModel {
-    let header: ProfileHeaderViewModel
-    let progress: ProfileProgressViewModel
-    let statistics: [StatCardViewModel]
-    let achievements: [AchievementCardViewModel]
+struct ProfileContentViewData {
+    let header: ProfileHeaderViewData
+    let progress: ProfileProgressViewData
+    let statistics: [StatCardViewData]
+    let achievements: [AchievementCardViewData]
 }
 
-struct ProfileHeaderViewModel {
+struct ProfileHeaderViewData {
     let name: String
     let email: String
 }
 
-struct ProfileProgressViewModel {
+struct ProfileProgressViewData {
     let title: String
     let percentTitle: String
     let progress: Double
@@ -21,6 +21,6 @@ struct ProfileProgressViewModel {
 
 enum ProfileViewState {
     case loading
-    case content(ProfileContentViewModel)
+    case content(ProfileContentViewData)
     case error(String)
 }

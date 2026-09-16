@@ -4,7 +4,7 @@ enum LessonState {
     case locked
 }
 
-struct LessonCardViewModel: Identifiable, Hashable {
+struct LessonCardViewData: Identifiable, Hashable {
     // MARK: - Public properties -
 
     let id: String

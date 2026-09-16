@@ -1,21 +1,21 @@
 import SwiftUI
 
 struct LoadingStateView: View {
-    let viewModel: LoadingStateViewModel
+    let viewData: LoadingStateViewData
 
     init(title: String) {
-        self.init(viewModel: LoadingStateViewModel(title: title))
+        self.init(viewData: LoadingStateViewData(title: title))
     }
 
-    init(viewModel: LoadingStateViewModel) {
-        self.viewModel = viewModel
+    init(viewData: LoadingStateViewData) {
+        self.viewData = viewData
     }
 
     var body: some View {
         VStack(spacing: 14) {
             ProgressView()
 
-            Text(viewModel.title)
+            Text(viewData.title)
                 .font(.headline)
                 .foregroundStyle(AppColors.textSecondary)
         }

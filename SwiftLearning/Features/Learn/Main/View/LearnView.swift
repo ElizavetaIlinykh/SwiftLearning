@@ -65,19 +65,19 @@ struct LearnView: View {
         case .empty:
             emptyView
 
-        case let .content(contentViewModel):
-            lessonsContent(contentViewModel)
+        case let .content(contentViewData):
+            lessonsContent(contentViewData)
         }
     }
 
-    private func lessonsContent(_ contentViewModel: LearnContentViewModel) -> some View {
-        let currentLesson = contentViewModel.lessonCards.first(where: isCurrentLesson)
-        let courseLessons = contentViewModel.lessonCards.filter { lesson in
+    private func lessonsContent(_ contentViewData: LearnContentViewData) -> some View {
+        let currentLesson = contentViewData.lessonCards.first(where: isCurrentLesson)
+        let courseLessons = contentViewData.lessonCards.filter { lesson in
             lesson.id != currentLesson?.id
         }
 
         return VStack(alignment: .leading, spacing: AppSpacing.section) {
-            ProgressCardView(viewModel: contentViewModel.progressCard)
+            ProgressCardView(viewData: contentViewData.progressCard)
 
             if let currentLesson {
                 currentLessonSection(currentLesson)
@@ -85,12 +85,12 @@ struct LearnView: View {
 
             courseSection(
                 lessons: courseLessons,
-                loadMoreState: contentViewModel.loadMoreState
+                loadMoreState: contentViewData.loadMoreState
             )
         }
     }
 
-    private func currentLessonSection(_ lesson: LessonCardViewModel) -> some View {
+    private func currentLessonSection(_ lesson: LessonCardViewData) -> some View {
         VStack(alignment: .leading, spacing: AppSpacing.medium) {
             VStack(alignment: .leading, spacing: AppSpacing.xSmall) {
                 Text(L10n.string("learn.currentLesson.section"))
@@ -146,7 +146,7 @@ struct LearnView: View {
     }
 
     private func courseSection(
-        lessons: [LessonCardViewModel],
+        lessons: [LessonCardViewData],
         loadMoreState: LoadMoreView.State
     ) -> some View {
         VStack(alignment: .leading, spacing: AppSpacing.large) {
@@ -158,7 +158,7 @@ struct LearnView: View {
             if !lessons.isEmpty {
                 LazyVStack(alignment: .leading, spacing: AppSpacing.large) {
                     ForEach(lessons) { lessonCard in
-                        LessonCardView(viewModel: lessonCard) {
+                        LessonCardView(viewData: lessonCard) {
                             viewModel.selectLesson(id: lessonCard.id)
                         }
                     }
@@ -174,7 +174,7 @@ struct LearnView: View {
 
     // MARK: - Private methods -
 
-    private func isCurrentLesson(_ lesson: LessonCardViewModel) -> Bool {
+    private func isCurrentLesson(_ lesson: LessonCardViewData) -> Bool {
         if case .current = lesson.state {
             return true
         }

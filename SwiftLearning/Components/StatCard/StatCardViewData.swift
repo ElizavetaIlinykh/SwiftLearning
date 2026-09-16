@@ -1,4 +1,4 @@
-struct StatCardViewModel: Identifiable {
+struct StatCardViewData: Identifiable {
     let id: String
     let title: String
     let value: String

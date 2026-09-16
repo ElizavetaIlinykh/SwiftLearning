@@ -1,13 +1,13 @@
 import Foundation
 
-struct PracticeContentViewModel {
-    let topics: [PracticeCategoryCardViewModel]
+struct PracticeContentViewData {
+    let topics: [PracticeCategoryCardViewData]
     let loadMoreState: LoadMoreView.State
 }
 
 enum PracticeViewState {
     case loading
-    case content(PracticeContentViewModel)
+    case content(PracticeContentViewData)
     case empty
     case error(String)
 }

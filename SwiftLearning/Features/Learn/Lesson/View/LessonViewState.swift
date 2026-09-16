@@ -3,8 +3,8 @@ import Foundation
 enum LessonViewState {
     case loading
     case content(
-        progressViewModel: LessonProgressViewModel,
-        contentViewModel: LessonContentViewModel
+        progressViewData: LessonProgressViewData,
+        contentViewData: LessonContentViewData
     )
     case error(String)
 }

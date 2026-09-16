@@ -3,7 +3,7 @@ import SwiftUI
 struct PrimaryButtonView: View {
     // MARK: - Public properties -
 
-    let viewModel: PrimaryButtonViewModel
+    let viewData: PrimaryButtonViewData
     let action: () -> Void
 
     @Environment(\.isEnabled) private var isEnabled
@@ -15,22 +15,22 @@ struct PrimaryButtonView: View {
         action: @escaping () -> Void
     ) {
         self.init(
-            viewModel: PrimaryButtonViewModel(title: title),
+            viewData: PrimaryButtonViewData(title: title),
             action: action
         )
     }
 
     init(
-        viewModel: PrimaryButtonViewModel,
+        viewData: PrimaryButtonViewData,
         action: @escaping () -> Void
     ) {
-        self.viewModel = viewModel
+        self.viewData = viewData
         self.action = action
     }
 
     var body: some View {
         Button(action: action) {
-            Text(viewModel.title)
+            Text(viewData.title)
                 .font(.headline)
                 .fontWeight(.semibold)
                 .foregroundStyle(isEnabled ? AppColors.onPrimary : AppColors.textSecondary)

@@ -1,4 +1,4 @@
-struct ErrorStateViewModel {
+struct ErrorStateViewData {
     let title: String
     let message: String
     let retryTitle: String

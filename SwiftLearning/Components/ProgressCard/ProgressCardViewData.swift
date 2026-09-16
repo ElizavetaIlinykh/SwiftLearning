@@ -4,7 +4,7 @@ enum ProgressCardState {
     case completed
 }
 
-struct ProgressCardViewModel {
+struct ProgressCardViewData {
     // MARK: - Public properties -
 
     let courseTitle: String

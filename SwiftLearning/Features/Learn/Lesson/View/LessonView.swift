@@ -38,10 +38,10 @@ struct LessonView: View {
             loadingView
         case let .error(message):
             errorView(message: message)
-        case let .content(progressViewModel, contentViewModel):
+        case let .content(progressViewData, contentViewData):
             lessonContent(
-                contentViewModel,
-                progressViewModel: progressViewModel
+                contentViewData,
+                progressViewData: progressViewData
             )
         }
     }
@@ -49,24 +49,24 @@ struct LessonView: View {
     // MARK: - Private methods -
 
     private func lessonContent(
-        _ contentViewModel: LessonContentViewModel,
-        progressViewModel: LessonProgressViewModel
+        _ contentViewData: LessonContentViewData,
+        progressViewData: LessonProgressViewData
     ) -> some View {
         VStack(alignment: .leading, spacing: 24) {
-            lessonProgress(progressViewModel)
+            lessonProgress(progressViewData)
 
             VStack(alignment: .leading, spacing: 12) {
-                Text(contentViewModel.theorySectionTitle)
+                Text(contentViewData.theorySectionTitle)
                     .font(.caption)
                     .fontWeight(.bold)
                     .foregroundStyle(AppColors.textSecondary)
 
-                Text(contentViewModel.title)
+                Text(contentViewData.title)
                     .font(.title)
                     .fontWeight(.bold)
                     .foregroundStyle(AppColors.textPrimary)
 
-                Text(contentViewModel.theory)
+                Text(contentViewData.theory)
                     .font(.body)
                     .lineSpacing(6)
                     .multilineTextAlignment(.leading)
@@ -74,39 +74,39 @@ struct LessonView: View {
             }
 
             VStack(alignment: .leading, spacing: 10) {
-                Text(contentViewModel.codeSectionTitle)
+                Text(contentViewData.codeSectionTitle)
                     .font(.caption)
                     .fontWeight(.bold)
                     .foregroundStyle(AppColors.textSecondary)
 
                 CodeBlockView(
-                    viewModel: CodeBlockViewModel(code: contentViewModel.codeExample)
+                    viewData: CodeBlockViewData(code: contentViewData.codeExample)
                 )
             }
 
             PrimaryButtonView(title: L10n.string("common.continue")) {
-                viewModel.continueToQuiz(lessonID: contentViewModel.lessonID)
+                viewModel.continueToQuiz(lessonID: contentViewData.lessonID)
             }
         }
     }
 
-    private func lessonProgress(_ progressViewModel: LessonProgressViewModel) -> some View {
+    private func lessonProgress(_ progressViewData: LessonProgressViewData) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text(progressViewModel.title)
+                Text(progressViewData.title)
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .foregroundStyle(AppColors.textSecondary)
 
                 Spacer()
 
-                Text(progressViewModel.valueTitle)
+                Text(progressViewData.valueTitle)
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .foregroundStyle(AppColors.textSecondary)
             }
 
-            AppProgressBarView(value: progressViewModel.progress)
+            AppProgressBarView(value: progressViewData.progress)
         }
     }
 

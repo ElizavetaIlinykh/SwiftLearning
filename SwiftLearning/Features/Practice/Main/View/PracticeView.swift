@@ -45,23 +45,23 @@ struct PracticeView: View {
             errorView(message: message)
         case .empty:
             emptyView
-        case let .content(contentViewModel):
-            topicsList(contentViewModel)
+        case let .content(contentViewData):
+            topicsList(contentViewData)
         }
     }
 
-    private func topicsList(_ contentViewModel: PracticeContentViewModel) -> some View {
+    private func topicsList(_ contentViewData: PracticeContentViewData) -> some View {
         VStack(spacing: 14) {
             LazyVStack(spacing: 14) {
-                ForEach(contentViewModel.topics) { topic in
-                    PracticeCategoryCardView(viewModel: topic) {
+                ForEach(contentViewData.topics) { topic in
+                    PracticeCategoryCardView(viewData: topic) {
                         viewModel.selectTopic(id: topic.id)
                     }
                 }
             }
             .scrollTargetLayout()
 
-            LoadMoreView(state: contentViewModel.loadMoreState) {
+            LoadMoreView(state: contentViewData.loadMoreState) {
                 await viewModel.retryLoadMoreTopics()
             }
         }

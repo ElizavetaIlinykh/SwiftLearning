@@ -1,6 +1,6 @@
 import Foundation
 
-struct LessonContentViewModel {
+struct LessonContentViewData {
     let lessonID: String
     let theorySectionTitle: String
     let title: String
