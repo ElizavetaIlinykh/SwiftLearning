@@ -24,10 +24,10 @@ struct LessonQuizRouteView: View {
         .navigationTitle(L10n.string("quiz.navigationTitle"))
         .navigationBarTitleDisplayMode(.inline)
         .task {
-            await viewModel.loadQuestions()
+            await viewModel.handle(.load)
         }
         .refreshable {
-            await viewModel.loadQuestions()
+            await viewModel.handle(.refresh)
         }
     }
 
@@ -59,7 +59,9 @@ struct LessonQuizRouteView: View {
                 feedbackView(contentViewModel)
 
                 PrimaryButtonView(title: contentViewModel.primaryButtonTitle) {
-                    viewModel.advance()
+                    Task {
+                        await viewModel.handle(.advance)
+                    }
                 }
             }
         }
@@ -92,7 +94,9 @@ struct LessonQuizRouteView: View {
                         state: answer.state
                     )
                 ) {
-                    viewModel.selectAnswer(at: index)
+                    Task {
+                        await viewModel.handle(.selectAnswer(index))
+                    }
                 }
                 .disabled(contentViewModel.isAnswered)
             }
@@ -124,7 +128,7 @@ struct LessonQuizRouteView: View {
             message: message
         ) {
             Task {
-                await viewModel.loadQuestions()
+                await viewModel.handle(.retry)
             }
         }
     }
@@ -135,7 +139,9 @@ struct LessonQuizRouteView: View {
             message: L10n.string("quiz.empty.message")
         ) {
             PrimaryButtonView(title: L10n.string("common.continue")) {
-                viewModel.openCodeTask()
+                Task {
+                    await viewModel.handle(.openCodeTask)
+                }
             }
         }
     }
