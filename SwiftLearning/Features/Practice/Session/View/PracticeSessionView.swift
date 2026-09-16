@@ -3,16 +3,16 @@ import SwiftUI
 struct PracticeSessionView: View {
     // MARK: - Private properties -
 
+    private let topicTitle: String
     @StateObject private var viewModel: PracticeSessionViewModel
 
     // MARK: - Init -
 
-    @State private var currentTaskIndex = 0
-    @State private var selectedAnswerIndex: Int?
-    @State private var isAnswered = false
-    @State private var correctAnswersCount = 0
-    @State private var totalAnswersCount = 0
-    init(viewModel: PracticeSessionViewModel) {
+    init(
+        topicTitle: String,
+        viewModel: PracticeSessionViewModel
+    ) {
+        self.topicTitle = topicTitle
         _viewModel = StateObject(wrappedValue: viewModel)
     }
 
@@ -26,14 +26,13 @@ struct PracticeSessionView: View {
             .padding(AppSpacing.screen)
         }
         .background(AppColors.background)
-        .navigationTitle(viewModel.topicTitle)
+        .navigationTitle(topicTitle)
         .navigationBarTitleDisplayMode(.inline)
-        .animation(.easeInOut(duration: 0.2), value: currentTaskIndex)
         .task {
             await viewModel.loadTasks()
         }
         .refreshable {
-            await refreshTasks()
+            await viewModel.refreshTasks()
         }
     }
 
@@ -47,124 +46,91 @@ struct PracticeSessionView: View {
         case .empty:
             emptyView
         case let .content(contentViewModel):
-            taskContent(contentViewModel.tasks)
+            taskContent(contentViewModel)
         }
     }
 
     // MARK: - Private methods -
 
-    private func taskContent(_ tasks: [PracticeTaskViewModel]) -> some View {
-        let safeTaskIndex = min(currentTaskIndex, tasks.count - 1)
-        let task = tasks[safeTaskIndex]
-        let answers = task.answers
-
-        return VStack(alignment: .leading, spacing: 22) {
-            taskProgress(totalTasks: tasks.count)
+    private func taskContent(_ contentViewModel: PracticeSessionContentViewModel) -> some View {
+        VStack(alignment: .leading, spacing: 22) {
+            taskProgress(contentViewModel)
                 .task {
-                    await viewModel.loadMoreTasksIfNeeded(currentTaskID: task.id)
+                    await viewModel.loadMoreTasksIfNeeded()
                 }
 
-            VStack(alignment: .leading, spacing: 14) {
-                DifficultyBadgeView(difficulty: task.difficulty)
+            taskHeader(contentViewModel.task)
 
-                Text(task.question)
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundStyle(AppColors.textPrimary)
-                    .multilineTextAlignment(.leading)
+            answersView(contentViewModel)
 
-                if let code = task.code {
-                    CodeBlockView(
-                        viewModel: CodeBlockViewModel(code: code)
-                    )
-                }
-            }
-
-            VStack(spacing: 12) {
-                ForEach(answers.indices, id: \.self) { index in
-                    AnswerOptionView(
-                        viewModel: AnswerOptionViewModel(
-                            title: answers[index].text,
-                            state: optionState(for: index, in: answers)
-                        )
-                    ) {
-                        selectAnswer(index, in: answers)
-                    }
-                    .disabled(isAnswered)
-                }
-            }
-
-            if isAnswered {
-                feedbackView(task)
-                completionErrorView
-                loadMoreTasksView
+            if contentViewModel.isAnswered {
+                feedbackView(contentViewModel)
+                loadMoreTasksView(contentViewModel)
 
                 PrimaryButtonView(
-                    title: actionButtonTitle(totalTasks: tasks.count),
+                    title: contentViewModel.actionButtonTitle,
                     action: {
                         Task {
-                            await advance(totalTasks: tasks.count)
+                            await viewModel.advance()
                         }
                     }
                 )
-                .disabled(isSavingResult || viewModel.isLoadingMoreTasks)
+                .disabled(contentViewModel.isActionButtonDisabled)
             }
         }
     }
 
-    private func taskProgress(totalTasks: Int) -> some View {
+    private func taskHeader(_ task: PracticeTaskViewModel) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            DifficultyBadgeView(difficulty: task.difficulty)
+
+            Text(task.question)
+                .font(.title2)
+                .fontWeight(.bold)
+                .foregroundStyle(AppColors.textPrimary)
+                .multilineTextAlignment(.leading)
+
+            if let code = task.code {
+                CodeBlockView(
+                    viewModel: CodeBlockViewModel(code: code)
+                )
+            }
+        }
+    }
+
+    private func answersView(_ contentViewModel: PracticeSessionContentViewModel) -> some View {
+        VStack(spacing: 12) {
+            ForEach(contentViewModel.task.answers) { answer in
+                AnswerOptionView(
+                    viewModel: AnswerOptionViewModel(
+                        title: answer.text,
+                        state: answer.state
+                    )
+                ) {
+                    viewModel.selectAnswer(answerID: answer.id)
+                }
+                .disabled(contentViewModel.isAnswered)
+            }
+        }
+    }
+
+    private func taskProgress(_ contentViewModel: PracticeSessionContentViewModel) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text(L10n.format("practice.questionProgress", currentTaskIndex + 1, totalTasks))
+                Text(contentViewModel.progressTitle)
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .foregroundStyle(AppColors.textSecondary)
 
                 Spacer()
 
-                Text(viewModel.topicTitle)
+                Text(topicTitle)
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .foregroundStyle(AppColors.primary)
             }
 
-            AppProgressBarView(value: Double(currentTaskIndex + 1) / Double(totalTasks))
-        }
-    }
-
-    private func feedbackView(_ task: PracticeTaskViewModel) -> some View {
-        let isCorrect = selectedAnswerIndex.map { task.answers[$0].isCorrect } ?? false
-
-        return AnswerExplanationView(
-            viewModel: AnswerExplanationViewModel(
-                isCorrect: isCorrect,
-                explanation: task.explanation,
-                correctAnswer: isCorrect ? nil : correctAnswerText(in: task.answers)
-            )
-        )
-    }
-
-    @ViewBuilder
-    private var completionErrorView: some View {
-        if case let .failed(message) = viewModel.completionState {
-            Text(message)
-                .font(.subheadline)
-                .foregroundStyle(AppColors.error)
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
-    }
-
-    @ViewBuilder
-    private var loadMoreTasksView: some View {
-        if viewModel.isLoadingMoreTasks {
-            ProgressView()
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 8)
-        } else if let message = viewModel.loadMoreTasksError {
-            Text(message)
-                .font(.subheadline)
-                .foregroundStyle(AppColors.textSecondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            AppProgressBarView(value: contentViewModel.progressValue)
         }
     }
 
@@ -195,113 +161,25 @@ struct PracticeSessionView: View {
         }
     }
 
-    private func refreshTasks() async {
-        currentTaskIndex = 0
-        selectedAnswerIndex = nil
-        isAnswered = false
-        correctAnswersCount = 0
-        totalAnswersCount = 0
-        await viewModel.loadTasks()
-    }
-
-    private func optionState(
-        for index: Int,
-        in answers: [PracticeAnswerViewModel]
-    ) -> AnswerOptionState {
-        guard let selectedAnswerIndex else { return .neutral }
-
-        if index == selectedAnswerIndex, answers[index].isCorrect {
-            return .selectedCorrect
-        }
-
-        if index == selectedAnswerIndex {
-            return .selectedIncorrect
-        }
-
-        if answers[index].isCorrect {
-            return .correct
-        }
-
-        return .neutral
-    }
-
-    private func correctAnswerText(in answers: [PracticeAnswerViewModel]) -> String? {
-        answers.first { $0.isCorrect }?.text
-    }
-
-    private func selectAnswer(
-        _ index: Int,
-        in answers: [PracticeAnswerViewModel]
-    ) {
-        guard !isAnswered else { return }
-
-        selectedAnswerIndex = index
-        isAnswered = true
-        totalAnswersCount += 1
-
-        if answers[index].isCorrect {
-            correctAnswersCount += 1
+    @ViewBuilder
+    private func feedbackView(_ contentViewModel: PracticeSessionContentViewModel) -> some View {
+        if let answerExplanationViewModel = contentViewModel.answerExplanationViewModel {
+            AnswerExplanationView(viewModel: answerExplanationViewModel)
         }
     }
 
-    private func advance(totalTasks: Int) async {
-        if isLastTask(totalTasks: totalTasks), viewModel.hasMoreTasks {
-            let previousTaskCount = viewModel.taskCount
-            await viewModel.loadMoreTasks()
-
-            if viewModel.taskCount > previousTaskCount {
-                moveToNextTask()
-            } else if !viewModel.hasMoreTasks {
-                await saveResult()
-            }
-            return
+    @ViewBuilder
+    private func loadMoreTasksView(_ contentViewModel: PracticeSessionContentViewModel) -> some View {
+        if contentViewModel.isLoadingMoreTasks {
+            ProgressView()
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 8)
+        } else if let message = contentViewModel.loadMoreTasksError {
+            Text(message)
+                .font(.subheadline)
+                .foregroundStyle(AppColors.textSecondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
-
-        if isLastTask(totalTasks: totalTasks) {
-            await saveResult()
-        } else {
-            moveToNextTask()
-        }
-    }
-
-    private func moveToNextTask() {
-        currentTaskIndex += 1
-        selectedAnswerIndex = nil
-        isAnswered = false
-    }
-
-    private func saveResult() async {
-        guard let progress = await viewModel.saveResult(
-            correctAnswersCount: correctAnswersCount,
-            totalAnswersCount: totalAnswersCount
-        ) else {
-            return
-        }
-
-        viewModel.openResult(progress: progress)
-    }
-
-    private func actionButtonTitle(totalTasks: Int) -> String {
-        if isSavingResult {
-            return L10n.string("common.saving")
-        }
-
-        if viewModel.isLoadingMoreTasks {
-            return L10n.string("common.loadingEllipsis")
-        }
-
-        return isLastTask(totalTasks: totalTasks) && !viewModel.hasMoreTasks ? L10n.string("practice.seeResults") : L10n.string("practice.nextQuestion")
-    }
-
-    private var isSavingResult: Bool {
-        if case .saving = viewModel.completionState {
-            return true
-        }
-        return false
-    }
-
-    private func isLastTask(totalTasks: Int) -> Bool {
-        currentTaskIndex == totalTasks - 1
     }
 }
 

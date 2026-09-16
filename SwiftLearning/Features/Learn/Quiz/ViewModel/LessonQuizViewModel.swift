@@ -7,17 +7,21 @@ enum LessonQuizOutput {
 
 @MainActor
 final class LessonQuizViewModel: ObservableObject {
+    private struct QuizProgressState {
+        var questions: [LessonQuizQuestionViewModel] = []
+        var currentQuestionIndex = 0
+        var selectedAnswerIndex: Int?
+    }
+
     // MARK: - Private properties -
 
     private let quizManager: LessonQuizManager
     private let contentBuilder: LessonQuizContentBuilder
     private let output: (LessonQuizOutput) -> Void
-    private var questions: [LessonQuizQuestionViewModel] = []
-    private var currentQuestionIndex = 0
-    private var selectedAnswerIndex: Int?
+    private var quizProgress = QuizProgressState()
 
     private var isAnswered: Bool {
-        selectedAnswerIndex != nil
+        quizProgress.selectedAnswerIndex != nil
     }
 
     // MARK: - Public properties -
@@ -47,7 +51,7 @@ final class LessonQuizViewModel: ObservableObject {
 
         do {
             let loadedQuestions = try await quizManager.loadQuestions()
-            questions = contentBuilder.build(questions: loadedQuestions)
+            quizProgress.questions = contentBuilder.build(questions: loadedQuestions)
             state = makeState()
         } catch is CancellationError {
             return
@@ -57,10 +61,10 @@ final class LessonQuizViewModel: ObservableObject {
     }
 
     func selectAnswer(at index: Int) {
-        guard selectedAnswerIndex == nil else { return }
+        guard quizProgress.selectedAnswerIndex == nil else { return }
         guard currentQuestion?.answers.indices.contains(index) == true else { return }
 
-        selectedAnswerIndex = index
+        quizProgress.selectedAnswerIndex = index
         state = makeState()
     }
 
@@ -68,8 +72,8 @@ final class LessonQuizViewModel: ObservableObject {
         if isLastQuestion {
             openCodeTask()
         } else {
-            currentQuestionIndex += 1
-            selectedAnswerIndex = nil
+            quizProgress.currentQuestionIndex += 1
+            quizProgress.selectedAnswerIndex = nil
             state = makeState()
         }
     }
@@ -81,21 +85,19 @@ final class LessonQuizViewModel: ObservableObject {
     // MARK: - Private properties -
 
     private var currentQuestion: LessonQuizQuestionViewModel? {
-        guard !questions.isEmpty else { return nil }
-        let safeQuestionIndex = min(currentQuestionIndex, questions.count - 1)
-        return questions[safeQuestionIndex]
+        guard !quizProgress.questions.isEmpty else { return nil }
+        let safeQuestionIndex = min(quizProgress.currentQuestionIndex, quizProgress.questions.count - 1)
+        return quizProgress.questions[safeQuestionIndex]
     }
 
     private var isLastQuestion: Bool {
-        currentQuestionIndex == questions.count - 1
+        quizProgress.currentQuestionIndex == quizProgress.questions.count - 1
     }
 
     // MARK: - Private methods -
 
     private func resetQuizProgress() {
-        questions = []
-        currentQuestionIndex = 0
-        selectedAnswerIndex = nil
+        quizProgress = QuizProgressState()
     }
 
     private func makeState() -> LessonQuizViewState {
@@ -104,8 +106,8 @@ final class LessonQuizViewModel: ObservableObject {
         return .content(
             LessonQuizContentViewModel(
                 question: questionWithAnswerStates(currentQuestion),
-                progressTitle: L10n.format("quiz.progress.title", currentQuestionIndex + 1, questions.count),
-                progressValue: Double(currentQuestionIndex + 1) / Double(questions.count),
+                progressTitle: L10n.format("quiz.progress.title", quizProgress.currentQuestionIndex + 1, quizProgress.questions.count),
+                progressValue: Double(quizProgress.currentQuestionIndex + 1) / Double(quizProgress.questions.count),
                 isAnswered: isAnswered,
                 primaryButtonTitle: isLastQuestion ? L10n.string("common.continue") : L10n.string("quiz.nextQuestion"),
                 answerExplanationViewModel: answerExplanationViewModel(for: currentQuestion)
@@ -131,7 +133,7 @@ final class LessonQuizViewModel: ObservableObject {
     private func visibleAnswerIndices(
         in answers: [LessonQuizAnswerViewModel]
     ) -> [Int] {
-        guard let selectedAnswerIndex else {
+        guard let selectedAnswerIndex = quizProgress.selectedAnswerIndex else {
             return Array(answers.indices)
         }
 
@@ -157,7 +159,7 @@ final class LessonQuizViewModel: ObservableObject {
         for index: Int,
         in answers: [LessonQuizAnswerViewModel]
     ) -> AnswerOptionState {
-        guard let selectedAnswerIndex else { return .neutral }
+        guard let selectedAnswerIndex = quizProgress.selectedAnswerIndex else { return .neutral }
 
         if index == selectedAnswerIndex, answers[index].isCorrect {
             return .selectedCorrect
@@ -177,7 +179,7 @@ final class LessonQuizViewModel: ObservableObject {
     private func answerExplanationViewModel(
         for question: LessonQuizQuestionViewModel
     ) -> AnswerExplanationViewModel? {
-        guard let selectedAnswerIndex else { return nil }
+        guard let selectedAnswerIndex = quizProgress.selectedAnswerIndex else { return nil }
 
         let isCorrect = question.answers[selectedAnswerIndex].isCorrect
         return AnswerExplanationViewModel(

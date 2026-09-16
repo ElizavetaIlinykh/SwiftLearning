@@ -29,7 +29,8 @@ struct PracticeTaskBuilder {
         PracticeAnswerViewModel(
             id: answer.id,
             text: answer.text,
-            isCorrect: answer.isCorrect
+            isCorrect: answer.isCorrect,
+            state: .neutral
         )
     }
 }

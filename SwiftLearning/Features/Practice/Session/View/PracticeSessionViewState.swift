@@ -1,7 +1,15 @@
 import Foundation
 
 struct PracticeSessionContentViewModel {
-    let tasks: [PracticeTaskViewModel]
+    let task: PracticeTaskViewModel
+    let progressTitle: String
+    let progressValue: Double
+    let isAnswered: Bool
+    let actionButtonTitle: String
+    let isActionButtonDisabled: Bool
+    let answerExplanationViewModel: AnswerExplanationViewModel?
+    let isLoadingMoreTasks: Bool
+    let loadMoreTasksError: String?
 }
 
 struct PracticeTaskViewModel: Identifiable {
@@ -18,6 +26,7 @@ struct PracticeAnswerViewModel: Identifiable {
     let id: String
     let text: String
     let isCorrect: Bool
+    let state: AnswerOptionState
 }
 
 enum PracticeSessionViewState {
