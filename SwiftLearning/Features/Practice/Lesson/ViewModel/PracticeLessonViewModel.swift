@@ -1,6 +1,15 @@
 import Combine
 import Foundation
 
+enum PracticeLessonAction {
+    case load
+    case refresh
+    case retry
+    case selectAnswer(String)
+    case advance
+    case close
+}
+
 enum PracticeLessonOutput {
     case closePractice
     case openResult(progress: PracticeProgress)
@@ -18,16 +27,19 @@ final class PracticeLessonViewModel: ObservableObject {
 
     // MARK: - Public properties -
 
+    let topicTitle: String
     @Published private(set) var state: PracticeLessonViewState = .loading
 
     // MARK: - Init -
 
     init(
+        topicTitle: String,
         tasksManager: PracticeTasksManager,
         taskBuilder: PracticeTaskBuilder,
         contentBuilder: PracticeLessonContentBuilder,
         output: @escaping (PracticeLessonOutput) -> Void
     ) {
+        self.topicTitle = topicTitle
         self.tasksManager = tasksManager
         self.taskBuilder = taskBuilder
         self.contentBuilder = contentBuilder
@@ -36,13 +48,31 @@ final class PracticeLessonViewModel: ObservableObject {
 
     // MARK: - Public methods -
 
-    func loadTasks() async {
+    func handle(_ action: PracticeLessonAction) async {
+        switch action {
+        case .load, .retry:
+            await loadTasks()
+        case .refresh:
+            await refreshTasks()
+        case let .selectAnswer(answerID):
+            selectAnswer(answerID: answerID)
+        case .advance:
+            await advance()
+        case .close:
+            closePractice()
+        }
+    }
+
+    // MARK: - Private methods -
+
+    private func loadTasks() async {
         state = .loading
         resetProgress()
 
         do {
             let page = try await tasksManager.loadTasks()
             setLoadedPage(page)
+            await loadMoreTasksIfNeededForCurrentTask()
         } catch is CancellationError {
             return
         } catch {
@@ -50,52 +80,34 @@ final class PracticeLessonViewModel: ObservableObject {
         }
     }
 
-    func refreshTasks() async {
+    private func refreshTasks() async {
         await loadTasks()
     }
 
-    func loadMoreTasksIfNeeded() async {
-        guard let currentTask = session.currentTask else { return }
-
-        await loadMoreTasks { [tasksManager] in
-            try await tasksManager.loadMoreTasksIfNeeded(currentTaskID: currentTask.id)
-        }
-    }
-
-    func selectAnswer(answerID: String) {
+    private func selectAnswer(answerID: String) {
         session.selectAnswer(id: answerID)
         updateStateFromTasks()
     }
 
-    func advance() async {
+    private func advance() async {
         guard session.hasTasks else { return }
 
-        if session.isLastTask, session.pagination.hasMore {
-            let previousTaskCount = session.taskCount
-            await loadMoreTasks { [tasksManager] in
-                try await tasksManager.loadMoreTasks()
-            }
-
-            if session.taskCount > previousTaskCount {
-                moveToNextTask()
-            } else if !session.pagination.hasMore {
+        if session.isLastTask {
+            if session.pagination.hasMore {
+                await loadNextPageAndAdvanceIfPossible()
+            } else {
                 await saveResult()
             }
             return
         }
 
-        if session.isLastTask {
-            await saveResult()
-        } else {
-            moveToNextTask()
-        }
+        moveToNextTask()
+        await loadMoreTasksIfNeededForCurrentTask()
     }
 
-    func closePractice() {
+    private func closePractice() {
         output(.closePractice)
     }
-
-    // MARK: - Private methods -
 
     private func resetProgress() {
         session = PracticeSessionState()
@@ -110,12 +122,37 @@ final class PracticeLessonViewModel: ObservableObject {
     }
 
     private func updateStateFromTasks() {
-        guard let content = contentBuilder.build(session: session) else {
+        guard let content = contentBuilder.build(
+            session: session,
+            topicTitle: topicTitle
+        ) else {
             state = .empty
             return
         }
 
         state = .content(content)
+    }
+
+    private func loadMoreTasksIfNeededForCurrentTask() async {
+        guard let currentTask = session.currentTask else { return }
+
+        await loadMoreTasks { [tasksManager] in
+            try await tasksManager.loadMoreTasksIfNeeded(currentTaskID: currentTask.id)
+        }
+    }
+
+    private func loadNextPageAndAdvanceIfPossible() async {
+        let previousTaskCount = session.taskCount
+        await loadMoreTasks { [tasksManager] in
+            try await tasksManager.loadMoreTasks()
+        }
+
+        if session.taskCount > previousTaskCount {
+            moveToNextTask()
+            await loadMoreTasksIfNeededForCurrentTask()
+        } else if !session.pagination.hasMore {
+            await saveResult()
+        }
     }
 
     private func loadMoreTasks(

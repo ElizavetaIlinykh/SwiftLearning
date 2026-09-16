@@ -29,15 +29,13 @@ enum PracticeModuleAssembler {
             practiceService: dependencies.services.practiceService
         )
         let viewModel = PracticeLessonViewModel(
+            topicTitle: topicTitle,
             tasksManager: tasksManager,
             taskBuilder: PracticeTaskBuilder(),
             contentBuilder: PracticeLessonContentBuilder(),
             output: output
         )
 
-        return PracticeLessonView(
-            topicTitle: topicTitle,
-            viewModel: viewModel
-        )
+        return PracticeLessonView(viewModel: viewModel)
     }
 }

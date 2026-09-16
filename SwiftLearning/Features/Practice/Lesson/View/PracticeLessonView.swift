@@ -3,16 +3,11 @@ import SwiftUI
 struct PracticeLessonView: View {
     // MARK: - Private properties -
 
-    private let topicTitle: String
     @StateObject private var viewModel: PracticeLessonViewModel
 
     // MARK: - Init -
 
-    init(
-        topicTitle: String,
-        viewModel: PracticeLessonViewModel
-    ) {
-        self.topicTitle = topicTitle
+    init(viewModel: PracticeLessonViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
 
@@ -26,13 +21,13 @@ struct PracticeLessonView: View {
             .padding(AppSpacing.screen)
         }
         .background(AppColors.background)
-        .navigationTitle(topicTitle)
+        .navigationTitle(viewModel.topicTitle)
         .navigationBarTitleDisplayMode(.inline)
         .task {
-            await viewModel.loadTasks()
+            await viewModel.handle(.load)
         }
         .refreshable {
-            await viewModel.refreshTasks()
+            await viewModel.handle(.refresh)
         }
     }
 
@@ -55,9 +50,6 @@ struct PracticeLessonView: View {
     private func taskContent(_ contentViewModel: PracticeLessonContentViewModel) -> some View {
         VStack(alignment: .leading, spacing: 22) {
             taskProgress(contentViewModel)
-                .task {
-                    await viewModel.loadMoreTasksIfNeeded()
-                }
 
             taskHeader(contentViewModel.task)
 
@@ -65,13 +57,13 @@ struct PracticeLessonView: View {
 
             if contentViewModel.isAnswered {
                 feedbackView(contentViewModel)
-                loadMoreTasksView(contentViewModel)
+                paginationErrorView(contentViewModel)
 
                 PrimaryButtonView(
                     title: contentViewModel.actionButtonTitle,
                     action: {
                         Task {
-                            await viewModel.advance()
+                            await viewModel.handle(.advance)
                         }
                     }
                 )
@@ -107,7 +99,9 @@ struct PracticeLessonView: View {
                         state: answer.state
                     )
                 ) {
-                    viewModel.selectAnswer(answerID: answer.id)
+                    Task {
+                        await viewModel.handle(.selectAnswer(answer.id))
+                    }
                 }
                 .disabled(contentViewModel.isAnswered)
             }
@@ -124,7 +118,7 @@ struct PracticeLessonView: View {
 
                 Spacer()
 
-                Text(topicTitle)
+                Text(contentViewModel.topicTitle)
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .foregroundStyle(AppColors.primary)
@@ -144,7 +138,7 @@ struct PracticeLessonView: View {
             message: message
         ) {
             Task {
-                await viewModel.loadTasks()
+                await viewModel.handle(.retry)
             }
         }
     }
@@ -155,7 +149,9 @@ struct PracticeLessonView: View {
             message: L10n.string("practice.emptyTasks.message")
         ) {
             Button(L10n.string("common.done")) {
-                viewModel.closePractice()
+                Task {
+                    await viewModel.handle(.close)
+                }
             }
             .appSecondaryButton()
         }
@@ -169,12 +165,8 @@ struct PracticeLessonView: View {
     }
 
     @ViewBuilder
-    private func loadMoreTasksView(_ contentViewModel: PracticeLessonContentViewModel) -> some View {
-        if contentViewModel.isLoadingMoreTasks {
-            ProgressView()
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 8)
-        } else if let message = contentViewModel.loadMoreTasksError {
+    private func paginationErrorView(_ contentViewModel: PracticeLessonContentViewModel) -> some View {
+        if let message = contentViewModel.paginationErrorMessage {
             Text(message)
                 .font(.subheadline)
                 .foregroundStyle(AppColors.textSecondary)

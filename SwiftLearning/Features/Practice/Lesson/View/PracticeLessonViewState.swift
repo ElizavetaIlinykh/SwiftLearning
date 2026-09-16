@@ -1,6 +1,7 @@
 import Foundation
 
 struct PracticeLessonContentViewModel {
+    let topicTitle: String
     let task: PracticeTaskViewModel
     let progressTitle: String
     let progressValue: Double
@@ -8,8 +9,7 @@ struct PracticeLessonContentViewModel {
     let actionButtonTitle: String
     let isActionButtonDisabled: Bool
     let answerExplanationViewModel: AnswerExplanationViewModel?
-    let isLoadingMoreTasks: Bool
-    let loadMoreTasksError: String?
+    let paginationErrorMessage: String?
 }
 
 struct PracticeTaskViewModel: Identifiable {

@@ -54,6 +54,15 @@ struct PracticeSessionState {
         completionState != .saving && !pagination.hasMore
     }
 
+    var isWaitingForRequiredTasks: Bool {
+        isLastTask && pagination.hasMore && pagination.isLoading
+    }
+
+    var blockingPaginationErrorMessage: String? {
+        guard isLastTask, pagination.hasMore else { return nil }
+        return pagination.error
+    }
+
     var taskCount: Int {
         tasks.count
     }

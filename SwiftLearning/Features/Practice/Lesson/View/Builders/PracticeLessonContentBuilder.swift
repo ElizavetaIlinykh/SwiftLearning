@@ -3,10 +3,14 @@ import Foundation
 struct PracticeLessonContentBuilder {
     // MARK: - Public methods -
 
-    func build(session: PracticeSessionState) -> PracticeLessonContentViewModel? {
+    func build(
+        session: PracticeSessionState,
+        topicTitle: String
+    ) -> PracticeLessonContentViewModel? {
         guard let currentTask = session.currentTask else { return nil }
 
         return PracticeLessonContentViewModel(
+            topicTitle: topicTitle,
             task: buildTask(
                 from: currentTask,
                 selectedAnswerIndex: session.selectedAnswerIndex
@@ -19,13 +23,12 @@ struct PracticeLessonContentBuilder {
             progressValue: Double(session.currentQuestionNumber) / Double(session.taskCount),
             isAnswered: session.isAnswered,
             actionButtonTitle: actionButtonTitle(for: session),
-            isActionButtonDisabled: session.isSavingResult || session.pagination.isLoading,
+            isActionButtonDisabled: session.isSavingResult || session.isWaitingForRequiredTasks,
             answerExplanationViewModel: buildAnswerExplanation(
                 for: currentTask,
                 selectedAnswerIndex: session.selectedAnswerIndex
             ),
-            isLoadingMoreTasks: session.pagination.isLoading,
-            loadMoreTasksError: session.pagination.error
+            paginationErrorMessage: session.blockingPaginationErrorMessage
         )
     }
 
@@ -36,7 +39,7 @@ struct PracticeLessonContentBuilder {
             return L10n.string("common.saving")
         }
 
-        if session.pagination.isLoading {
+        if session.isWaitingForRequiredTasks {
             return L10n.string("common.loadingEllipsis")
         }
 
